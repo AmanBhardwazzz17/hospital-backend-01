@@ -1,3 +1,4 @@
+const cors = require('cors');
 // server.js
 const express = require("express");
 const mongoose = require("mongoose");
@@ -7,6 +8,7 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 // ✅ Import routes (file: routes/authRoutes.js)
 const authRoutes = require("./routes/authRoutes");

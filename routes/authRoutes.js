@@ -1,17 +1,45 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const axios = require("axios");
 const User = require("../models/User");
 
 const router = express.Router();
 
+// reCAPTCHA v3 Verify Function
+async function verifyRecaptcha(token) {
+  try {
+    const response = await axios.post(
+      `https://www.google.com/recaptcha/api/siteverify`,
+      null,
+      {
+        params: {
+          secret: process.env.RECAPTCHA_SECRET,
+          response: token,
+        },
+      }
+    );
+    const { success, score } = response.data;
+    return success && score >= 0.5;
+  } catch (err) {
+    return false;
+  }
+}
+
 // Register
 router.post("/register", async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, recaptchaToken } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
+    }
+
+    if (recaptchaToken) {
+      const isHuman = await verifyRecaptcha(recaptchaToken);
+      if (!isHuman) {
+        return res.status(403).json({ message: "reCAPTCHA verification failed. Bot detected!" });
+      }
     }
 
     const existingUser = await User.findOne({ email });
@@ -40,10 +68,17 @@ router.post("/register", async (req, res) => {
 // Login
 router.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, recaptchaToken } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password required" });
+    }
+
+    if (recaptchaToken) {
+      const isHuman = await verifyRecaptcha(recaptchaToken);
+      if (!isHuman) {
+        return res.status(403).json({ message: "reCAPTCHA verification failed. Bot detected!" });
+      }
     }
 
     const user = await User.findOne({ email });
