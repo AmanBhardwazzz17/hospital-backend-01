@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patient Dashboard</title>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+    font-family: Arial;
+    margin: 0;
+    background: #f4f6f9;
+}
+
+header {
+    background: #007bff;
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
+
+.container {
+    padding: 20px;
+}
+
+.card {
+    background: white;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+button {
+    padding: 10px 15px;
+    border: none;
+    background: red;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#map {
+    height: 300px;
+    width: 100%;
+    border-radius: 10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+    <h2>Patient Dashboard</h2>
+</header>
+
+<div class="container">
+
+    <!-- Google Maps -->
+    <div class="card">
+        <h3>Nearby Hospitals</h3>
+        <div id="map"></div>
+    </div>
+
+    <!-- Bed Availability -->
+    <div class="card">
+        <h3>Live Bed Availability</h3>
+        <p>ICU Beds: <span id="icu">Loading...</span></p>
+        <p>General Beds: <span id="general">Loading...</span></p>
+    </div>
+
+    <!-- Emergency Button -->
+    <div class="card">
+        <h3>Emergency</h3>
+        <button onclick="sendEmergency()">🚨 Send Emergency Request</button>
+        <p id="status"></p>
+    </div>
+
+    <!-- Analytics -->
+    <div class="card">
+        <h3>Peak Emergency Hours</h3>
+        <canvas id="chart"></canvas>
+    </div>
+
+</div>
+
+<!-- Google Maps Script -->
+<script>
+function initMap() {
+    const location = { lat: 26.1445, lng: 91.7362 }; // Guwahati
+
+    const map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 13,
+        center: location,
+    });
+
+    const service = new google.maps.places.PlacesService(map);
+
+    service.nearbySearch({
+        location: location,
+        radius: 3000,
+        type: ['hospital']
+    }, function(results, status) {
+        if (status === google.maps.places.PlacesServiceStatus.OK) {
+            results.forEach(place => {
+                new google.maps.Marker({
+                    map,
+                    position: place.geometry.location
+                });
+            });
+        }
+    });
+}
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initMap" async defer></script>
+
+<!-- Live Bed Data -->
+<script>
+function loadBeds() {
+    // Fake data (backend se aayega real project me)
+    document.getElementById("icu").innerText = Math.floor(Math.random() * 10);
+    document.getElementById("general").innerText = Math.floor(Math.random() * 50);
+}
+
+setInterval(loadBeds, 3000);
+loadBeds();
+</script>
+
+<!-- Emergency Request -->
+<script>
+function sendEmergency() {
+    document.getElementById("status").innerText = "Sending request...";
+
+    setTimeout(() => {
+        document.getElementById("status").innerText = "🚑 Emergency Sent! SMS Alert Triggered.";
+    }, 2000);
+}
+</script>
+
+<!-- Analytics Chart -->
+<script>
+const ctx = document.getElementById('chart').getContext('2d');
+
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ["12AM","3AM","6AM","9AM","12PM","3PM","6PM","9PM"],
+        datasets: [{
+            label: "Emergency Cases",
+            data: [2,4,3,8,15,20,18,10],
+            borderWidth: 2
+        }]
+    }
+});
+</script>
+
+</body>
+</html>
