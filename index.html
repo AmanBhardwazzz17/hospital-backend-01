@@ -4,66 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hospital Tracking – Login</title>
-<!-- reCAPTCHA v3 -->
-<script src="https://www.google.com/recaptcha/api.js?render=6LfZBdYsAAAAP0Kz9Nbnv_UxcC3WLfoutwQPSAM"></script>
+<script src="https://www.google.com/recaptcha/api.js?render=6LfZBdYsAAAAP0Kz9Nbnv_UxcC3WLfoutwQPSAM&onload=onRecaptchaLoad" async defer></script>
 <style>
-* {
-  margin: 0; padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', Arial, sans-serif;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
 body {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: linear-gradient(135deg, #e8f5e9, #e3f2fd);
-  padding: 20px;
+  min-height: 100vh; display: flex; justify-content: center;
+  align-items: center; background: linear-gradient(135deg, #e8f5e9, #e3f2fd); padding: 20px;
 }
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(40px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeInLeft {
-  from { opacity: 0; transform: translateX(-40px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-@keyframes fadeInRight {
-  from { opacity: 0; transform: translateX(40px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-@keyframes slideIn {
-  from { opacity: 0; transform: translateX(30px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-@keyframes slideInLeft {
-  from { opacity: 0; transform: translateX(-30px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50%       { transform: scale(1.08); }
-}
-@keyframes modalIn {
-  from { opacity: 0; transform: scale(0.7); }
-  to   { opacity: 1; transform: scale(1); }
-}
-@keyframes overlayIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-@keyframes circleDraw {
-  from { stroke-dashoffset: 283; }
-  to   { stroke-dashoffset: 0; }
-}
-@keyframes checkDraw {
-  from { stroke-dashoffset: 100; }
-  to   { stroke-dashoffset: 0; }
-}
-@keyframes confetti {
-  0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(80px) rotate(360deg); opacity: 0; }
-}
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeInLeft { from { opacity: 0; transform: translateX(-40px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes fadeInRight { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes slideInLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+@keyframes modalIn { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: scale(1); } }
+@keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes circleDraw { from { stroke-dashoffset: 283; } to { stroke-dashoffset: 0; } }
+@keyframes checkDraw { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
+@keyframes confetti { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(80px) rotate(360deg); opacity: 0; } }
 
 .modal-overlay {
   display: none; position: fixed; inset: 0;
@@ -73,9 +31,8 @@ body {
 }
 .modal-overlay.show { display: flex; }
 .modal-box {
-  background: white; border-radius: 24px;
-  padding: 45px 40px; text-align: center;
-  max-width: 380px; width: 90%;
+  background: white; border-radius: 24px; padding: 45px 40px;
+  text-align: center; max-width: 380px; width: 90%;
   animation: modalIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
   position: relative; overflow: hidden;
 }
@@ -111,8 +68,7 @@ body {
 .container {
   display: flex; width: 100%; max-width: 900px; min-height: 560px;
   background: #fff; border-radius: 24px; overflow: hidden;
-  box-shadow: 0 24px 60px rgba(0,0,0,0.15);
-  animation: fadeInUp 0.7s ease both;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.15); animation: fadeInUp 0.7s ease both;
 }
 .left {
   width: 50%;
@@ -128,8 +84,7 @@ body {
 .left:hover::before { opacity: 0.85; }
 .left-content {
   position: absolute; inset: 0; z-index: 1;
-  display: flex; flex-direction: column;
-  justify-content: space-between; padding: 30px;
+  display: flex; flex-direction: column; justify-content: space-between; padding: 30px;
 }
 .brand { display: flex; align-items: center; gap: 10px; }
 .brand-icon {
@@ -147,8 +102,7 @@ body {
 
 .right {
   width: 50%; padding: 45px 40px;
-  display: flex; flex-direction: column;
-  justify-content: center; overflow-y: auto;
+  display: flex; flex-direction: column; justify-content: center; overflow-y: auto;
   animation: fadeInRight 0.8s ease both;
 }
 .form-header { margin-bottom: 28px; }
@@ -198,18 +152,11 @@ body {
   transition: background 0.2s, transform 0.2s, box-shadow 0.3s;
 }
 .google-btn:hover { background: #f9f9f9; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
-
-/* reCAPTCHA badge styling */
 .grecaptcha-badge { opacity: 0.6; }
-
 .footer { margin-top: 20px; font-size: 13px; text-align: center; color: #999; }
 .footer a { color: #009688; text-decoration: none; cursor: pointer; font-weight: 600; transition: color 0.2s; }
 .footer a:hover { color: #1565c0; }
-
-.recaptcha-note {
-  font-size: 11px; color: #bbb; text-align: center;
-  margin-top: 12px; line-height: 1.5;
-}
+.recaptcha-note { font-size: 11px; color: #bbb; text-align: center; margin-top: 12px; line-height: 1.5; }
 .recaptcha-note a { color: #009688; text-decoration: none; }
 
 @media (max-width: 650px) {
@@ -241,7 +188,6 @@ body {
 
 <!-- MAIN -->
 <div class="container">
-
   <!-- LEFT -->
   <div class="left">
     <div class="left-content">
@@ -385,14 +331,29 @@ body {
   const RECAPTCHA_SITE_KEY = "6LfZBdYsAAAAP0Kz9Nbnv_UxcC3WLfoutwQPSAM";
   const colors = ['#4caf50','#009688','#1565c0','#ff4b2b','#ffc107','#e91e63'];
 
-  // Get reCAPTCHA token
+  // ✅ reCAPTCHA ready flag
+  let recaptchaReady = false;
+  window.onRecaptchaLoad = () => { recaptchaReady = true; };
+
+  // ✅ Fast reCAPTCHA — 3 second timeout
   async function getRecaptchaToken(action) {
-    return new Promise((resolve) => {
-      grecaptcha.ready(async () => {
-        const token = await grecaptcha.execute(RECAPTCHA_SITE_KEY, { action });
-        resolve(token);
-      });
-    });
+    try {
+      if (!recaptchaReady) {
+        await new Promise((resolve, reject) => {
+          const timeout = setTimeout(() => reject('timeout'), 3000);
+          const check = setInterval(() => {
+            if (recaptchaReady) {
+              clearInterval(check);
+              clearTimeout(timeout);
+              resolve();
+            }
+          }, 100);
+        });
+      }
+      return await grecaptcha.execute(RECAPTCHA_SITE_KEY, { action });
+    } catch(e) {
+      return null; // timeout hone pe bhi login chale
+    }
   }
 
   function showSuccessModal(userName) {
@@ -412,9 +373,7 @@ body {
     }
   }
 
-  function closeModal() {
-    document.getElementById('successModal').classList.remove('show');
-  }
+  function closeModal() { document.getElementById('successModal').classList.remove('show'); }
 
   function togglePassword(inputId, icon) {
     const input = document.getElementById(inputId);
@@ -438,11 +397,11 @@ body {
     log.style.animation = "slideInLeft 0.4s ease both";
   }
 
-  // LOGIN
+  // ✅ LOGIN
   document.getElementById("loginForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     const btn = e.target.querySelector(".login-btn");
-    btn.textContent = "Verifying...";
+    btn.textContent = "Logging in...";
     btn.style.opacity = "0.75";
 
     const email = document.getElementById("loginEmail").value;
@@ -490,11 +449,11 @@ body {
     }
   });
 
-  // REGISTER
+  // ✅ REGISTER
   document.getElementById("registerForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     const btn = e.target.querySelector(".login-btn");
-    btn.textContent = "Verifying...";
+    btn.textContent = "Creating...";
     btn.style.opacity = "0.75";
 
     const name = document.getElementById("registerName").value;
