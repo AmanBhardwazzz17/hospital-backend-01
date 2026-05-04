@@ -181,8 +181,8 @@ body {
       </svg>
     </div>
     <h2>Login Successful!</h2>
-    <p>Welcome, <span class="user-name" id="welcomeName">User</span>! 👋<br>You have successfully signed into Hospital Tracking.</p>
-    <button class="modal-close-btn" onclick="closeModal()">Go to Dashboard →</button>
+    <p>Welcome, <span class="user-name" id="welcomeName">User</span>! 👋<br>Redirecting to your dashboard...</p>
+    <button class="modal-close-btn" id="dashboardBtn" onclick="redirectToDashboard()">Go to Dashboard →</button>
   </div>
 </div>
 
@@ -319,7 +319,8 @@ body {
       const token = await user.getIdToken();
       localStorage.setItem("token", token);
       localStorage.setItem("userName", user.displayName);
-      showSuccessModal(user.displayName);
+      localStorage.setItem("role", "patient"); // Google login = patient by default
+      showSuccessModal(user.displayName, "patient");
     } catch (error) {
       alert("Google Login Failed ❌ " + error.message);
     }
@@ -330,6 +331,8 @@ body {
   const API_URL = "https://hospital-backend-01.onrender.com";
   const RECAPTCHA_SITE_KEY = "6LfZBdYsAAAAP0Kz9Nbnv_UxcC3WLfoutwQPSAM";
   const colors = ['#4caf50','#009688','#1565c0','#ff4b2b','#ffc107','#e91e63'];
+
+  let currentRole = "patient";
 
   // ✅ reCAPTCHA ready flag
   let recaptchaReady = false;
@@ -352,13 +355,37 @@ body {
       }
       return await grecaptcha.execute(RECAPTCHA_SITE_KEY, { action });
     } catch(e) {
-      return null; // timeout hone pe bhi login chale
+      return null;
     }
   }
 
-  function showSuccessModal(userName) {
+  // ✅ Role ke hisaab se redirect
+  function redirectToDashboard() {
+    const role = localStorage.getItem("role");
+    if (role === "admin") {
+      window.location.href = "admin-dashboard.html";
+    } else if (role === "hospital") {
+      window.location.href = "hospital-dashboard.html";
+    } else {
+      window.location.href = "patient-dashboard.html";
+    }
+  }
+
+  function showSuccessModal(userName, role) {
+    currentRole = role;
     document.getElementById('welcomeName').textContent = userName || 'User';
     document.getElementById('successModal').classList.add('show');
+
+    // Role ke hisaab se button text
+    const btn = document.getElementById('dashboardBtn');
+    if (role === "admin") {
+      btn.textContent = "Go to Admin Dashboard →";
+    } else if (role === "hospital") {
+      btn.textContent = "Go to Hospital Dashboard →";
+    } else {
+      btn.textContent = "Go to Patient Dashboard →";
+    }
+
     const wrap = document.getElementById('confettiWrap');
     wrap.innerHTML = '';
     for (let i = 0; i < 18; i++) {
@@ -371,6 +398,9 @@ body {
       dot.style.animationDuration = (0.8 + Math.random() * 0.5) + 's';
       wrap.appendChild(dot);
     }
+
+    // 3 second mein auto redirect
+    setTimeout(redirectToDashboard, 3000);
   }
 
   function closeModal() { document.getElementById('successModal').classList.remove('show'); }
@@ -421,13 +451,22 @@ body {
         btn.textContent = "Success ✅";
         btn.style.opacity = "1";
         btn.style.background = "#4caf50";
+
+        // ✅ Token aur role save karo
         localStorage.setItem("token", data.token);
+        localStorage.setItem("role", data.user?.role);
+        localStorage.setItem("userName", data.user?.name);
+        localStorage.setItem("userId", data.user?.id);
+
         const userName = data.user?.name || email.split('@')[0];
+        const role = data.user?.role;
+
         setTimeout(() => {
-          showSuccessModal(userName);
+          showSuccessModal(userName, role);
           btn.textContent = "Login to Dashboard";
           btn.style.background = "linear-gradient(135deg, #009688, #1565c0)";
         }, 600);
+
       } else {
         btn.textContent = "Failed ❌";
         btn.style.opacity = "1";
