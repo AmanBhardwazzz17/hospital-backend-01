@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>City Hospital – Admin Panel</title>
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --navy: #0f1b35;
+  --navy-mid: #162240;
+  --navy-light: #1e2f55;
+  --accent: #3b82f6;
+  --accent-glow: #60a5fa;
+  --teal: #14b8a6;
+  --amber: #f59e0b;
+  --rose: #f43f5e;
+  --green: #22c55e;
+  --purple: #a855f7;
+  --card: #1a2844;
+  --card-border: rgba(59,130,246,0.12);
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --sidebar-w: 220px;
+}
+
+/* LIGHT MODE */
+body.light {
+  --navy: #ffffff;
+  --navy-mid: #f8fafc;
+  --navy-light: #f1f5f9;
+  --card: #ffffff;
+  --card-border: rgba(0,0,0,0.08);
+  --text: #0f172a;
+  --muted: #64748b;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--navy);
+  color: var(--text);
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--navy-mid);
+  border-right: 1px solid var(--card-border);
+  position: fixed;
+  top: 0; bottom: 0;
+}
+
+.logo {
+  padding: 20px;
+  font-weight: bold;
+}
+
+/* Main */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+}
+
+/* Topbar */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: var(--navy-mid);
+  border-bottom: 1px solid var(--card-border);
+}
+
+.notif-btn {
+  cursor: pointer;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  background: var(--navy-light);
+}
+
+/* Content */
+.content {
+  padding: 20px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  padding: 20px;
+  border-radius: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="logo">CITY HOSPITAL</div>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <h3>Dashboard</h3>
+
+    <!-- THEME BUTTON -->
+    <button class="notif-btn" id="themeToggle">🌙</button>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+    <div class="card">
+      <h2>Welcome Admin 👋</h2>
+      <p>Same UI, now with Light + Dark Mode toggle</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const toggleBtn = document.getElementById("themeToggle");
+
+// load saved theme
+if (localStorage.getItem("theme") === "light") {
+  document.body.classList.add("light");
+  toggleBtn.textContent = "☀️";
+}
+
+toggleBtn.addEventListener("click", () => {
+  document.body.classList.toggle("light");
+
+  if (document.body.classList.contains("light")) {
+    toggleBtn.textContent = "☀️";
+    localStorage.setItem("theme", "light");
+  } else {
+    toggleBtn.textContent = "🌙";
+    localStorage.setItem("theme", "dark");
+  }
+});
+</script>
+
+</body>
+</html>
