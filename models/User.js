@@ -15,6 +15,23 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    // ✅ Role — admin, hospital, patient
+    role: {
+      type: String,
+      enum: ["admin", "hospital", "patient"],
+      default: "patient",
+    },
+    // ✅ Account active/inactive
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+    // ✅ Hospital ke liye — hospital ID
+    hospitalId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Hospital",
+      default: null,
+    },
   },
   { timestamps: true }
 );
