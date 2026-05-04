@@ -5,158 +5,199 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Patient Dashboard</title>
 
-<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body {
-    font-family: Arial;
-    margin: 0;
-    background: #f4f6f9;
+  font-family: Arial;
+  margin: 0;
+  background: #f4f7fb;
 }
 
-header {
-    background: #007bff;
-    color: white;
-    padding: 15px;
-    text-align: center;
+.header {
+  padding: 15px;
+  background: #2563eb;
+  color: white;
+  font-size: 18px;
+  display: flex;
+  justify-content: space-between;
 }
 
 .container {
-    padding: 20px;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
 }
 
 .card {
-    background: white;
-    padding: 15px;
-    margin-bottom: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
 }
 
-button {
-    padding: 10px 15px;
-    border: none;
-    background: red;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
+/* Map */
 #map {
-    height: 300px;
-    width: 100%;
-    border-radius: 10px;
+  height: 300px;
+  border-radius: 10px;
 }
 
+/* Beds */
+.bed {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0;
+}
+
+.bar {
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  background: #22c55e;
+}
+
+/* Emergency */
+.emergency {
+  background: red;
+  color: white;
+  padding: 15px;
+  border: none;
+  width: 100%;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* SMS */
+.sms input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 8px;
+}
+
+.sms button {
+  margin-top: 10px;
+  padding: 10px;
+  width: 100%;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+}
 </style>
 </head>
 
 <body>
 
-<header>
-    <h2>Patient Dashboard</h2>
-</header>
+<div class="header">
+  Patient Dashboard
+</div>
 
 <div class="container">
 
-    <!-- Google Maps -->
+  <!-- MAP -->
+  <div class="card">
+    <h3>Nearby Hospitals</h3>
+    <div id="map"></div>
+  </div>
+
+  <!-- RIGHT SIDE -->
+  <div>
+
+    <!-- BED STATUS -->
     <div class="card">
-        <h3>Nearby Hospitals</h3>
-        <div id="map"></div>
+      <h3>Bed Availability</h3>
+
+      <div class="bed">
+        ICU <span>6/10</span>
+      </div>
+      <div class="bar"><div class="bar-fill" style="width:60%"></div></div>
+
+      <div class="bed">
+        General <span>20/30</span>
+      </div>
+      <div class="bar"><div class="bar-fill" style="width:70%"></div></div>
+
     </div>
 
-    <!-- Bed Availability -->
+    <!-- EMERGENCY -->
     <div class="card">
-        <h3>Live Bed Availability</h3>
-        <p>ICU Beds: <span id="icu">Loading...</span></p>
-        <p>General Beds: <span id="general">Loading...</span></p>
+      <button class="emergency" onclick="sendEmergency()">🚨 Emergency Request</button>
     </div>
 
-    <!-- Emergency Button -->
-    <div class="card">
-        <h3>Emergency</h3>
-        <button onclick="sendEmergency()">🚨 Send Emergency Request</button>
-        <p id="status"></p>
+    <!-- SMS ALERT -->
+    <div class="card sms">
+      <h3>Send SMS Alert</h3>
+      <input type="text" id="phone" placeholder="Enter phone number">
+      <button onclick="sendSMS()">Send Alert</button>
     </div>
 
-    <!-- Analytics -->
-    <div class="card">
-        <h3>Peak Emergency Hours</h3>
-        <canvas id="chart"></canvas>
-    </div>
+  </div>
 
 </div>
 
-<!-- Google Maps Script -->
+<!-- ANALYTICS -->
+<div style="padding:20px;">
+  <div class="card">
+    <h3>Peak Emergency Hours</h3>
+    <canvas id="chart"></canvas>
+  </div>
+</div>
+
+<!-- GOOGLE MAP -->
 <script>
 function initMap() {
-    const location = { lat: 26.1445, lng: 91.7362 }; // Guwahati
+  const location = { lat: 26.1445, lng: 91.7362 }; // Guwahati
 
-    const map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 13,
-        center: location,
-    });
+  const map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 13,
+    center: location,
+  });
 
-    const service = new google.maps.places.PlacesService(map);
-
-    service.nearbySearch({
-        location: location,
-        radius: 3000,
-        type: ['hospital']
-    }, function(results, status) {
-        if (status === google.maps.places.PlacesServiceStatus.OK) {
-            results.forEach(place => {
-                new google.maps.Marker({
-                    map,
-                    position: place.geometry.location
-                });
-            });
-        }
-    });
+  new google.maps.Marker({
+    position: location,
+    map,
+    title: "Nearby Hospital"
+  });
 }
 </script>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initMap" async defer></script>
+<script async
+src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap">
+</script>
 
-<!-- Live Bed Data -->
+<!-- CHART -->
 <script>
-function loadBeds() {
-    // Fake data (backend se aayega real project me)
-    document.getElementById("icu").innerText = Math.floor(Math.random() * 10);
-    document.getElementById("general").innerText = Math.floor(Math.random() * 50);
-}
-
-setInterval(loadBeds, 3000);
-loadBeds();
+new Chart(document.getElementById("chart"), {
+  type: 'line',
+  data: {
+    labels: ["6AM","9AM","12PM","3PM","6PM","9PM"],
+    datasets: [{
+      label: "Emergency Cases",
+      data: [5, 12, 20, 15, 25, 18],
+      borderWidth: 2
+    }]
+  }
+});
 </script>
 
-<!-- Emergency Request -->
+<!-- FUNCTIONS -->
 <script>
 function sendEmergency() {
-    document.getElementById("status").innerText = "Sending request...";
-
-    setTimeout(() => {
-        document.getElementById("status").innerText = "🚑 Emergency Sent! SMS Alert Triggered.";
-    }, 2000);
+  alert("🚑 Emergency Request Sent!");
 }
-</script>
 
-<!-- Analytics Chart -->
-<script>
-const ctx = document.getElementById('chart').getContext('2d');
+function sendSMS() {
+  const phone = document.getElementById("phone").value;
+  alert("SMS sent to " + phone);
 
-new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: ["12AM","3AM","6AM","9AM","12PM","3PM","6PM","9PM"],
-        datasets: [{
-            label: "Emergency Cases",
-            data: [2,4,3,8,15,20,18,10],
-            borderWidth: 2
-        }]
-    }
-});
+  // Backend API yaha connect karega (Twilio etc.)
+}
 </script>
 
 </body>
