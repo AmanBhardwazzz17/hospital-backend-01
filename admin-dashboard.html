@@ -4,21 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Dashboard – HospTrack</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0f1117;
-  --sidebar: #161b27;
-  --card: #1e2535;
-  --card2: #252d40;
-  --border: rgba(255,255,255,0.07);
-  --accent: #00c896;
-  --accent2: #3b82f6;
+  --bg: #f4f7f6;
+  --sidebar: #ffffff;
+  --card: #ffffff;
+  --accent: #1a7a4a;
+  --accent2: #25a862;
+  --accent-light: #e8f5ee;
+  --text: #1a1a2e;
+  --muted: #8892a4;
+  --border: #eef0f3;
   --danger: #ef4444;
   --warning: #f59e0b;
-  --text: #f0f4ff;
-  --muted: #8892a4;
-  --font: 'Plus Jakarta Sans', sans-serif;
+  --blue: #3b82f6;
+  --font: 'Inter', sans-serif;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -26,260 +27,260 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 
 /* SIDEBAR */
 .sidebar {
-  width: 260px; min-height: 100vh; background: var(--sidebar);
+  width: 240px; min-height: 100vh; background: var(--sidebar);
   border-right: 1px solid var(--border); display: flex; flex-direction: column;
   position: fixed; left: 0; top: 0; bottom: 0; z-index: 100;
-  transition: transform 0.3s;
+  padding: 24px 16px;
 }
 
-.sidebar-logo {
-  padding: 28px 24px 20px;
-  border-bottom: 1px solid var(--border);
-}
-
-.logo-wrap { display: flex; align-items: center; gap: 12px; }
+.logo-wrap { display: flex; align-items: center; gap: 10px; padding: 0 8px; margin-bottom: 32px; }
 .logo-icon {
-  width: 42px; height: 42px; background: linear-gradient(135deg, var(--accent), var(--accent2));
-  border-radius: 12px; display: flex; align-items: center; justify-content: center;
-  font-size: 20px;
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
 }
-.logo-text { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
-.logo-badge {
-  font-size: 10px; background: var(--accent); color: #000;
-  padding: 2px 7px; border-radius: 20px; font-weight: 700;
-  letter-spacing: 0.5px; margin-top: 2px;
-}
+.logo-text { font-size: 17px; font-weight: 800; color: var(--text); }
+.logo-sub { font-size: 10px; color: var(--accent); font-weight: 600; }
 
-.sidebar-nav { flex: 1; padding: 20px 12px; overflow-y: auto; }
-.nav-section { margin-bottom: 28px; }
+.nav-section { margin-bottom: 24px; }
 .nav-label {
   font-size: 10px; font-weight: 700; color: var(--muted);
   letter-spacing: 1.5px; text-transform: uppercase;
-  padding: 0 12px; margin-bottom: 8px;
+  padding: 0 8px; margin-bottom: 6px;
 }
 
 .nav-item {
-  display: flex; align-items: center; gap: 12px;
-  padding: 11px 12px; border-radius: 10px; cursor: pointer;
-  transition: all 0.2s; color: var(--muted); font-size: 14px; font-weight: 500;
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 10px; cursor: pointer;
+  transition: all 0.2s; color: var(--muted); font-size: 13.5px; font-weight: 500;
   margin-bottom: 2px; text-decoration: none;
 }
-.nav-item:hover { background: var(--card); color: var(--text); }
-.nav-item.active { background: linear-gradient(135deg, rgba(0,200,150,0.15), rgba(59,130,246,0.15)); color: var(--accent); }
-.nav-item .icon { font-size: 18px; width: 20px; text-align: center; }
+.nav-item:hover { background: var(--accent-light); color: var(--accent); }
+.nav-item.active { background: var(--accent-light); color: var(--accent); font-weight: 600; }
+.nav-item .icon { font-size: 16px; width: 18px; text-align: center; }
 .nav-badge {
-  margin-left: auto; background: var(--danger); color: white;
-  font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 20px;
+  margin-left: auto; background: var(--accent); color: white;
+  font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px;
 }
+.nav-badge.red { background: var(--danger); }
 
-.sidebar-footer {
-  padding: 16px 12px; border-top: 1px solid var(--border);
-}
-.admin-profile {
-  display: flex; align-items: center; gap: 12px;
-  padding: 10px 12px; border-radius: 10px;
-  background: var(--card); cursor: pointer;
+.sidebar-footer { margin-top: auto; }
+.admin-card {
+  background: var(--accent-light); border-radius: 14px; padding: 14px;
+  display: flex; align-items: center; gap: 10px;
 }
 .admin-avatar {
-  width: 36px; height: 36px; border-radius: 10px;
+  width: 38px; height: 38px; border-radius: 10px;
   background: linear-gradient(135deg, var(--accent), var(--accent2));
   display: flex; align-items: center; justify-content: center;
-  font-weight: 800; font-size: 14px; color: #000;
+  font-weight: 800; font-size: 15px; color: white; flex-shrink: 0;
 }
-.admin-info { flex: 1; }
-.admin-name { font-size: 13px; font-weight: 600; }
-.admin-role { font-size: 11px; color: var(--accent); }
+.admin-name { font-size: 13px; font-weight: 700; color: var(--text); }
+.admin-role { font-size: 11px; color: var(--accent); font-weight: 500; }
 .logout-btn {
-  background: none; border: none; color: var(--muted);
-  cursor: pointer; font-size: 18px; padding: 4px;
-  transition: color 0.2s;
+  margin-left: auto; background: none; border: none;
+  color: var(--muted); cursor: pointer; font-size: 16px;
+  transition: color 0.2s; padding: 4px;
 }
 .logout-btn:hover { color: var(--danger); }
 
 /* MAIN */
-.main {
-  margin-left: 260px; flex: 1; min-height: 100vh;
-  display: flex; flex-direction: column;
-}
+.main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; }
 
+/* TOPBAR */
 .topbar {
-  padding: 20px 32px; display: flex; align-items: center;
-  justify-content: space-between; border-bottom: 1px solid var(--border);
-  background: var(--bg); position: sticky; top: 0; z-index: 50;
+  padding: 18px 28px; display: flex; align-items: center;
+  justify-content: space-between; background: var(--sidebar);
+  border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50;
 }
 
-.topbar-left h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
-.topbar-left p { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.topbar-left h1 { font-size: 20px; font-weight: 800; }
+.topbar-left p { font-size: 12px; color: var(--muted); margin-top: 1px; }
 
-.topbar-right { display: flex; align-items: center; gap: 12px; }
-.topbar-btn {
-  padding: 9px 18px; border-radius: 10px; border: 1px solid var(--border);
-  background: var(--card); color: var(--text); font-size: 13px; font-weight: 600;
-  cursor: pointer; transition: all 0.2s; font-family: var(--font);
-  display: flex; align-items: center; gap: 6px;
+.search-bar {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 10px; padding: 8px 14px; width: 240px;
 }
-.topbar-btn:hover { border-color: var(--accent); color: var(--accent); }
-.topbar-btn.primary {
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  border: none; color: #000;
+.search-bar input {
+  border: none; background: none; outline: none;
+  font-size: 13px; color: var(--text); font-family: var(--font); width: 100%;
 }
-.topbar-btn.primary:hover { opacity: 0.9; color: #000; }
+.search-bar span { color: var(--muted); font-size: 16px; }
 
-.notif-btn {
-  width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--border);
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.icon-btn {
+  width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border);
   background: var(--card); display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: 18px; position: relative; transition: all 0.2s;
+  cursor: pointer; font-size: 16px; position: relative; transition: all 0.2s;
 }
-.notif-btn:hover { border-color: var(--accent); }
+.icon-btn:hover { border-color: var(--accent); }
 .notif-dot {
-  position: absolute; top: 6px; right: 6px; width: 8px; height: 8px;
-  background: var(--danger); border-radius: 50%; border: 2px solid var(--bg);
+  position: absolute; top: 5px; right: 5px; width: 7px; height: 7px;
+  background: var(--danger); border-radius: 50%; border: 2px solid white;
 }
+
+.add-btn {
+  padding: 9px 18px; border-radius: 10px; border: none;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white; font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: var(--font);
+  display: flex; align-items: center; gap: 6px;
+  transition: opacity 0.2s; box-shadow: 0 4px 12px rgba(26,122,74,0.3);
+}
+.add-btn:hover { opacity: 0.9; }
 
 /* CONTENT */
-.content { padding: 28px 32px; flex: 1; }
+.content { padding: 24px 28px; flex: 1; }
 
-/* STATS GRID */
-.stats-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 28px;
-}
+/* STATS ROW */
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
 
 .stat-card {
-  background: var(--card); border-radius: 16px; padding: 22px;
-  border: 1px solid var(--border); position: relative; overflow: hidden;
-  transition: transform 0.2s, border-color 0.2s;
+  background: var(--card); border-radius: 16px; padding: 20px;
+  border: 1px solid var(--border); transition: transform 0.2s, box-shadow 0.2s;
+  animation: fadeUp 0.5s ease both;
 }
-.stat-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.12); }
+.stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+.stat-card:nth-child(1) { animation-delay: 0.1s; }
+.stat-card:nth-child(2) { animation-delay: 0.15s; }
+.stat-card:nth-child(3) { animation-delay: 0.2s; }
+.stat-card:nth-child(4) { animation-delay: 0.25s; }
 
-.stat-card::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-}
-.stat-card.green::before { background: linear-gradient(90deg, var(--accent), transparent); }
-.stat-card.blue::before { background: linear-gradient(90deg, var(--accent2), transparent); }
-.stat-card.red::before { background: linear-gradient(90deg, var(--danger), transparent); }
-.stat-card.yellow::before { background: linear-gradient(90deg, var(--warning), transparent); }
-
-.stat-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
-.stat-icon {
-  width: 42px; height: 42px; border-radius: 12px;
+.stat-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.stat-icon-wrap {
+  width: 44px; height: 44px; border-radius: 12px;
   display: flex; align-items: center; justify-content: center; font-size: 20px;
 }
-.stat-icon.green { background: rgba(0,200,150,0.12); }
-.stat-icon.blue { background: rgba(59,130,246,0.12); }
-.stat-icon.red { background: rgba(239,68,68,0.12); }
-.stat-icon.yellow { background: rgba(245,158,11,0.12); }
+.stat-icon-wrap.green { background: #e8f5ee; }
+.stat-icon-wrap.blue { background: #eff6ff; }
+.stat-icon-wrap.yellow { background: #fffbeb; }
+.stat-icon-wrap.red { background: #fef2f2; }
 
 .stat-change {
-  font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 20px;
+  font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 20px;
+  display: flex; align-items: center; gap: 3px;
 }
-.stat-change.up { background: rgba(0,200,150,0.12); color: var(--accent); }
-.stat-change.down { background: rgba(239,68,68,0.12); color: var(--danger); }
+.stat-change.up { background: #e8f5ee; color: var(--accent); }
+.stat-change.down { background: #fef2f2; color: var(--danger); }
 
-.stat-value { font-size: 32px; font-weight: 800; letter-spacing: -1px; margin-bottom: 4px; }
-.stat-label { font-size: 13px; color: var(--muted); }
+.stat-num { font-size: 30px; font-weight: 800; letter-spacing: -1px; margin-bottom: 3px; }
+.stat-label { font-size: 12.5px; color: var(--muted); }
+.stat-sub { font-size: 11px; color: var(--muted); margin-top: 8px; }
+.stat-sub span { color: var(--accent); font-weight: 600; }
 
-/* CONTENT GRID */
-.content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
-.content-grid.three { grid-template-columns: 2fr 1fr; }
+/* MAIN GRID */
+.main-grid { display: grid; grid-template-columns: 1fr 340px; gap: 20px; margin-bottom: 20px; }
 
 .panel {
-  background: var(--card); border-radius: 16px; padding: 22px;
-  border: 1px solid var(--border);
+  background: var(--card); border-radius: 16px; padding: 20px;
+  border: 1px solid var(--border); animation: fadeUp 0.5s ease both;
 }
-.panel-header {
-  display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+
+.panel-head {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;
 }
-.panel-title { font-size: 15px; font-weight: 700; }
+.panel-title { font-size: 14px; font-weight: 700; }
 .panel-action {
   font-size: 12px; color: var(--accent); cursor: pointer; font-weight: 600;
   background: none; border: none; font-family: var(--font);
+  padding: 5px 12px; border-radius: 8px; background: var(--accent-light);
+  transition: opacity 0.2s;
 }
+.panel-action:hover { opacity: 0.8; }
 
 /* TABLE */
-.table-wrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; }
 th {
   text-align: left; font-size: 11px; color: var(--muted);
-  font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
-  padding: 0 12px 12px; border-bottom: 1px solid var(--border);
+  font-weight: 600; padding: 0 10px 12px; border-bottom: 1px solid var(--border);
 }
-td { padding: 14px 12px; font-size: 13px; border-bottom: 1px solid var(--border); }
+td { padding: 13px 10px; font-size: 13px; border-bottom: 1px solid var(--border); }
 tr:last-child td { border-bottom: none; }
-tr:hover td { background: rgba(255,255,255,0.02); }
+tr:hover td { background: #fafbfc; }
 
-.hospital-name { font-weight: 600; display: flex; align-items: center; gap: 8px; }
-.hospital-dot { width: 8px; height: 8px; border-radius: 50%; }
-.hospital-dot.active { background: var(--accent); }
-.hospital-dot.inactive { background: var(--danger); }
+.hosp-info { display: flex; align-items: center; gap: 10px; }
+.hosp-avatar {
+  width: 34px; height: 34px; border-radius: 9px;
+  background: var(--accent-light); display: flex; align-items: center;
+  justify-content: center; font-size: 16px; flex-shrink: 0;
+}
+.hosp-name { font-weight: 600; font-size: 13px; }
+.hosp-city { font-size: 11px; color: var(--muted); }
 
 .badge {
-  padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
+  padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+  display: inline-block;
 }
-.badge.active { background: rgba(0,200,150,0.12); color: var(--accent); }
-.badge.inactive { background: rgba(239,68,68,0.12); color: var(--danger); }
-.badge.pending { background: rgba(245,158,11,0.12); color: var(--warning); }
+.badge.active { background: #e8f5ee; color: var(--accent); }
+.badge.inactive { background: #fef2f2; color: var(--danger); }
+.badge.pending { background: #fffbeb; color: var(--warning); }
 
-.action-btn {
-  padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;
-  cursor: pointer; border: 1px solid var(--border); background: var(--card2);
+.progress-mini { height: 5px; background: var(--border); border-radius: 10px; overflow: hidden; width: 80px; }
+.progress-mini-fill { height: 100%; border-radius: 10px; }
+
+.tbl-btn {
+  padding: 5px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;
+  cursor: pointer; border: 1px solid var(--border); background: white;
   color: var(--text); font-family: var(--font); transition: all 0.2s;
 }
-.action-btn:hover { border-color: var(--accent); color: var(--accent); }
+.tbl-btn:hover { border-color: var(--accent); color: var(--accent); }
 
-/* ACTIVITY */
-.activity-list { display: flex; flex-direction: column; gap: 14px; }
-.activity-item { display: flex; align-items: flex-start; gap: 12px; }
-.activity-icon {
-  width: 36px; height: 36px; border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px; flex-shrink: 0;
-}
-.activity-icon.green { background: rgba(0,200,150,0.12); }
-.activity-icon.blue { background: rgba(59,130,246,0.12); }
-.activity-icon.red { background: rgba(239,68,68,0.12); }
-.activity-icon.yellow { background: rgba(245,158,11,0.12); }
-.activity-text { flex: 1; }
-.activity-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
-.activity-desc { font-size: 12px; color: var(--muted); }
-.activity-time { font-size: 11px; color: var(--muted); white-space: nowrap; }
+/* RIGHT PANEL */
+.right-col { display: flex; flex-direction: column; gap: 16px; }
 
 /* QUICK ACTIONS */
 .quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.quick-btn {
+.quick-card {
   padding: 14px; border-radius: 12px; border: 1px solid var(--border);
-  background: var(--card2); cursor: pointer; text-align: center;
-  transition: all 0.2s; font-family: var(--font);
+  cursor: pointer; text-align: center; transition: all 0.2s; background: white;
 }
-.quick-btn:hover { border-color: var(--accent); transform: translateY(-2px); }
-.quick-btn .q-icon { font-size: 22px; margin-bottom: 6px; }
-.quick-btn .q-text { font-size: 12px; font-weight: 600; color: var(--text); }
+.quick-card:hover { border-color: var(--accent); background: var(--accent-light); transform: translateY(-2px); }
+.quick-card .qc-icon { font-size: 22px; margin-bottom: 6px; }
+.quick-card .qc-text { font-size: 11.5px; font-weight: 600; color: var(--text); }
 
-/* PROGRESS BAR */
-.progress-item { margin-bottom: 16px; }
-.progress-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
-.progress-name { font-size: 13px; font-weight: 500; }
-.progress-val { font-size: 13px; color: var(--muted); }
-.progress-bar { height: 6px; background: var(--card2); border-radius: 10px; overflow: hidden; }
-.progress-fill { height: 100%; border-radius: 10px; transition: width 1s ease; }
+/* ACTIVITY */
+.activity-list { display: flex; flex-direction: column; gap: 12px; }
+.act-item { display: flex; align-items: flex-start; gap: 10px; }
+.act-icon {
+  width: 34px; height: 34px; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0;
+}
+.act-icon.green { background: #e8f5ee; }
+.act-icon.blue { background: #eff6ff; }
+.act-icon.red { background: #fef2f2; }
+.act-icon.yellow { background: #fffbeb; }
+.act-body { flex: 1; }
+.act-title { font-size: 12.5px; font-weight: 600; margin-bottom: 1px; }
+.act-desc { font-size: 11.5px; color: var(--muted); }
+.act-time { font-size: 11px; color: var(--muted); white-space: nowrap; margin-top: 2px; }
+
+/* BED OCCUPANCY */
+.occ-item { margin-bottom: 14px; }
+.occ-head { display: flex; justify-content: space-between; margin-bottom: 5px; }
+.occ-name { font-size: 12.5px; font-weight: 500; }
+.occ-val { font-size: 12px; color: var(--muted); }
+.occ-bar { height: 7px; background: var(--border); border-radius: 10px; overflow: hidden; }
+.occ-fill { height: 100%; border-radius: 10px; transition: width 1.2s ease; }
+
+/* BOTTOM GRID */
+.bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
 /* ANIMATIONS */
-@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-.stat-card { animation: fadeIn 0.5s ease both; }
-.stat-card:nth-child(1) { animation-delay: 0.1s; }
-.stat-card:nth-child(2) { animation-delay: 0.2s; }
-.stat-card:nth-child(3) { animation-delay: 0.3s; }
-.stat-card:nth-child(4) { animation-delay: 0.4s; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 
-/* MOBILE */
-@media (max-width: 1024px) {
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
-  .content-grid { grid-template-columns: 1fr; }
-  .content-grid.three { grid-template-columns: 1fr; }
+@media (max-width: 1100px) {
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .main-grid { grid-template-columns: 1fr; }
+  .bottom-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 768px) {
-  .sidebar { transform: translateX(-100%); }
+  .sidebar { display: none; }
   .main { margin-left: 0; }
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .search-bar { display: none; }
 }
 </style>
 </head>
@@ -287,25 +288,23 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 
 <!-- SIDEBAR -->
 <aside class="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-wrap">
-      <div class="logo-icon">🏥</div>
-      <div>
-        <div class="logo-text">HospTrack</div>
-        <div class="logo-badge">ADMIN</div>
-      </div>
+  <div class="logo-wrap">
+    <div class="logo-icon">🏥</div>
+    <div>
+      <div class="logo-text">HospTrack</div>
+      <div class="logo-sub">ADMIN PANEL</div>
     </div>
   </div>
 
-  <nav class="sidebar-nav">
+  <nav>
     <div class="nav-section">
-      <div class="nav-label">Main</div>
+      <div class="nav-label">Menu</div>
       <a class="nav-item active" href="#">
         <span class="icon">📊</span> Dashboard
       </a>
       <a class="nav-item" href="#">
         <span class="icon">🏥</span> Hospitals
-        <span class="nav-badge">12</span>
+        <span class="nav-badge">4</span>
       </a>
       <a class="nav-item" href="#">
         <span class="icon">👥</span> Users
@@ -316,34 +315,30 @@ tr:hover td { background: rgba(255,255,255,0.02); }
     </div>
 
     <div class="nav-section">
-      <div class="nav-label">Management</div>
+      <div class="nav-label">General</div>
       <a class="nav-item" href="#">
-        <span class="icon">🛏️</span> Bed Availability
+        <span class="icon">🛏️</span> Bed Tracker
       </a>
       <a class="nav-item" href="#">
-        <span class="icon">🚨</span> Emergency Alerts
-        <span class="nav-badge">3</span>
+        <span class="icon">🚨</span> Emergencies
+        <span class="nav-badge red">3</span>
       </a>
       <a class="nav-item" href="#">
         <span class="icon">📋</span> Reports
       </a>
-    </div>
-
-    <div class="nav-section">
-      <div class="nav-label">System</div>
       <a class="nav-item" href="#">
         <span class="icon">⚙️</span> Settings
       </a>
-      <a class="nav-item" href="#">
-        <span class="icon">🔒</span> Security
+      <a class="nav-item" href="#" onclick="logout()">
+        <span class="icon">🚪</span> Logout
       </a>
     </div>
   </nav>
 
   <div class="sidebar-footer">
-    <div class="admin-profile">
+    <div class="admin-card">
       <div class="admin-avatar" id="adminInitial">A</div>
-      <div class="admin-info">
+      <div>
         <div class="admin-name" id="adminName">Admin</div>
         <div class="admin-role">Super Admin</div>
       </div>
@@ -358,16 +353,24 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   <!-- TOPBAR -->
   <div class="topbar">
     <div class="topbar-left">
-      <h1>Dashboard Overview</h1>
+      <h1>Dashboard</h1>
       <p id="dateTime">Loading...</p>
     </div>
+
+    <div class="search-bar">
+      <span>🔍</span>
+      <input type="text" placeholder="Search hospitals, users...">
+    </div>
+
     <div class="topbar-right">
-      <div class="notif-btn">
+      <div class="icon-btn">
         🔔
         <div class="notif-dot"></div>
       </div>
-      <button class="topbar-btn" onclick="window.location.href='index.html'">← Back to Login</button>
-      <button class="topbar-btn primary" onclick="addHospital()">+ Add Hospital</button>
+      <div class="icon-btn">⚙️</div>
+      <button class="add-btn" onclick="addHospital()">
+        + Add Hospital
+      </button>
     </div>
   </div>
 
@@ -375,247 +378,326 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   <div class="content">
 
     <!-- STATS -->
-    <div class="stats-grid">
-      <div class="stat-card green">
-        <div class="stat-header">
-          <div class="stat-icon green">🏥</div>
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-top">
+          <div class="stat-icon-wrap green">🏥</div>
           <span class="stat-change up">↑ 2.4%</span>
         </div>
-        <div class="stat-value" id="totalHospitals">—</div>
+        <div class="stat-num" id="totalHospitals">4</div>
         <div class="stat-label">Total Hospitals</div>
+        <div class="stat-sub"><span>2</span> added this month</div>
       </div>
 
-      <div class="stat-card blue">
-        <div class="stat-header">
-          <div class="stat-icon blue">👥</div>
+      <div class="stat-card">
+        <div class="stat-top">
+          <div class="stat-icon-wrap blue">👥</div>
           <span class="stat-change up">↑ 5.1%</span>
         </div>
-        <div class="stat-value" id="totalUsers">—</div>
+        <div class="stat-num" id="totalUsers">13</div>
         <div class="stat-label">Total Users</div>
+        <div class="stat-sub"><span>5</span> new this week</div>
       </div>
 
-      <div class="stat-card yellow">
-        <div class="stat-header">
-          <div class="stat-icon yellow">🛏️</div>
+      <div class="stat-card">
+        <div class="stat-top">
+          <div class="stat-icon-wrap yellow">🛏️</div>
           <span class="stat-change down">↓ 1.2%</span>
         </div>
-        <div class="stat-value">342</div>
+        <div class="stat-num">342</div>
         <div class="stat-label">Available Beds</div>
+        <div class="stat-sub">Out of <span>580</span> total</div>
       </div>
 
-      <div class="stat-card red">
-        <div class="stat-header">
-          <div class="stat-icon red">🚨</div>
-          <span class="stat-change up">↑ 3</span>
+      <div class="stat-card">
+        <div class="stat-top">
+          <div class="stat-icon-wrap red">🚨</div>
+          <span class="stat-change down" style="background:#fef2f2;color:var(--danger)">↑ 3</span>
         </div>
-        <div class="stat-value">3</div>
+        <div class="stat-num">3</div>
         <div class="stat-label">Active Emergencies</div>
+        <div class="stat-sub"><span style="color:var(--danger)">Critical</span> — ICU full</div>
       </div>
     </div>
 
-    <!-- ROW 2 -->
-    <div class="content-grid three">
+    <!-- MAIN GRID -->
+    <div class="main-grid">
 
       <!-- HOSPITALS TABLE -->
       <div class="panel">
-        <div class="panel-header">
+        <div class="panel-head">
           <span class="panel-title">🏥 Registered Hospitals</span>
           <button class="panel-action">View All →</button>
         </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Hospital</th>
-                <th>City</th>
-                <th>Beds</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody id="hospitalTable">
-              <tr>
-                <td><span class="hospital-name"><span class="hospital-dot active"></span>City Hospital</span></td>
-                <td style="color:var(--muted)">Mumbai</td>
-                <td>120</td>
-                <td><span class="badge active">Active</span></td>
-                <td><button class="action-btn">Manage</button></td>
-              </tr>
-              <tr>
-                <td><span class="hospital-name"><span class="hospital-dot active"></span>Apollo Medical</span></td>
-                <td style="color:var(--muted)">Delhi</td>
-                <td>85</td>
-                <td><span class="badge active">Active</span></td>
-                <td><button class="action-btn">Manage</button></td>
-              </tr>
-              <tr>
-                <td><span class="hospital-name"><span class="hospital-dot inactive"></span>Green Cross</span></td>
-                <td style="color:var(--muted)">Pune</td>
-                <td>60</td>
-                <td><span class="badge inactive">Inactive</span></td>
-                <td><button class="action-btn">Manage</button></td>
-              </tr>
-              <tr>
-                <td><span class="hospital-name"><span class="hospital-dot active"></span>LifeCare</span></td>
-                <td style="color:var(--muted)">Bangalore</td>
-                <td>200</td>
-                <td><span class="badge pending">Pending</span></td>
-                <td><button class="action-btn">Manage</button></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Hospital</th>
+              <th>City</th>
+              <th>Beds</th>
+              <th>Occupancy</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="hosp-info">
+                  <div class="hosp-avatar">🏥</div>
+                  <div>
+                    <div class="hosp-name">City Hospital</div>
+                    <div class="hosp-city">cityhospital@hosptrack.com</div>
+                  </div>
+                </div>
+              </td>
+              <td style="color:var(--muted)">Mumbai</td>
+              <td>120</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <div class="progress-mini"><div class="progress-mini-fill" style="width:78%;background:var(--warning)"></div></div>
+                  <span style="font-size:11px;color:var(--muted)">78%</span>
+                </div>
+              </td>
+              <td><span class="badge active">Active</span></td>
+              <td><button class="tbl-btn">Manage</button></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="hosp-info">
+                  <div class="hosp-avatar">🏨</div>
+                  <div>
+                    <div class="hosp-name">Apollo Medical</div>
+                    <div class="hosp-city">apollo@hosptrack.com</div>
+                  </div>
+                </div>
+              </td>
+              <td style="color:var(--muted)">Delhi</td>
+              <td>85</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <div class="progress-mini"><div class="progress-mini-fill" style="width:45%;background:var(--accent)"></div></div>
+                  <span style="font-size:11px;color:var(--muted)">45%</span>
+                </div>
+              </td>
+              <td><span class="badge active">Active</span></td>
+              <td><button class="tbl-btn">Manage</button></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="hosp-info">
+                  <div class="hosp-avatar">🏪</div>
+                  <div>
+                    <div class="hosp-name">Green Cross</div>
+                    <div class="hosp-city">greencross@hosptrack.com</div>
+                  </div>
+                </div>
+              </td>
+              <td style="color:var(--muted)">Pune</td>
+              <td>60</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <div class="progress-mini"><div class="progress-mini-fill" style="width:30%;background:var(--accent)"></div></div>
+                  <span style="font-size:11px;color:var(--muted)">30%</span>
+                </div>
+              </td>
+              <td><span class="badge inactive">Inactive</span></td>
+              <td><button class="tbl-btn">Manage</button></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="hosp-info">
+                  <div class="hosp-avatar">🏬</div>
+                  <div>
+                    <div class="hosp-name">LifeCare</div>
+                    <div class="hosp-city">lifecare@hosptrack.com</div>
+                  </div>
+                </div>
+              </td>
+              <td style="color:var(--muted)">Bangalore</td>
+              <td>200</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <div class="progress-mini"><div class="progress-mini-fill" style="width:92%;background:var(--danger)"></div></div>
+                  <span style="font-size:11px;color:var(--muted)">92%</span>
+                </div>
+              </td>
+              <td><span class="badge pending">Pending</span></td>
+              <td><button class="tbl-btn">Manage</button></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       <!-- RIGHT COLUMN -->
-      <div style="display:flex;flex-direction:column;gap:20px;">
+      <div class="right-col">
 
         <!-- QUICK ACTIONS -->
         <div class="panel">
-          <div class="panel-header">
+          <div class="panel-head">
             <span class="panel-title">⚡ Quick Actions</span>
           </div>
           <div class="quick-grid">
-            <div class="quick-btn" onclick="addHospital()">
-              <div class="q-icon">🏥</div>
-              <div class="q-text">Add Hospital</div>
+            <div class="quick-card" onclick="addHospital()">
+              <div class="qc-icon">🏥</div>
+              <div class="qc-text">Add Hospital</div>
             </div>
-            <div class="quick-btn">
-              <div class="q-icon">👤</div>
-              <div class="q-text">Add User</div>
+            <div class="quick-card">
+              <div class="qc-icon">👤</div>
+              <div class="qc-text">Add User</div>
             </div>
-            <div class="quick-btn">
-              <div class="q-icon">📋</div>
-              <div class="q-text">View Reports</div>
+            <div class="quick-card">
+              <div class="qc-icon">📋</div>
+              <div class="qc-text">Reports</div>
             </div>
-            <div class="quick-btn">
-              <div class="q-icon">🚨</div>
-              <div class="q-text">Emergencies</div>
+            <div class="quick-card">
+              <div class="qc-icon">🚨</div>
+              <div class="qc-text">Alerts</div>
             </div>
           </div>
         </div>
 
         <!-- BED OCCUPANCY -->
         <div class="panel">
-          <div class="panel-header">
+          <div class="panel-head">
             <span class="panel-title">🛏️ Bed Occupancy</span>
+            <button class="panel-action">Details →</button>
           </div>
-          <div class="progress-item">
-            <div class="progress-header">
-              <span class="progress-name">City Hospital</span>
-              <span class="progress-val">78%</span>
+          <div class="occ-item">
+            <div class="occ-head">
+              <span class="occ-name">City Hospital</span>
+              <span class="occ-val">78%</span>
             </div>
-            <div class="progress-bar">
-              <div class="progress-fill" style="width:78%;background:var(--warning)"></div>
-            </div>
+            <div class="occ-bar"><div class="occ-fill" style="width:78%;background:var(--warning)"></div></div>
           </div>
-          <div class="progress-item">
-            <div class="progress-header">
-              <span class="progress-name">Apollo Medical</span>
-              <span class="progress-val">45%</span>
+          <div class="occ-item">
+            <div class="occ-head">
+              <span class="occ-name">Apollo Medical</span>
+              <span class="occ-val">45%</span>
             </div>
-            <div class="progress-bar">
-              <div class="progress-fill" style="width:45%;background:var(--accent)"></div>
-            </div>
+            <div class="occ-bar"><div class="occ-fill" style="width:45%;background:var(--accent)"></div></div>
           </div>
-          <div class="progress-item">
-            <div class="progress-header">
-              <span class="progress-name">LifeCare</span>
-              <span class="progress-val">92%</span>
+          <div class="occ-item">
+            <div class="occ-head">
+              <span class="occ-name">LifeCare</span>
+              <span class="occ-val">92%</span>
             </div>
-            <div class="progress-bar">
-              <div class="progress-fill" style="width:92%;background:var(--danger)"></div>
+            <div class="occ-bar"><div class="occ-fill" style="width:92%;background:var(--danger)"></div></div>
+          </div>
+          <div class="occ-item" style="margin-bottom:0">
+            <div class="occ-head">
+              <span class="occ-name">Green Cross</span>
+              <span class="occ-val">30%</span>
             </div>
+            <div class="occ-bar"><div class="occ-fill" style="width:30%;background:var(--accent)"></div></div>
           </div>
         </div>
 
       </div>
     </div>
 
-    <!-- ROW 3 -->
-    <div class="content-grid">
+    <!-- BOTTOM GRID -->
+    <div class="bottom-grid">
 
       <!-- RECENT ACTIVITY -->
       <div class="panel">
-        <div class="panel-header">
+        <div class="panel-head">
           <span class="panel-title">📋 Recent Activity</span>
           <button class="panel-action">View All →</button>
         </div>
         <div class="activity-list">
-          <div class="activity-item">
-            <div class="activity-icon green">🏥</div>
-            <div class="activity-text">
-              <div class="activity-title">New hospital registered</div>
-              <div class="activity-desc">City Hospital — Mumbai added to system</div>
+          <div class="act-item">
+            <div class="act-icon green">🏥</div>
+            <div class="act-body">
+              <div class="act-title">New hospital registered</div>
+              <div class="act-desc">City Hospital — Mumbai added</div>
             </div>
-            <div class="activity-time">2 min ago</div>
+            <div class="act-time">2 min ago</div>
           </div>
-          <div class="activity-item">
-            <div class="activity-icon blue">👤</div>
-            <div class="activity-text">
-              <div class="activity-title">New user registered</div>
-              <div class="activity-desc">Patient account created — Rahul Sharma</div>
+          <div class="act-item">
+            <div class="act-icon blue">👤</div>
+            <div class="act-body">
+              <div class="act-title">New user registered</div>
+              <div class="act-desc">Patient — Rahul Sharma</div>
             </div>
-            <div class="activity-time">15 min ago</div>
+            <div class="act-time">15 min ago</div>
           </div>
-          <div class="activity-item">
-            <div class="activity-icon red">🚨</div>
-            <div class="activity-text">
-              <div class="activity-title">Emergency alert triggered</div>
-              <div class="activity-desc">ICU beds critical at Apollo Medical</div>
+          <div class="act-item">
+            <div class="act-icon red">🚨</div>
+            <div class="act-body">
+              <div class="act-title">Emergency alert triggered</div>
+              <div class="act-desc">ICU beds critical at Apollo</div>
             </div>
-            <div class="activity-time">1 hr ago</div>
+            <div class="act-time">1 hr ago</div>
           </div>
-          <div class="activity-item">
-            <div class="activity-icon yellow">🛏️</div>
-            <div class="activity-text">
-              <div class="activity-title">Bed availability updated</div>
-              <div class="activity-desc">LifeCare updated ICU — 8 beds available</div>
+          <div class="act-item">
+            <div class="act-icon yellow">🛏️</div>
+            <div class="act-body">
+              <div class="act-title">Bed availability updated</div>
+              <div class="act-desc">LifeCare — 8 ICU beds available</div>
             </div>
-            <div class="activity-time">2 hr ago</div>
+            <div class="act-time">2 hr ago</div>
           </div>
         </div>
       </div>
 
-      <!-- USERS OVERVIEW -->
+      <!-- USERS TABLE -->
       <div class="panel">
-        <div class="panel-header">
+        <div class="panel-head">
           <span class="panel-title">👥 Users Overview</span>
           <button class="panel-action">Manage →</button>
         </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Role</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="usersTable">
-              <tr>
-                <td style="font-weight:600">Aman Kumar</td>
-                <td><span class="badge active">Admin</span></td>
-                <td><span class="badge active">Active</span></td>
-              </tr>
-              <tr>
-                <td style="font-weight:600">City Hospital</td>
-                <td><span class="badge pending">Hospital</span></td>
-                <td><span class="badge active">Active</span></td>
-              </tr>
-              <tr>
-                <td style="font-weight:600">Rahul Sharma</td>
-                <td style="color:var(--muted)">Patient</td>
-                <td><span class="badge active">Active</span></td>
-              </tr>
-              <tr>
-                <td style="font-weight:600">Priya Singh</td>
-                <td style="color:var(--muted)">Patient</td>
-                <td><span class="badge inactive">Inactive</span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Role</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div style="width:30px;height:30px;border-radius:8px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--accent)" id="userInitial">A</div>
+                  <span style="font-weight:600;font-size:13px" id="adminNameTable">Admin</span>
+                </div>
+              </td>
+              <td><span class="badge active">Admin</span></td>
+              <td><span class="badge active">Active</span></td>
+            </tr>
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div style="width:30px;height:30px;border-radius:8px;background:#eff6ff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--blue)">C</div>
+                  <span style="font-weight:600;font-size:13px">City Hospital</span>
+                </div>
+              </td>
+              <td><span class="badge pending">Hospital</span></td>
+              <td><span class="badge active">Active</span></td>
+            </tr>
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div style="width:30px;height:30px;border-radius:8px;background:#fef2f2;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--danger)">R</div>
+                  <span style="font-weight:600;font-size:13px">Rahul Sharma</span>
+                </div>
+              </td>
+              <td style="color:var(--muted);font-size:12px">Patient</td>
+              <td><span class="badge active">Active</span></td>
+            </tr>
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div style="width:30px;height:30px;border-radius:8px;background:#fffbeb;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--warning)">P</div>
+                  <span style="font-weight:600;font-size:13px">Priya Singh</span>
+                </div>
+              </td>
+              <td style="color:var(--muted);font-size:12px">Patient</td>
+              <td><span class="badge inactive">Inactive</span></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
     </div>
@@ -625,53 +707,31 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 
 <script>
   const API_URL = "https://hospital-backend-01.onrender.com";
-
-  // ✅ Auth check — agar login nahi toh wapas bhejo
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
   const userName = localStorage.getItem("userName");
 
+  // ✅ Auth Check
   if (!token || role !== "admin") {
     alert("Access Denied! Admin login required.");
     window.location.href = "index.html";
   }
 
-  // ✅ Admin name set karo
+  // ✅ Set admin name
   if (userName) {
     document.getElementById("adminName").textContent = userName;
     document.getElementById("adminInitial").textContent = userName.charAt(0).toUpperCase();
+    document.getElementById("adminNameTable").textContent = userName;
+    document.getElementById("userInitial").textContent = userName.charAt(0).toUpperCase();
   }
 
-  // ✅ Date time
+  // ✅ Date Time
   function updateTime() {
     const now = new Date();
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-    document.getElementById("dateTime").textContent = now.toLocaleDateString('en-IN', options);
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById("dateTime").textContent = "Today, " + now.toLocaleDateString('en-IN', options);
   }
   updateTime();
-  setInterval(updateTime, 60000);
-
-  // ✅ Load stats from API
-  async function loadStats() {
-    try {
-      const res = await fetch(`${API_URL}/api/auth/stats`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        document.getElementById("totalUsers").textContent = data.totalUsers || "—";
-        document.getElementById("totalHospitals").textContent = data.totalHospitals || "—";
-      } else {
-        // Dummy data agar API nahi hai
-        document.getElementById("totalUsers").textContent = "13";
-        document.getElementById("totalHospitals").textContent = "4";
-      }
-    } catch {
-      document.getElementById("totalUsers").textContent = "13";
-      document.getElementById("totalHospitals").textContent = "4";
-    }
-  }
-  loadStats();
 
   // ✅ Logout
   function logout() {
@@ -681,7 +741,6 @@ tr:hover td { background: rgba(255,255,255,0.02); }
     }
   }
 
-  // ✅ Add Hospital placeholder
   function addHospital() {
     alert("Hospital add karne ka feature abhi ban raha hai! 🏥");
   }
