@@ -4,150 +4,804 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>City Hospital – Admin Panel</title>
-
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
-
 <style>
-:root {
-  --navy: #0f1b35;
-  --navy-mid: #162240;
-  --navy-light: #1e2f55;
-  --accent: #3b82f6;
-  --accent-glow: #60a5fa;
-  --teal: #14b8a6;
-  --amber: #f59e0b;
-  --rose: #f43f5e;
-  --green: #22c55e;
-  --purple: #a855f7;
-  --card: #1a2844;
-  --card-border: rgba(59,130,246,0.12);
-  --text: #e2e8f0;
-  --muted: #94a3b8;
-  --sidebar-w: 220px;
-}
+  :root {
+    --navy: #0f1b35;
+    --navy-mid: #162240;
+    --navy-light: #1e2f55;
+    --accent: #3b82f6;
+    --accent-glow: #60a5fa;
+    --teal: #14b8a6;
+    --amber: #f59e0b;
+    --rose: #f43f5e;
+    --green: #22c55e;
+    --purple: #a855f7;
+    --card: #1a2844;
+    --card-border: rgba(59,130,246,0.12);
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --sidebar-w: 220px;
+  }
 
-/* LIGHT MODE */
-body.light {
-  --navy: #ffffff;
-  --navy-mid: #f8fafc;
-  --navy-light: #f1f5f9;
-  --card: #ffffff;
-  --card-border: rgba(0,0,0,0.08);
-  --text: #0f172a;
-  --muted: #64748b;
-}
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--navy);
+    color: var(--text);
+    display: flex;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--navy);
-  color: var(--text);
-  display: flex;
-  min-height: 100vh;
-}
+  /* ── Sidebar ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--navy-mid);
+    border-right: 1px solid var(--card-border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 100;
+    padding: 0 0 24px;
+  }
 
-/* Sidebar */
-.sidebar {
-  width: var(--sidebar-w);
-  background: var(--navy-mid);
-  border-right: 1px solid var(--card-border);
-  position: fixed;
-  top: 0; bottom: 0;
-}
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    padding: 22px 20px;
+    border-bottom: 1px solid var(--card-border);
+  }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: var(--accent);
+    border-radius: 10px;
+    display: grid; place-items: center;
+    font-size: 18px; font-weight: 800; color: #fff;
+    font-family: 'Syne', sans-serif;
+    box-shadow: 0 0 18px rgba(59,130,246,.45);
+  }
+  .logo-text h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px; font-weight: 700;
+    color: #fff; letter-spacing: .5px;
+  }
+  .logo-text p { font-size: 10px; color: var(--muted); margin-top: 1px; }
 
-.logo {
-  padding: 20px;
-  font-weight: bold;
-}
+  nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
 
-/* Main */
-.main {
-  margin-left: var(--sidebar-w);
-  flex: 1;
-}
+  .nav-item {
+    display: flex; align-items: center; gap: 11px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 13px; font-weight: 500;
+    color: var(--muted);
+    transition: all .2s;
+    text-decoration: none;
+  }
+  .nav-item:hover { background: rgba(59,130,246,.08); color: var(--text); }
+  .nav-item.active {
+    background: rgba(59,130,246,.15);
+    color: var(--accent-glow);
+    box-shadow: inset 3px 0 0 var(--accent);
+  }
+  .nav-item svg { flex-shrink: 0; }
 
-/* Topbar */
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 20px;
-  background: var(--navy-mid);
-  border-bottom: 1px solid var(--card-border);
-}
+  .nav-logout {
+    padding: 0 12px;
+  }
+  .nav-logout .nav-item { color: var(--rose); }
+  .nav-logout .nav-item:hover { background: rgba(244,63,94,.1); }
 
-.notif-btn {
-  cursor: pointer;
-  border: none;
-  padding: 10px;
-  border-radius: 8px;
-  background: var(--navy-light);
-}
+  /* ── Main ── */
+  .main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
 
-/* Content */
-.content {
-  padding: 20px;
-}
+  /* ── Topbar ── */
+  .topbar {
+    background: var(--navy-mid);
+    border-bottom: 1px solid var(--card-border);
+    padding: 0 28px;
+    height: 64px;
+    display: flex; align-items: center; gap: 16px;
+    position: sticky; top: 0; z-index: 50;
+  }
+  .menu-btn { background: none; border: none; cursor: pointer; color: var(--muted); }
 
-.card {
-  background: var(--card);
-  border: 1px solid var(--card-border);
-  padding: 20px;
-  border-radius: 10px;
-}
+  .search {
+    flex: 1; max-width: 420px;
+    display: flex; align-items: center; gap: 10px;
+    background: var(--navy-light);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 8px 14px;
+  }
+  .search input {
+    background: none; border: none; outline: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; color: var(--text); flex: 1;
+  }
+  .search input::placeholder { color: var(--muted); }
+
+  .topbar-right { display: flex; align-items: center; gap: 14px; margin-left: auto; }
+
+  .notif-btn {
+    position: relative; background: var(--navy-light);
+    border: 1px solid var(--card-border);
+    border-radius: 10px; width: 40px; height: 40px;
+    display: grid; place-items: center; cursor: pointer;
+    color: var(--muted);
+  }
+  .badge {
+    position: absolute; top: -4px; right: -4px;
+    background: var(--rose); color: #fff;
+    font-size: 9px; font-weight: 700;
+    border-radius: 999px; width: 16px; height: 16px;
+    display: grid; place-items: center;
+  }
+
+  .user-chip {
+    display: flex; align-items: center; gap: 9px;
+    background: var(--navy-light);
+    border: 1px solid var(--card-border);
+    border-radius: 10px; padding: 6px 12px;
+    cursor: pointer;
+  }
+  .avatar {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: var(--accent); display: grid; place-items: center;
+    font-size: 12px; font-weight: 700; color: #fff;
+  }
+  .user-chip span { font-size: 12px; font-weight: 600; }
+  .user-chip small { font-size: 10px; color: var(--muted); display: block; }
+
+  /* ── Content ── */
+  .content {
+    padding: 28px;
+    flex: 1;
+  }
+
+  /* ── Header ── */
+  .page-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 28px;
+    animation: fadeUp .5s ease both;
+  }
+  .page-header h1 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; }
+  .page-header p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .date-chip {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--card); border: 1px solid var(--card-border);
+    border-radius: 8px; padding: 7px 13px;
+    font-size: 12px; color: var(--muted);
+  }
+
+  /* ── Stat Cards ── */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 20px;
+    position: relative; overflow: hidden;
+    animation: fadeUp .5s ease both;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .stat-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,.3); }
+  .stat-card:nth-child(1) { animation-delay: .05s; }
+  .stat-card:nth-child(2) { animation-delay: .10s; }
+  .stat-card:nth-child(3) { animation-delay: .15s; }
+  .stat-card:nth-child(4) { animation-delay: .20s; }
+
+  .stat-card::before {
+    content: ''; position: absolute;
+    top: 0; right: 0; width: 80px; height: 80px;
+    border-radius: 50%;
+    transform: translate(20px,-20px);
+    opacity: .08;
+  }
+  .stat-card.blue::before { background: var(--accent); }
+  .stat-card.teal::before { background: var(--teal); }
+  .stat-card.purple::before { background: var(--purple); }
+  .stat-card.amber::before { background: var(--amber); }
+
+  .stat-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: grid; place-items: center; margin-bottom: 14px;
+  }
+  .stat-icon.blue { background: rgba(59,130,246,.15); color: var(--accent-glow); }
+  .stat-icon.teal { background: rgba(20,184,166,.15); color: var(--teal); }
+  .stat-icon.purple { background: rgba(168,85,247,.15); color: var(--purple); }
+  .stat-icon.amber { background: rgba(245,158,11,.15); color: var(--amber); }
+
+  .stat-label { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .stat-value { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; }
+  .stat-change {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 11px; margin-top: 8px;
+  }
+  .stat-change.up { color: var(--green); }
+  .stat-change.neutral { color: var(--muted); }
+
+  /* ── Middle Row ── */
+  .mid-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 20px;
+    animation: fadeUp .5s ease both;
+    animation-delay: .25s;
+  }
+
+  .card-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px;
+  }
+  .card-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; }
+  .view-all { font-size: 12px; color: var(--accent-glow); cursor: pointer; text-decoration: none; }
+  .view-all:hover { text-decoration: underline; }
+
+  /* Chart */
+  .chart-card { grid-column: span 1; }
+  .chart-wrap { position: relative; height: 160px; }
+  svg.chart { width: 100%; height: 100%; }
+
+  .chart-badge {
+    position: absolute; top: 40%; left: 62%;
+    background: var(--accent);
+    border-radius: 10px; padding: 6px 10px;
+    font-family: 'Syne', sans-serif;
+    font-size: 18px; font-weight: 700; color: #fff;
+    box-shadow: 0 4px 16px rgba(59,130,246,.5);
+    text-align: center;
+    line-height: 1.2;
+  }
+  .chart-badge small { display: block; font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 400; opacity: .8; }
+
+  .chart-filter {
+    background: var(--navy-light); border: 1px solid var(--card-border);
+    border-radius: 7px; padding: 4px 10px;
+    font-size: 11px; color: var(--muted);
+    cursor: pointer;
+  }
+
+  /* Appointments list */
+  .appt-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,.04);
+  }
+  .appt-item:last-child { border-bottom: none; }
+  .appt-time { font-size: 11px; color: var(--accent-glow); font-weight: 600; min-width: 56px; }
+  .appt-info { flex: 1; }
+  .appt-info strong { font-size: 12px; font-weight: 600; display: block; }
+  .appt-info span { font-size: 10px; color: var(--muted); }
+
+  .tag {
+    font-size: 9px; font-weight: 600;
+    border-radius: 5px; padding: 2px 7px;
+    letter-spacing: .3px;
+  }
+  .tag.cardio { background: rgba(59,130,246,.15); color: var(--accent-glow); }
+  .tag.derm { background: rgba(20,184,166,.15); color: var(--teal); }
+  .tag.neuro { background: rgba(168,85,247,.15); color: var(--purple); }
+  .tag.pedia { background: rgba(245,158,11,.15); color: var(--amber); }
+
+  .status {
+    font-size: 9px; font-weight: 600;
+    border-radius: 5px; padding: 2px 8px;
+  }
+  .status.confirmed { background: rgba(34,197,94,.15); color: var(--green); }
+  .status.pending { background: rgba(245,158,11,.15); color: var(--amber); }
+  .status.new { background: rgba(59,130,246,.15); color: var(--accent-glow); }
+
+  /* New bookings */
+  .booking-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(255,255,255,.04);
+  }
+  .booking-item:last-child { border-bottom: none; }
+  .booking-time { font-size: 11px; color: var(--teal); font-weight: 600; min-width: 52px; }
+  .booking-info { flex: 1; }
+  .booking-info strong { font-size: 12px; font-weight: 600; display: block; }
+  .booking-info span { font-size: 10px; color: var(--muted); }
+
+  /* ── Bottom Row ── */
+  .bottom-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
+  }
+
+  /* Table */
+  .tabs { display: flex; gap: 4px; margin-bottom: 16px; }
+  .tab {
+    font-size: 12px; font-weight: 500; padding: 6px 14px;
+    border-radius: 8px; cursor: pointer; color: var(--muted);
+    transition: all .2s;
+  }
+  .tab.active { background: var(--accent); color: #fff; }
+  .tab:hover:not(.active) { background: rgba(59,130,246,.1); color: var(--text); }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    font-size: 11px; font-weight: 600; color: var(--muted);
+    text-align: left; padding: 8px 0; text-transform: uppercase;
+    letter-spacing: .5px;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+  }
+  tbody tr { transition: background .15s; }
+  tbody tr:hover { background: rgba(59,130,246,.04); }
+  tbody td {
+    font-size: 12px; padding: 11px 0;
+    border-bottom: 1px solid rgba(255,255,255,.04);
+    vertical-align: middle;
+  }
+  .eye-btn {
+    color: var(--accent-glow); cursor: pointer; background: none; border: none;
+    font-size: 14px;
+  }
+
+  /* Quick Actions */
+  .quick-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .quick-btn {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 8px; padding: 16px 8px;
+    background: var(--navy-light);
+    border: 1px solid var(--card-border);
+    border-radius: 12px; cursor: pointer;
+    font-size: 11px; font-weight: 500; color: var(--text);
+    transition: all .2s; text-align: center;
+  }
+  .quick-btn:hover { background: rgba(59,130,246,.1); border-color: rgba(59,130,246,.3); transform: translateY(-2px); }
+  .quick-icon {
+    width: 38px; height: 38px; border-radius: 10px;
+    display: grid; place-items: center; font-size: 18px;
+  }
+  .qi-blue { background: rgba(59,130,246,.15); }
+  .qi-green { background: rgba(34,197,94,.15); }
+  .qi-purple { background: rgba(168,85,247,.15); }
+  .qi-amber { background: rgba(245,158,11,.15); }
+  .qi-teal { background: rgba(20,184,166,.15); }
+  .qi-rose { background: rgba(244,63,94,.15); }
+
+  /* ── Animations ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--navy-light); border-radius: 99px; }
 </style>
 </head>
-
 <body>
 
-<!-- Sidebar -->
-<div class="sidebar">
-  <div class="logo">CITY HOSPITAL</div>
-</div>
-
-<!-- Main -->
-<div class="main">
-
-  <!-- Topbar -->
-  <div class="topbar">
-    <h3>Dashboard</h3>
-
-    <!-- THEME BUTTON -->
-    <button class="notif-btn" id="themeToggle">🌙</button>
-  </div>
-
-  <!-- Content -->
-  <div class="content">
-    <div class="card">
-      <h2>Welcome Admin 👋</h2>
-      <p>Same UI, now with Light + Dark Mode toggle</p>
+<!-- ═══════════════ SIDEBAR ═══════════════ -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">+</div>
+    <div class="logo-text">
+      <h2>CITY HOSPITAL</h2>
+      <p>Hospital Admin Panel</p>
     </div>
   </div>
 
-</div>
+  <nav>
+    <a class="nav-item active" href="#">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      Appointments
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Patients
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6M12 9v6"/><circle cx="12" cy="12" r="9"/></svg>
+      Doctors
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      Departments
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Staff
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+      Billing & Payments
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3h18v18H3zM8 12h8M12 8v8"/></svg>
+      Pharmacy
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 9H22M2 15H22M5 3v18M19 3v18"/></svg>
+      Bed Management
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      Reports
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+      Settings
+    </a>
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Profile
+    </a>
+  </nav>
+
+  <div class="nav-logout">
+    <a class="nav-item" href="#">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Logout
+    </a>
+  </div>
+</aside>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<div class="main">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <button class="menu-btn">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="search">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Search patients, appointments, doctors...">
+    </div>
+    <div class="topbar-right">
+      <div class="notif-btn">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="badge">3</span>
+      </div>
+      <div class="user-chip">
+        <div class="avatar">A</div>
+        <div>
+          <span>Admin</span>
+          <small>City Hospital</small>
+        </div>
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div>
+        <h1>Welcome, Admin 👋</h1>
+        <p>Here's what's happening at City Hospital today.</p>
+      </div>
+      <div class="date-chip">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        25 May 2024, Saturday
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-card blue">
+        <div class="stat-icon blue">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="stat-label">Total Patients</div>
+        <div class="stat-value">1,248</div>
+        <div class="stat-change up">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+          12% from yesterday
+        </div>
+      </div>
+      <div class="stat-card teal">
+        <div class="stat-icon teal">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        </div>
+        <div class="stat-label">Appointments Today</div>
+        <div class="stat-value">86</div>
+        <div class="stat-change up" style="color:var(--teal)">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+          8% from yesterday
+        </div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-icon purple">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6M12 9v6"/><circle cx="12" cy="12" r="9"/></svg>
+        </div>
+        <div class="stat-label">Doctors</div>
+        <div class="stat-value">42</div>
+        <div class="stat-change neutral">— No change</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-icon amber">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 9H22M2 15H22M5 3v18M19 3v18"/></svg>
+        </div>
+        <div class="stat-label">Occupied Beds</div>
+        <div class="stat-value">68</div>
+        <div class="stat-change up" style="color:var(--amber)">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+          5% from yesterday
+        </div>
+      </div>
+    </div>
+
+    <!-- Middle Row -->
+    <div class="mid-row">
+
+      <!-- Chart Card -->
+      <div class="card chart-card">
+        <div class="card-header">
+          <span class="card-title">Appointments Overview</span>
+          <div class="chart-filter">This Week ▾</div>
+        </div>
+        <div class="chart-wrap">
+          <svg class="chart" viewBox="0 0 320 150" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#3b82f6" stop-opacity=".3"/>
+                <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <!-- Grid lines -->
+            <line x1="0" y1="20" x2="320" y2="20" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
+            <line x1="0" y1="50" x2="320" y2="50" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
+            <line x1="0" y1="80" x2="320" y2="80" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
+            <line x1="0" y1="110" x2="320" y2="110" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
+            <!-- Area fill -->
+            <path d="M0,110 C20,100 40,90 60,75 C80,60 90,55 110,50 C130,45 140,25 160,22 C175,20 185,45 200,65 C215,85 225,90 240,80 C258,68 275,30 290,15 L290,140 L0,140 Z"
+                  fill="url(#chartGrad)"/>
+            <!-- Line -->
+            <path d="M0,110 C20,100 40,90 60,75 C80,60 90,55 110,50 C130,45 140,25 160,22 C175,20 185,45 200,65 C215,85 225,90 240,80 C258,68 275,30 290,15"
+                  fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round"/>
+            <!-- End dot -->
+            <circle cx="290" cy="15" r="5" fill="#3b82f6" stroke="#fff" stroke-width="2"/>
+          </svg>
+          <div class="chart-badge">86<small>Appointments</small></div>
+        </div>
+        <!-- X axis labels -->
+        <div style="display:flex;justify-content:space-between;margin-top:8px;padding:0 2px;">
+          <span style="font-size:9px;color:var(--muted)">19 May</span>
+          <span style="font-size:9px;color:var(--muted)">20 May</span>
+          <span style="font-size:9px;color:var(--muted)">21 May</span>
+          <span style="font-size:9px;color:var(--muted)">22 May</span>
+          <span style="font-size:9px;color:var(--muted)">23 May</span>
+          <span style="font-size:9px;color:var(--muted)">24 May</span>
+          <span style="font-size:9px;color:var(--accent-glow)">25 May</span>
+        </div>
+      </div>
+
+      <!-- Recent Appointments -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Recent Appointments</span>
+          <a class="view-all" href="#">View All</a>
+        </div>
+        <div class="appt-item">
+          <span class="appt-time">09:00 AM</span>
+          <div class="appt-info"><strong>Rahul Sharma</strong><span>OPD · Dr. Amit Verma</span></div>
+          <span class="tag cardio">Cardiology</span>
+          <span class="status confirmed">Confirmed</span>
+        </div>
+        <div class="appt-item">
+          <span class="appt-time">10:00 AM</span>
+          <div class="appt-info"><strong>Priya Singh</strong><span>OPD · Dr. Neha Gupta</span></div>
+          <span class="tag derm">Dermatology</span>
+          <span class="status confirmed">Confirmed</span>
+        </div>
+        <div class="appt-item">
+          <span class="appt-time">11:00 AM</span>
+          <div class="appt-info"><strong>Anil Kumar</strong><span>OPD · Dr. Rajesh Patel</span></div>
+          <span class="tag neuro">Neurology</span>
+          <span class="status pending">Pending</span>
+        </div>
+        <div class="appt-item">
+          <span class="appt-time">12:00 PM</span>
+          <div class="appt-info"><strong>Sneha Varma</strong><span>OPD · Dr. Pooja Mehta</span></div>
+          <span class="tag pedia">Pediatrics</span>
+          <span class="status confirmed">Confirmed</span>
+        </div>
+        <div class="appt-item">
+          <span class="appt-time">01:00 PM</span>
+          <div class="appt-info"><strong>Vikram Mehta</strong><span>OPD · Dr. Amit Verma</span></div>
+          <span class="tag cardio">Cardiology</span>
+          <span class="status pending">Pending</span>
+        </div>
+      </div>
+
+      <!-- New Bookings -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">New Bookings (Today)</span>
+          <a class="view-all" href="#">View All</a>
+        </div>
+        <div class="booking-item">
+          <span class="booking-time">02:00 PM</span>
+          <div class="booking-info"><strong>Karan Jain</strong><span>OPD · Dr. Amit Verma</span></div>
+          <span class="status new">New</span>
+        </div>
+        <div class="booking-item">
+          <span class="booking-time">02:30 PM</span>
+          <div class="booking-info"><strong>Neha Yadav</strong><span>OPD · Dr. Neha Gupta</span></div>
+          <span class="status new">New</span>
+        </div>
+        <div class="booking-item">
+          <span class="booking-time">03:00 PM</span>
+          <div class="booking-info"><strong>Mohit Gupta</strong><span>OPD · Dr. Rajesh Patel</span></div>
+          <span class="status new">New</span>
+        </div>
+        <div class="booking-item">
+          <span class="booking-time">03:30 PM</span>
+          <div class="booking-info"><strong>Pooja Sinha</strong><span>OPD · Dr. Pooja Mehta</span></div>
+          <span class="status new">New</span>
+        </div>
+        <div class="booking-item">
+          <span class="booking-time">04:00 PM</span>
+          <div class="booking-info"><strong>Ramesh Choudhary</strong><span>OPD · Dr. Amit Verma</span></div>
+          <span class="status new">New</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Row -->
+    <div class="bottom-row">
+
+      <!-- All Bookings Table -->
+      <div class="card" style="animation-delay:.35s">
+        <div class="card-header">
+          <span class="card-title">All Bookings</span>
+          <a class="view-all" href="#">View All</a>
+        </div>
+        <div class="tabs">
+          <div class="tab active">Upcoming</div>
+          <div class="tab">Confirmed</div>
+          <div class="tab">Completed</div>
+          <div class="tab">Cancelled</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Date &amp; Time</th>
+              <th>Patient Name</th>
+              <th>Doctor</th>
+              <th>Department</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="color:var(--muted);font-size:11px">25 May 2024, 02:00 PM</td>
+              <td><strong>Karan Jain</strong></td>
+              <td style="color:var(--muted)">Dr. Amit Verma</td>
+              <td>Cardiology</td>
+              <td><span class="status new">New</span></td>
+              <td><button class="eye-btn">👁</button></td>
+            </tr>
+            <tr>
+              <td style="color:var(--muted);font-size:11px">25 May 2024, 02:30 PM</td>
+              <td><strong>Neha Yadav</strong></td>
+              <td style="color:var(--muted)">Dr. Neha Gupta</td>
+              <td>Dermatology</td>
+              <td><span class="status new">New</span></td>
+              <td><button class="eye-btn">👁</button></td>
+            </tr>
+            <tr>
+              <td style="color:var(--muted);font-size:11px">25 May 2024, 03:00 PM</td>
+              <td><strong>Mohit Gupta</strong></td>
+              <td style="color:var(--muted)">Dr. Rajesh Patel</td>
+              <td>Neurology</td>
+              <td><span class="status new">New</span></td>
+              <td><button class="eye-btn">👁</button></td>
+            </tr>
+            <tr>
+              <td style="color:var(--muted);font-size:11px">25 May 2024, 03:30 PM</td>
+              <td><strong>Pooja Sinha</strong></td>
+              <td style="color:var(--muted)">Dr. Pooja Mehta</td>
+              <td>Pediatrics</td>
+              <td><span class="status new">New</span></td>
+              <td><button class="eye-btn">👁</button></td>
+            </tr>
+            <tr>
+              <td style="color:var(--muted);font-size:11px">25 May 2024, 04:00 PM</td>
+              <td><strong>Ramesh Choudhary</strong></td>
+              <td style="color:var(--muted)">Dr. Amit Verma</td>
+              <td>Cardiology</td>
+              <td><span class="status new">New</span></td>
+              <td><button class="eye-btn">👁</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="card" style="animation-delay:.4s">
+        <div class="card-header">
+          <span class="card-title">Quick Actions</span>
+        </div>
+        <div class="quick-grid">
+          <div class="quick-btn">
+            <div class="quick-icon qi-blue">📅</div>
+            New Appointment
+          </div>
+          <div class="quick-btn">
+            <div class="quick-icon qi-green">👤</div>
+            Add Patient
+          </div>
+          <div class="quick-btn">
+            <div class="quick-icon qi-purple">🩺</div>
+            Add Doctor
+          </div>
+          <div class="quick-btn">
+            <div class="quick-icon qi-amber">🛏️</div>
+            Bed Availability
+          </div>
+          <div class="quick-btn">
+            <div class="quick-icon qi-teal">📄</div>
+            Generate Report
+          </div>
+          <div class="quick-btn">
+            <div class="quick-icon qi-rose">💳</div>
+            Billing
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /content -->
+</div><!-- /main -->
 
 <script>
-const toggleBtn = document.getElementById("themeToggle");
+  // Tab switching
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      tab.closest('.tabs').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+    });
+  });
 
-// load saved theme
-if (localStorage.getItem("theme") === "light") {
-  document.body.classList.add("light");
-  toggleBtn.textContent = "☀️";
-}
-
-toggleBtn.addEventListener("click", () => {
-  document.body.classList.toggle("light");
-
-  if (document.body.classList.contains("light")) {
-    toggleBtn.textContent = "☀️";
-    localStorage.setItem("theme", "light");
-  } else {
-    toggleBtn.textContent = "🌙";
-    localStorage.setItem("theme", "dark");
-  }
-});
+  // Nav item highlighting
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+    });
+  });
 </script>
-
 </body>
 </html>
