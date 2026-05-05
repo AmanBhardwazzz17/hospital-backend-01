@@ -3,176 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Patient Dashboard</title>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<style>
-body {
-  font-family: Arial;
-  margin: 0;
-  background: #f4f7fb;
-}
-
-.header {
-  padding: 15px;
-  background: #2563eb;
-  color: white;
-  font-size: 18px;
-  display: flex;
-  justify-content: space-between;
-}
-
-.container {
-  padding: 20px;
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 20px;
-}
-
-.card {
-  background: white;
-  padding: 15px;
-  border-radius: 10px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-}
-
-/* Map */
-#map {
-  height: 300px;
-  border-radius: 10px;
-}
-
-/* Beds */
-.bed {
-  display: flex;
-  justify-content: space-between;
-  margin: 10px 0;
-}
-
-.bar {
-  height: 8px;
-  background: #e5e7eb;
-  border-radius: 5px;
-  overflow: hidden;
-}
-.bar-fill {
-  height: 100%;
-  background: #22c55e;
-}
-
-/* Emergency */
-.emergency {
-  background: red;
-  color: white;
-  padding: 15px;
-  border: none;
-  width: 100%;
-  border-radius: 10px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-/* SMS */
-.sms input {
-  width: 100%;
-  padding: 8px;
-  margin-top: 8px;
-}
-
-.sms button {
-  margin-top: 10px;
-  padding: 10px;
-  width: 100%;
-  background: #2563eb;
-  color: white;
-  border: none;
-  border-radius: 8px;
-}
-</style>
-</head>
-
-<body>
-
-<div class="header">
-  Patient Dashboard
-</div>
-
-<div class="container">
-
-  <!-- MAP -->
-  <div class="card">
-    <h3>Nearby Hospitals</h3>
-    <div id="map"></div>
-  </div>
-
-  <!-- RIGHT SIDE -->
-  <div>
-
-    <!-- BED STATUS -->
-    <div class="card">
-      <h3>Bed Availability</h3>
-
-      <div class="bed">
-        ICU <span>6/10</span>
-      </div>
-      <div class="bar"><div class="bar-fill" style="width:60%"></div></div>
-
-      <div class="bed">
-        General <span>20/30</span>
-      </div>
-      <div class="bar"><div class="bar-fill" style="width:70%"></div></div>
-
-    </div>
-
-    <!-- EMERGENCY -->
-    <div class="card">
-      <button class="emergency" onclick="sendEmergency()">🚨 Emergency Request</button>
-    </div>
-
-    <!-- SMS ALERT -->
-    <div class="card sms">
-      <h3>Send SMS Alert</h3>
-      <input type="text" id="phone" placeholder="Enter phone number">
-      <button onclick="sendSMS()">Send Alert</button>
-    </div>
-
-  </div>
-
-</div>
-
-<!-- ANALYTICS -->
-<div style="padding:20px;">
-  <div class="card">
-    <h3>Peak Emergency Hours</h3>
-    <canvas id="chart"></canvas>
-  </div>
-</div>
-
-<!-- GOOGLE MAP -->
-<script>
-function initMap() {
-  const location = { lat: 26.1445, lng: 91.7362 }; // Guwahati
-
-  const map = new google.maps.Map(document.getElementById("map"), {
-    zoom: 13,
-    center: location,
-  });
-
-  new google.maps.Marker({
-    position: location,
-    map,
-    title: "Nearby Hospital"
-  });
-}
-</script>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Live Bed Availability – HospTrack</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
 <style>
 :root {
   --bg: #f0f4ff;
@@ -188,579 +22,161 @@ function initMap() {
   --font: 'Plus Jakarta Sans', sans-serif;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--bg)}
 
-/* TOPBAR */
-.topbar {
-  background: white; border-bottom: 1px solid var(--border);
-  padding: 16px 28px; display: flex; align-items: center;
-  justify-content: space-between; position: sticky; top: 0; z-index: 100;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+.topbar{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:15px;background:white;border-bottom:1px solid #eee
 }
-.logo { display: flex; align-items: center; gap: 10px; }
-.logo-icon {
-  width: 38px; height: 38px;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  border-radius: 10px; display: flex; align-items: center;
-  justify-content: center; font-size: 18px;
-}
-.logo-text { font-size: 17px; font-weight: 800; }
+.logo{font-weight:800}
+.content{padding:20px}
 
-.live-badge {
-  display: flex; align-items: center; gap: 6px;
-  background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2);
-  padding: 6px 14px; border-radius: 20px; font-size: 12px;
-  font-weight: 700; color: var(--success);
+.summary-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px
 }
-.live-dot {
-  width: 8px; height: 8px; background: var(--success);
-  border-radius: 50%; animation: blink 1s infinite;
-}
-@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
-
-.topbar-right { display: flex; align-items: center; gap: 10px; }
-.last-update { font-size: 12px; color: var(--muted); }
-.refresh-btn {
-  padding: 8px 16px; border-radius: 10px; border: 1px solid var(--border);
-  background: white; color: var(--text); font-size: 13px; font-weight: 600;
-  cursor: pointer; font-family: var(--font); transition: all 0.2s;
-  display: flex; align-items: center; gap: 6px;
-}
-.refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
-.back-btn {
-  padding: 8px 16px; border-radius: 10px; border: none;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  color: white; font-size: 13px; font-weight: 700;
-  cursor: pointer; font-family: var(--font);
+.summary-card{
+  background:white;padding:15px;border-radius:10px;text-align:center
 }
 
-/* CONTENT */
-.content { padding: 24px 28px; max-width: 1400px; margin: 0 auto; }
+.map-section{background:white;border-radius:10px;margin-bottom:20px}
+#map{height:300px}
 
-/* HEADER */
-.page-header { margin-bottom: 24px; }
-.page-header h1 { font-size: 26px; font-weight: 800; margin-bottom: 6px; }
-.page-header p { font-size: 14px; color: var(--muted); }
-
-/* SUMMARY CARDS */
-.summary-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px;
+.hospitals-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:15px
 }
-.summary-card {
-  background: white; border-radius: 16px; padding: 20px;
-  border: 1px solid var(--border); transition: transform 0.2s;
-}
-.summary-card:hover { transform: translateY(-2px); }
-.summary-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.summary-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-.summary-icon.green { background: rgba(0,150,136,0.1); }
-.summary-icon.blue { background: rgba(59,130,246,0.1); }
-.summary-icon.red { background: rgba(239,68,68,0.1); }
-.summary-icon.yellow { background: rgba(245,158,11,0.1); }
-.summary-val { font-size: 30px; font-weight: 800; margin-bottom: 4px; }
-.summary-label { font-size: 12px; color: var(--muted); font-weight: 500; }
-.summary-sub { font-size: 12px; color: var(--success); font-weight: 600; margin-top: 6px; }
-
-/* FILTERS */
-.filters {
-  display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;
-  align-items: center;
-}
-.filter-btn {
-  padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border);
-  background: white; color: var(--muted); font-size: 12px; font-weight: 600;
-  cursor: pointer; font-family: var(--font); transition: all 0.2s;
-}
-.filter-btn:hover, .filter-btn.active {
-  border-color: var(--accent); color: var(--accent);
-  background: rgba(0,150,136,0.05);
-}
-.search-filter {
-  margin-left: auto; display: flex; align-items: center; gap: 8px;
-  background: white; border: 1px solid var(--border); border-radius: 10px;
-  padding: 8px 14px;
-}
-.search-filter input {
-  border: none; outline: none; font-size: 13px; font-family: var(--font);
-  color: var(--text); width: 180px; background: none;
+.hospital-card{
+  background:white;padding:15px;border-radius:10px
 }
 
-/* HOSPITAL CARDS */
-.hospitals-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 20px;
-}
-
-.hospital-card {
-  background: white; border-radius: 20px; padding: 22px;
-  border: 1px solid var(--border); transition: all 0.3s;
-  animation: fadeInUp 0.5s ease both;
-}
-.hospital-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.1); }
-
-@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-.card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
-.card-title { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
-.card-location { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 4px; }
-
-.status-badge { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-.status-badge.high { background: rgba(16,185,129,0.1); color: var(--success); }
-.status-badge.medium { background: rgba(245,158,11,0.1); color: var(--warning); }
-.status-badge.low { background: rgba(239,68,68,0.1); color: var(--danger); }
-.status-badge.emergency { background: rgba(239,68,68,0.15); color: var(--danger); border: 1px solid rgba(239,68,68,0.2); }
-
-/* BED TYPES */
-.bed-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-.bed-item {
-  background: var(--bg); border-radius: 12px; padding: 12px;
-  border: 1px solid var(--border);
-}
-.bed-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-.bed-item-label { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-.bed-item-count { font-size: 18px; font-weight: 800; }
-.bed-item-count.safe { color: var(--success); }
-.bed-item-count.warn { color: var(--warning); }
-.bed-item-count.danger { color: var(--danger); }
-
-.bed-bar { height: 5px; background: var(--border); border-radius: 10px; overflow: hidden; }
-.bed-fill { height: 100%; border-radius: 10px; transition: width 1s ease; }
-.bed-fill.safe { background: var(--success); }
-.bed-fill.warn { background: var(--warning); }
-.bed-fill.danger { background: var(--danger); }
-
-.bed-sub { font-size: 10px; color: var(--muted); margin-top: 4px; }
-
-/* CARD FOOTER */
-.card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 14px; border-top: 1px solid var(--border); }
-.card-updated { font-size: 11px; color: var(--muted); }
-.card-btns { display: flex; gap: 8px; }
-.card-btn {
-  padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;
-  cursor: pointer; font-family: var(--font); transition: all 0.2s; border: 1px solid var(--border);
-  background: white; color: var(--text);
-}
-.card-btn:hover { border-color: var(--accent); color: var(--accent); }
-.card-btn.primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; color: white; }
-.card-btn.primary:hover { opacity: 0.9; color: white; }
-
-/* EMERGENCY BANNER */
-.emergency-banner {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  border-radius: 16px; padding: 18px 24px; margin-bottom: 24px;
-  display: flex; align-items: center; justify-content: space-between;
-  animation: pulse-banner 2s infinite;
-}
-@keyframes pulse-banner { 0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.3); } 50% { box-shadow: 0 0 0 10px rgba(239,68,68,0); } }
-.emergency-left { display: flex; align-items: center; gap: 14px; }
-.emergency-icon { font-size: 28px; }
-.emergency-text h3 { font-size: 16px; font-weight: 800; color: white; margin-bottom: 3px; }
-.emergency-text p { font-size: 12px; color: rgba(255,255,255,0.8); }
-.emergency-btn {
-  padding: 10px 20px; background: white; border: none; border-radius: 10px;
-  color: var(--danger); font-size: 13px; font-weight: 800; cursor: pointer;
-  font-family: var(--font); transition: transform 0.2s;
-}
-.emergency-btn:hover { transform: scale(1.05); }
-
-/* LOADING */
-.loading { text-align: center; padding: 60px; }
-.spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* EMPTY */
-.empty { text-align: center; padding: 60px; color: var(--muted); }
-.empty-icon { font-size: 48px; margin-bottom: 12px; }
-
-/* RESPONSIVE */
-@media (max-width: 768px) {
-  .summary-grid { grid-template-columns: repeat(2, 1fr); }
-  .hospitals-grid { grid-template-columns: 1fr; }
-  .content { padding: 16px; }
-  .topbar { padding: 12px 16px; }
-  .filters { gap: 6px; }
-  .search-filter { width: 100%; }
-  .search-filter input { width: 100%; }
-}
+button{cursor:pointer}
 </style>
 </head>
+
 <body>
 
-<!-- TOPBAR -->
 <div class="topbar">
-  <div class="logo">
-    <div class="logo-icon">🏥</div>
-    <div class="logo-text">HospTrack</div>
-  </div>
-  <div class="live-badge">
-    <div class="live-dot"></div>
-    LIVE
-  </div>
-  <div class="topbar-right">
-    <span class="last-update" id="lastUpdate">Updating...</span>
-    <button class="refresh-btn" onclick="loadBeds()">🔄 Refresh</button>
-    <button class="back-btn" onclick="history.back()">← Back</button>
-  </div>
+  <div class="logo">🏥 HospTrack</div>
+  <button onclick="loadBeds()">Refresh</button>
 </div>
 
-<!-- CONTENT -->
 <div class="content">
 
-  <div class="page-header">
-    <h1>🛏️ Live Bed Availability</h1>
-    <p>Real-time hospital bed availability — updated every 30 seconds automatically</p>
-  </div>
+<h2>🛏️ Live Bed Availability</h2>
 
-  <!-- EMERGENCY BANNER -->
-  <div class="emergency-banner">
-    <div class="emergency-left">
-      <div class="emergency-icon">🚨</div>
-      <div class="emergency-text">
-        <h3>Need Emergency Help?</h3>
-        <p>Click to find nearest hospital with available emergency beds</p>
-      </div>
-    </div>
-    <button class="emergency-btn" onclick="findEmergency()">Find Emergency Bed →</button>
-  </div>
+<div class="summary-grid">
+  <div class="summary-card"><div id="totalHospitals">0</div>Total Hospitals</div>
+  <div class="summary-card"><div id="totalBeds">0</div>Total Beds</div>
+  <div class="summary-card"><div id="availableBeds">0</div>Available Beds</div>
+  <div class="summary-card"><div id="availableICU">0</div>ICU Beds</div>
+</div>
 
-  <!-- SUMMARY -->
-  <div class="summary-grid">
-    <div class="summary-card">
-      <div class="summary-top">
-        <div class="summary-icon green">🏥</div>
-      </div>
-      <div class="summary-val" id="totalHospitals">—</div>
-      <div class="summary-label">Total Hospitals</div>
-      <div class="summary-sub" id="activeHospitals">— Active</div>
-    </div>
-    <div class="summary-card">
-      <div class="summary-top">
-        <div class="summary-icon blue">🛏️</div>
-      </div>
-      <div class="summary-val" id="totalBeds">—</div>
-      <div class="summary-label">Total Beds</div>
-      <div class="summary-sub" id="availableBeds">— Available</div>
-    </div>
-    <div class="summary-card">
-      <div class="summary-top">
-        <div class="summary-icon red">🏥</div>
-      </div>
-      <div class="summary-val" id="totalICU">—</div>
-      <div class="summary-label">ICU Beds</div>
-      <div class="summary-sub" id="availableICU">— Available</div>
-    </div>
-    <div class="summary-card">
-      <div class="summary-top">
-        <div class="summary-icon yellow">💨</div>
-      </div>
-      <div class="summary-val" id="totalOxygen">—</div>
-      <div class="summary-label">Oxygen Beds</div>
-      <div class="summary-sub" id="availableOxygen">— Available</div>
-    </div>
-  </div>
+<div class="map-section">
+  <div id="map"></div>
+</div>
 
-  <!-- FILTERS -->
-  <div class="filters">
-    <button class="filter-btn active" onclick="filterBeds('all', this)">All Hospitals</button>
-    <button class="filter-btn" onclick="filterBeds('available', this)">✅ Beds Available</button>
-    <button class="filter-btn" onclick="filterBeds('icu', this)">🏥 ICU Available</button>
-    <button class="filter-btn" onclick="filterBeds('emergency', this)">🚨 Emergency</button>
-    <div class="search-filter">
-      🔍 <input type="text" id="searchInput" placeholder="Search hospital or city..." oninput="searchHospitals()">
-    </div>
-  </div>
-
-  <!-- HOSPITALS GRID -->
-  <div id="hospitalsGrid" class="hospitals-grid">
-    <div class="loading">
-      <div class="spinner"></div>
-      <p>Loading hospitals...</p>
-    </div>
-  </div>
+<div id="hospitalsGrid" class="hospitals-grid"></div>
 
 </div>
 
 <script>
-  const API_URL = "https://hospital-backend-01.onrender.com";
-  let allHospitals = [];
-  let currentFilter = 'all';
+const API_URL = "https://hospital-backend-01.onrender.com";
 
-  // ✅ Bed status calculate
-  function getBedStatus(available, total) {
-    if (total === 0) return 'danger';
-    const pct = (available / total) * 100;
-    if (pct > 40) return 'safe';
-    if (pct > 15) return 'warn';
-    return 'danger';
-  }
+let hospitals = [];
+let map;
+let markers=[];
 
-  // ✅ Availability badge
-  function getStatusBadge(available, total) {
-    if (total === 0) return '<span class="status-badge low">No Data</span>';
-    const pct = (available / total) * 100;
-    if (pct > 40) return `<span class="status-badge high">✓ Available</span>`;
-    if (pct > 15) return `<span class="status-badge medium">⚠ Limited</span>`;
-    return `<span class="status-badge low">✗ Critical</span>`;
-  }
-
-  // ✅ Time ago
-  function timeAgo(date) {
-    const seconds = Math.floor((new Date() - new Date(date)) / 1000);
-    if (seconds < 60) return `${seconds}s ago`;
-    if (seconds < 3600) return `${Math.floor(seconds/60)}m ago`;
-    return `${Math.floor(seconds/3600)}h ago`;
-  }
-
-  // ✅ Render hospitals
-  function renderHospitals(hospitals) {
-    const grid = document.getElementById('hospitalsGrid');
-
-    if (hospitals.length === 0) {
-      grid.innerHTML = `
-        <div class="empty" style="grid-column:1/-1">
-          <div class="empty-icon">🏥</div>
-          <p>No hospitals found</p>
-        </div>`;
-      return;
-    }
-
-    grid.innerHTML = hospitals.map((h, i) => {
-      const generalStatus = getBedStatus(h.availableBeds, h.totalBeds);
-      const icuStatus = getBedStatus(h.icuAvailable, h.icuTotal);
-      const oxygenStatus = getBedStatus(h.oxygenAvailable, h.oxygenTotal);
-      const ventStatus = getBedStatus(h.ventilatorAvailable, h.ventilatorTotal);
-
-      const generalPct = h.totalBeds > 0 ? Math.round((h.availableBeds / h.totalBeds) * 100) : 0;
-      const icuPct = h.icuTotal > 0 ? Math.round((h.icuAvailable / h.icuTotal) * 100) : 0;
-      const oxygenPct = h.oxygenTotal > 0 ? Math.round((h.oxygenAvailable / h.oxygenTotal) * 100) : 0;
-      const ventPct = h.ventilatorTotal > 0 ? Math.round((h.ventilatorAvailable / h.ventilatorTotal) * 100) : 0;
-
-      return `
-        <div class="hospital-card" style="animation-delay:${i * 0.05}s">
-          <div class="card-header">
-            <div>
-              <div class="card-title">🏥 ${h.name}</div>
-              <div class="card-location">📍 ${h.city}${h.address ? ' • ' + h.address : ''}</div>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
-              ${getStatusBadge(h.availableBeds, h.totalBeds)}
-              ${h.emergencyAvailable ? '<span class="status-badge high" style="font-size:10px">🚨 Emergency Open</span>' : '<span class="status-badge low" style="font-size:10px">🚨 Emergency Closed</span>'}
-            </div>
-          </div>
-
-          <div class="bed-grid">
-            <div class="bed-item">
-              <div class="bed-item-header">
-                <span class="bed-item-label">🛏️ General</span>
-                <span class="bed-item-count ${generalStatus}">${h.availableBeds}</span>
-              </div>
-              <div class="bed-bar"><div class="bed-fill ${generalStatus}" style="width:${generalPct}%"></div></div>
-              <div class="bed-sub">${h.availableBeds}/${h.totalBeds} available (${generalPct}%)</div>
-            </div>
-
-            <div class="bed-item">
-              <div class="bed-item-header">
-                <span class="bed-item-label">🏥 ICU</span>
-                <span class="bed-item-count ${icuStatus}">${h.icuAvailable}</span>
-              </div>
-              <div class="bed-bar"><div class="bed-fill ${icuStatus}" style="width:${icuPct}%"></div></div>
-              <div class="bed-sub">${h.icuAvailable}/${h.icuTotal} available (${icuPct}%)</div>
-            </div>
-
-            <div class="bed-item">
-              <div class="bed-item-header">
-                <span class="bed-item-label">💨 Oxygen</span>
-                <span class="bed-item-count ${oxygenStatus}">${h.oxygenAvailable}</span>
-              </div>
-              <div class="bed-bar"><div class="bed-fill ${oxygenStatus}" style="width:${oxygenPct}%"></div></div>
-              <div class="bed-sub">${h.oxygenAvailable}/${h.oxygenTotal} available (${oxygenPct}%)</div>
-            </div>
-
-            <div class="bed-item">
-              <div class="bed-item-header">
-                <span class="bed-item-label">🫁 Ventilator</span>
-                <span class="bed-item-count ${ventStatus}">${h.ventilatorAvailable}</span>
-              </div>
-              <div class="bed-bar"><div class="bed-fill ${ventStatus}" style="width:${ventPct}%"></div></div>
-              <div class="bed-sub">${h.ventilatorAvailable}/${h.ventilatorTotal} available (${ventPct}%)</div>
-            </div>
-          </div>
-
-          <div class="card-footer">
-            <span class="card-updated">🕐 Updated ${timeAgo(h.updatedAt)}</span>
-            <div class="card-btns">
-              ${h.phone ? `<button class="card-btn" onclick="callHospital('${h.phone}')">📞 Call</button>` : ''}
-              <button class="card-btn primary" onclick="bookBed('${h._id}', '${h.name}')">Book Bed →</button>
-            </div>
-          </div>
-        </div>`;
-    }).join('');
-  }
-
-  // ✅ Load beds from API
-  async function loadBeds() {
-    try {
-      const res = await fetch(`${API_URL}/api/hospitals/beds`);
-      const data = await res.json();
-
-      if (data.success) {
-        allHospitals = data.hospitals;
-        updateSummary(data.hospitals);
-        applyFilter(currentFilter);
-
-        const now = new Date();
-        document.getElementById('lastUpdate').textContent =
-          `Last updated: ${now.toLocaleTimeString('en-IN')}`;
-      } else {
-        showDemoData();
-      }
-    } catch (err) {
-      showDemoData();
-    }
-  }
-
-  // ✅ Demo data agar API nahi hai
-  function showDemoData() {
-    const demo = [
-      {
-        _id: '1', name: 'City Hospital', city: 'Mumbai', address: 'Andheri West',
-        totalBeds: 200, availableBeds: 85, icuTotal: 30, icuAvailable: 12,
-        oxygenTotal: 50, oxygenAvailable: 22, ventilatorTotal: 15, ventilatorAvailable: 6,
-        emergencyAvailable: true, phone: '022-12345678', updatedAt: new Date()
-      },
-      {
-        _id: '2', name: 'Apollo Medical Center', city: 'Delhi', address: 'Saket',
-        totalBeds: 350, availableBeds: 45, icuTotal: 60, icuAvailable: 5,
-        oxygenTotal: 80, oxygenAvailable: 8, ventilatorTotal: 25, ventilatorAvailable: 2,
-        emergencyAvailable: true, phone: '011-98765432', updatedAt: new Date(Date.now() - 300000)
-      },
-      {
-        _id: '3', name: 'LifeCare Hospital', city: 'Bangalore', address: 'Koramangala',
-        totalBeds: 150, availableBeds: 3, icuTotal: 20, icuAvailable: 0,
-        oxygenTotal: 35, oxygenAvailable: 1, ventilatorTotal: 10, ventilatorAvailable: 0,
-        emergencyAvailable: false, phone: '080-11223344', updatedAt: new Date(Date.now() - 600000)
-      },
-      {
-        _id: '4', name: 'Green Cross Hospital', city: 'Pune', address: 'Kothrud',
-        totalBeds: 120, availableBeds: 67, icuTotal: 18, icuAvailable: 9,
-        oxygenTotal: 30, oxygenAvailable: 18, ventilatorTotal: 8, ventilatorAvailable: 5,
-        emergencyAvailable: true, phone: '020-55667788', updatedAt: new Date(Date.now() - 120000)
-      },
-    ];
-
-    allHospitals = demo;
-    updateSummary(demo);
-    applyFilter(currentFilter);
-    document.getElementById('lastUpdate').textContent = `Demo Data — ${new Date().toLocaleTimeString('en-IN')}`;
-  }
-
-  // ✅ Update summary cards
-  function updateSummary(hospitals) {
-    const totalH = hospitals.length;
-    const totalB = hospitals.reduce((s, h) => s + h.totalBeds, 0);
-    const availB = hospitals.reduce((s, h) => s + h.availableBeds, 0);
-    const totalI = hospitals.reduce((s, h) => s + h.icuTotal, 0);
-    const availI = hospitals.reduce((s, h) => s + h.icuAvailable, 0);
-    const totalO = hospitals.reduce((s, h) => s + h.oxygenTotal, 0);
-    const availO = hospitals.reduce((s, h) => s + h.oxygenAvailable, 0);
-
-    document.getElementById('totalHospitals').textContent = totalH;
-    document.getElementById('activeHospitals').textContent = `${hospitals.filter(h => h.availableBeds > 0).length} with beds`;
-    document.getElementById('totalBeds').textContent = totalB;
-    document.getElementById('availableBeds').textContent = `${availB} Available`;
-    document.getElementById('totalICU').textContent = totalI;
-    document.getElementById('availableICU').textContent = `${availI} Available`;
-    document.getElementById('totalOxygen').textContent = totalO;
-    document.getElementById('availableOxygen').textContent = `${availO} Available`;
-  }
-
-  // ✅ Filter
-  function filterBeds(type, btn) {
-    currentFilter = type;
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    applyFilter(type);
-  }
-
-  function applyFilter(type) {
-    let filtered = [...allHospitals];
-    if (type === 'available') filtered = filtered.filter(h => h.availableBeds > 0);
-    if (type === 'icu') filtered = filtered.filter(h => h.icuAvailable > 0);
-    if (type === 'emergency') filtered = filtered.filter(h => h.emergencyAvailable);
-    renderHospitals(filtered);
-  }
-
-  // ✅ Search
-  function searchHospitals() {
-    const query = document.getElementById('searchInput').value.toLowerCase();
-    const filtered = allHospitals.filter(h =>
-      h.name.toLowerCase().includes(query) ||
-      h.city.toLowerCase().includes(query)
-    );
-    renderHospitals(filtered);
-  }
-
-  // ✅ Emergency
-  function findEmergency() {
-    const emergency = allHospitals
-      .filter(h => h.emergencyAvailable && h.availableBeds > 0)
-      .sort((a, b) => b.availableBeds - a.availableBeds)[0];
-
-    if (emergency) {
-      alert(`🚨 Nearest Emergency Hospital:\n\n🏥 ${emergency.name}\n📍 ${emergency.city}\n🛏️ ${emergency.availableBeds} beds available\n📞 ${emergency.phone || 'N/A'}`);
-    } else {
-      alert('❌ No emergency beds available nearby. Please call 108.');
-    }
-  }
-
-  // ✅ Call
-  function callHospital(phone) {
-    window.location.href = `tel:${phone}`;
-  }
-
-  // ✅ Book bed
-  function bookBed(id, name) {
-    alert(`📅 Booking bed at ${name}...\n\nAppointment booking feature coming soon!`);
-  }
-
-  // ✅ Auto refresh every 30 seconds
-  loadBeds();
-  setInterval(loadBeds, 30000);
-</script>
-
-</body>
-</html>
-<script async
-src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap">
-</script>
-
-<!-- CHART -->
-<script>
-new Chart(document.getElementById("chart"), {
-  type: 'line',
-  data: {
-    labels: ["6AM","9AM","12PM","3PM","6PM","9PM"],
-    datasets: [{
-      label: "Emergency Cases",
-      data: [5, 12, 20, 15, 25, 18],
-      borderWidth: 2
-    }]
-  }
-});
-</script>
-
-<!-- FUNCTIONS -->
-<script>
-function sendEmergency() {
-  alert("🚑 Emergency Request Sent!");
+function initMap(){
+  map=new google.maps.Map(document.getElementById("map"),{
+    center:{lat:28.61,lng:77.20},
+    zoom:5
+  });
 }
 
-function sendSMS() {
-  const phone = document.getElementById("phone").value;
-  alert("SMS sent to " + phone);
+async function loadBeds(){
+  try{
+    const res=await fetch(API_URL+"/api/hospitals");
+    const data=await res.json();
 
-  // Backend API yaha connect karega (Twilio etc.)
+    if(data.success){
+      hospitals=data.data;
+    }else{
+      demoData();
+    }
+  }catch{
+    demoData();
+  }
+
+  render();
 }
+
+function demoData(){
+  hospitals=[
+    {name:"City Hospital",city:"Mumbai",availableBeds:50,totalBeds:200,icuAvailable:10,lat:19.07,lng:72.87},
+    {name:"Apollo",city:"Delhi",availableBeds:20,totalBeds:150,icuAvailable:5,lat:28.61,lng:77.20}
+  ];
+}
+
+function render(){
+  document.getElementById("totalHospitals").innerText=hospitals.length;
+
+  let totalBeds=0,availableBeds=0,icu=0;
+
+  hospitals.forEach(h=>{
+    totalBeds+=h.totalBeds||0;
+    availableBeds+=h.availableBeds||0;
+    icu+=h.icuAvailable||0;
+  });
+
+  document.getElementById("totalBeds").innerText=totalBeds;
+  document.getElementById("availableBeds").innerText=availableBeds;
+  document.getElementById("availableICU").innerText=icu;
+
+  renderCards();
+  renderMap();
+}
+
+function renderCards(){
+  const grid=document.getElementById("hospitalsGrid");
+  grid.innerHTML="";
+
+  hospitals.forEach(h=>{
+    const card=document.createElement("div");
+    card.className="hospital-card";
+    card.innerHTML=`
+      <h3>${h.name}</h3>
+      <p>${h.city}</p>
+      <p>🛏️ ${h.availableBeds}/${h.totalBeds}</p>
+      <p>🏥 ICU: ${h.icuAvailable}</p>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function renderMap(){
+  if(!map)return;
+
+  markers.forEach(m=>m.setMap(null));
+  markers=[];
+
+  hospitals.forEach(h=>{
+    if(!h.lat)return;
+
+    const marker=new google.maps.Marker({
+      position:{lat:h.lat,lng:h.lng},
+      map,
+      title:h.name
+    });
+
+    markers.push(marker);
+  });
+}
+
+loadBeds();
+</script>
+
+<script async defer
+src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap">
 </script>
 
 </body>
