@@ -18,6 +18,10 @@ app.get("/", (req, res) => {
   res.send("Hospital Backend API is running ✅");
 });
 
+app.get('/map', (req, res) => {
+  res.sendFile(__dirname + '/map.html');
+});
+
 // ✅ Use routes
 app.use("/api/auth", authRoutes);
 app.use('/api/appointments', appointmentRoutes);
