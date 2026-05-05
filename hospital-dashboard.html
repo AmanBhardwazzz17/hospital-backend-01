@@ -1,807 +1,1091 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>City Hospital – Admin Panel</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --navy: #e5e7ed;
-    --navy-mid: #ebedf3;
-    --navy-light: #1e2f55;
-    --accent: #3b82f6;
-    --accent-glow: #60a5fa;
-    --teal: #14b8a6;
-    --amber: #f59e0b;
-    --rose: #f43f5e;
-    --green: #22c55e;
-    --purple: #a855f7;
-    --card: #1a2844;
-    --card-border: rgba(59,130,246,0.12);
-    --text: #e2e8f0;
-    --muted: #94a3b8;
-    --sidebar-w: 220px;
-  }
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bed Management — City Hospital Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --primary: #1a56db;
+      --primary-light: #e8f0fe;
+      --sidebar: #0f1f3d;
+      --sidebar-active: #1a56db;
+      --bg: #f4f7fe;
+      --white: #ffffff;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --muted: #64748b;
+      --green: #10b981;
+      --green-light: #d1fae5;
+      --red: #ef4444;
+      --red-light: #fee2e2;
+      --yellow: #f59e0b;
+      --yellow-light: #fef3c7;
+      --blue-light: #dbeafe;
+    }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--navy);
-    color: var(--text);
-    display: flex;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      min-height: 100vh;
+    }
 
-  /* ── Sidebar ── */
-  .sidebar {
-    width: var(--sidebar-w);
-    background: var(--navy-mid);
-    border-right: 1px solid var(--card-border);
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    top: 0; left: 0; bottom: 0;
-    z-index: 100;
-    padding: 0 0 24px;
-  }
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 220px;
+      background: var(--sidebar);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 100;
+    }
 
-  .logo {
-    display: flex; align-items: center; gap: 10px;
-    padding: 22px 20px;
-    border-bottom: 1px solid var(--card-border);
-  }
-  .logo-icon {
-    width: 36px; height: 36px;
-    background: var(--accent);
-    border-radius: 10px;
-    display: grid; place-items: center;
-    font-size: 18px; font-weight: 800; color: #fff;
-    font-family: 'Syne', sans-serif;
-    box-shadow: 0 0 18px rgba(59,130,246,.45);
-  }
-  .logo-text h2 {
-    font-family: 'Syne', sans-serif;
-    font-size: 13px; font-weight: 700;
-    color: #fff; letter-spacing: .5px;
-  }
-  .logo-text p { font-size: 10px; color: var(--muted); margin-top: 1px; }
+    .sidebar-brand {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-  nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
+    .brand-icon {
+      width: 36px; height: 36px;
+      background: var(--primary);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: white;
+    }
 
-  .nav-item {
-    display: flex; align-items: center; gap: 11px;
-    padding: 10px 12px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 13px; font-weight: 500;
-    color: var(--muted);
-    transition: all .2s;
-    text-decoration: none;
-  }
-  .nav-item:hover { background: rgba(59,130,246,.08); color: var(--text); }
-  .nav-item.active {
-    background: rgba(59,130,246,.15);
-    color: var(--accent-glow);
-    box-shadow: inset 3px 0 0 var(--accent);
-  }
-  .nav-item svg { flex-shrink: 0; }
+    .brand-text { color: white; }
+    .brand-text h3 { font-size: 0.95rem; font-weight: 700; }
+    .brand-text p { font-size: 0.7rem; color: rgba(255,255,255,0.5); margin-top: 1px; }
 
-  .nav-logout {
-    padding: 0 12px;
-  }
-  .nav-logout .nav-item { color: var(--rose); }
-  .nav-logout .nav-item:hover { background: rgba(244,63,94,.1); }
+    .nav { flex: 1; padding: 12px 0; }
 
-  /* ── Main ── */
-  .main {
-    margin-left: var(--sidebar-w);
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      color: rgba(255,255,255,0.6);
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-left: 3px solid transparent;
+    }
 
-  /* ── Topbar ── */
-  .topbar {
-    background: var(--navy-mid);
-    border-bottom: 1px solid var(--card-border);
-    padding: 0 28px;
-    height: 64px;
-    display: flex; align-items: center; gap: 16px;
-    position: sticky; top: 0; z-index: 50;
-  }
-  .menu-btn { background: none; border: none; cursor: pointer; color: var(--muted); }
+    .nav-item:hover { color: white; background: rgba(255,255,255,0.05); }
 
-  .search {
-    flex: 1; max-width: 420px;
-    display: flex; align-items: center; gap: 10px;
-    background: var(--navy-light);
-    border: 1px solid var(--card-border);
-    border-radius: 10px;
-    padding: 8px 14px;
-  }
-  .search input {
-    background: none; border: none; outline: none;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px; color: var(--text); flex: 1;
-  }
-  .search input::placeholder { color: var(--muted); }
+    .nav-item.active {
+      color: white;
+      background: rgba(26,86,219,0.3);
+      border-left-color: var(--primary);
+    }
 
-  .topbar-right { display: flex; align-items: center; gap: 14px; margin-left: auto; }
+    .nav-icon { font-size: 1rem; width: 18px; text-align: center; }
 
-  .notif-btn {
-    position: relative; background: var(--navy-light);
-    border: 1px solid var(--card-border);
-    border-radius: 10px; width: 40px; height: 40px;
-    display: grid; place-items: center; cursor: pointer;
-    color: var(--muted);
-  }
-  .badge {
-    position: absolute; top: -4px; right: -4px;
-    background: var(--rose); color: #fff;
-    font-size: 9px; font-weight: 700;
-    border-radius: 999px; width: 16px; height: 16px;
-    display: grid; place-items: center;
-  }
+    .sidebar-footer {
+      padding: 16px 20px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
 
-  .user-chip {
-    display: flex; align-items: center; gap: 9px;
-    background: var(--navy-light);
-    border: 1px solid var(--card-border);
-    border-radius: 10px; padding: 6px 12px;
-    cursor: pointer;
-  }
-  .avatar {
-    width: 28px; height: 28px; border-radius: 8px;
-    background: var(--accent); display: grid; place-items: center;
-    font-size: 12px; font-weight: 700; color: #fff;
-  }
-  .user-chip span { font-size: 12px; font-weight: 600; }
-  .user-chip small { font-size: 10px; color: var(--muted); display: block; }
+    .logout-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: rgba(255,255,255,0.5);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
 
-  /* ── Content ── */
-  .content {
-    padding: 28px;
-    flex: 1;
-  }
+    .logout-btn:hover { color: var(--red); }
 
-  /* ── Header ── */
-  .page-header {
-    display: flex; justify-content: space-between; align-items: flex-start;
-    margin-bottom: 28px;
-    animation: fadeUp .5s ease both;
-  }
-  .page-header h1 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; }
-  .page-header p { font-size: 13px; color: var(--muted); margin-top: 4px; }
-  .date-chip {
-    display: flex; align-items: center; gap: 6px;
-    background: var(--card); border: 1px solid var(--card-border);
-    border-radius: 8px; padding: 7px 13px;
-    font-size: 12px; color: var(--muted);
-  }
+    /* ── Main ── */
+    .main {
+      margin-left: 220px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
 
-  /* ── Stat Cards ── */
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    margin-bottom: 24px;
-  }
+    /* ── Topbar ── */
+    .topbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
 
-  .stat-card {
-    background: var(--card);
-    border: 1px solid var(--card-border);
-    border-radius: 16px;
-    padding: 20px;
-    position: relative; overflow: hidden;
-    animation: fadeUp .5s ease both;
-    transition: transform .2s, box-shadow .2s;
-  }
-  .stat-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,.3); }
-  .stat-card:nth-child(1) { animation-delay: .05s; }
-  .stat-card:nth-child(2) { animation-delay: .10s; }
-  .stat-card:nth-child(3) { animation-delay: .15s; }
-  .stat-card:nth-child(4) { animation-delay: .20s; }
+    .topbar-left { display: flex; align-items: center; gap: 16px; }
 
-  .stat-card::before {
-    content: ''; position: absolute;
-    top: 0; right: 0; width: 80px; height: 80px;
-    border-radius: 50%;
-    transform: translate(20px,-20px);
-    opacity: .08;
-  }
-  .stat-card.blue::before { background: var(--accent); }
-  .stat-card.teal::before { background: var(--teal); }
-  .stat-card.purple::before { background: var(--purple); }
-  .stat-card.amber::before { background: var(--amber); }
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 14px;
+      width: 280px;
+    }
 
-  .stat-icon {
-    width: 40px; height: 40px; border-radius: 10px;
-    display: grid; place-items: center; margin-bottom: 14px;
-  }
-  .stat-icon.blue { background: rgba(59,130,246,.15); color: var(--accent-glow); }
-  .stat-icon.teal { background: rgba(20,184,166,.15); color: var(--teal); }
-  .stat-icon.purple { background: rgba(168,85,247,.15); color: var(--purple); }
-  .stat-icon.amber { background: rgba(245,158,11,.15); color: var(--amber); }
+    .search-box input {
+      border: none;
+      background: none;
+      outline: none;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.85rem;
+      color: var(--text);
+      width: 100%;
+    }
 
-  .stat-label { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
-  .stat-value { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; }
-  .stat-change {
-    display: flex; align-items: center; gap: 4px;
-    font-size: 11px; margin-top: 8px;
-  }
-  .stat-change.up { color: var(--green); }
-  .stat-change.neutral { color: var(--muted); }
+    .search-box input::placeholder { color: var(--muted); }
 
-  /* ── Middle Row ── */
-  .mid-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 24px;
-  }
+    .topbar-right { display: flex; align-items: center; gap: 16px; }
 
-  .card {
-    background: var(--card);
-    border: 1px solid var(--card-border);
-    border-radius: 16px;
-    padding: 20px;
-    animation: fadeUp .5s ease both;
-    animation-delay: .25s;
-  }
+    .notif-btn {
+      position: relative;
+      width: 36px; height: 36px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1rem;
+    }
 
-  .card-header {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 16px;
-  }
-  .card-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; }
-  .view-all { font-size: 12px; color: var(--accent-glow); cursor: pointer; text-decoration: none; }
-  .view-all:hover { text-decoration: underline; }
+    .notif-badge {
+      position: absolute;
+      top: -4px; right: -4px;
+      background: var(--red);
+      color: white;
+      font-size: 0.6rem;
+      font-weight: 700;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-  /* Chart */
-  .chart-card { grid-column: span 1; }
-  .chart-wrap { position: relative; height: 160px; }
-  svg.chart { width: 100%; height: 100%; }
+    .admin-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
 
-  .chart-badge {
-    position: absolute; top: 40%; left: 62%;
-    background: var(--accent);
-    border-radius: 10px; padding: 6px 10px;
-    font-family: 'Syne', sans-serif;
-    font-size: 18px; font-weight: 700; color: #fff;
-    box-shadow: 0 4px 16px rgba(59,130,246,.5);
-    text-align: center;
-    line-height: 1.2;
-  }
-  .chart-badge small { display: block; font-family: 'DM Sans', sans-serif; font-size: 9px; font-weight: 400; opacity: .8; }
+    .admin-avatar {
+      width: 36px; height: 36px;
+      background: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
 
-  .chart-filter {
-    background: var(--navy-light); border: 1px solid var(--card-border);
-    border-radius: 7px; padding: 4px 10px;
-    font-size: 11px; color: var(--muted);
-    cursor: pointer;
-  }
+    .admin-info { line-height: 1.2; }
+    .admin-name { font-size: 0.85rem; font-weight: 600; }
+    .admin-role { font-size: 0.7rem; color: var(--muted); }
 
-  /* Appointments list */
-  .appt-item {
-    display: flex; align-items: center; gap: 12px;
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(255,255,255,.04);
-  }
-  .appt-item:last-child { border-bottom: none; }
-  .appt-time { font-size: 11px; color: var(--accent-glow); font-weight: 600; min-width: 56px; }
-  .appt-info { flex: 1; }
-  .appt-info strong { font-size: 12px; font-weight: 600; display: block; }
-  .appt-info span { font-size: 10px; color: var(--muted); }
+    /* ── Content ── */
+    .content { padding: 24px 28px; }
 
-  .tag {
-    font-size: 9px; font-weight: 600;
-    border-radius: 5px; padding: 2px 7px;
-    letter-spacing: .3px;
-  }
-  .tag.cardio { background: rgba(59,130,246,.15); color: var(--accent-glow); }
-  .tag.derm { background: rgba(20,184,166,.15); color: var(--teal); }
-  .tag.neuro { background: rgba(168,85,247,.15); color: var(--purple); }
-  .tag.pedia { background: rgba(245,158,11,.15); color: var(--amber); }
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+    }
 
-  .status {
-    font-size: 9px; font-weight: 600;
-    border-radius: 5px; padding: 2px 8px;
-  }
-  .status.confirmed { background: rgba(34,197,94,.15); color: var(--green); }
-  .status.pending { background: rgba(245,158,11,.15); color: var(--amber); }
-  .status.new { background: rgba(59,130,246,.15); color: var(--accent-glow); }
+    .page-title h1 { font-size: 1.4rem; font-weight: 700; }
+    .page-title p { font-size: 0.85rem; color: var(--muted); margin-top: 3px; }
 
-  /* New bookings */
-  .booking-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 9px 0;
-    border-bottom: 1px solid rgba(255,255,255,.04);
-  }
-  .booking-item:last-child { border-bottom: none; }
-  .booking-time { font-size: 11px; color: var(--teal); font-weight: 600; min-width: 52px; }
-  .booking-info { flex: 1; }
-  .booking-info strong { font-size: 12px; font-weight: 600; display: block; }
-  .booking-info span { font-size: 10px; color: var(--muted); }
+    .header-actions { display: flex; gap: 10px; }
 
-  /* ── Bottom Row ── */
-  .bottom-row {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 16px;
-  }
+    .btn {
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
 
-  /* Table */
-  .tabs { display: flex; gap: 4px; margin-bottom: 16px; }
-  .tab {
-    font-size: 12px; font-weight: 500; padding: 6px 14px;
-    border-radius: 8px; cursor: pointer; color: var(--muted);
-    transition: all .2s;
-  }
-  .tab.active { background: var(--accent); color: #fff; }
-  .tab:hover:not(.active) { background: rgba(59,130,246,.1); color: var(--text); }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: #1648c7; }
+    .btn-outline {
+      background: white;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover { background: var(--bg); }
 
-  table { width: 100%; border-collapse: collapse; }
-  thead th {
-    font-size: 11px; font-weight: 600; color: var(--muted);
-    text-align: left; padding: 8px 0; text-transform: uppercase;
-    letter-spacing: .5px;
-    border-bottom: 1px solid rgba(255,255,255,.06);
-  }
-  tbody tr { transition: background .15s; }
-  tbody tr:hover { background: rgba(59,130,246,.04); }
-  tbody td {
-    font-size: 12px; padding: 11px 0;
-    border-bottom: 1px solid rgba(255,255,255,.04);
-    vertical-align: middle;
-  }
-  .eye-btn {
-    color: var(--accent-glow); cursor: pointer; background: none; border: none;
-    font-size: 14px;
-  }
+    /* ── Stats Row ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
 
-  /* Quick Actions */
-  .quick-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-  }
-  .quick-btn {
-    display: flex; flex-direction: column; align-items: center;
-    gap: 8px; padding: 16px 8px;
-    background: var(--navy-light);
-    border: 1px solid var(--card-border);
-    border-radius: 12px; cursor: pointer;
-    font-size: 11px; font-weight: 500; color: var(--text);
-    transition: all .2s; text-align: center;
-  }
-  .quick-btn:hover { background: rgba(59,130,246,.1); border-color: rgba(59,130,246,.3); transform: translateY(-2px); }
-  .quick-icon {
-    width: 38px; height: 38px; border-radius: 10px;
-    display: grid; place-items: center; font-size: 18px;
-  }
-  .qi-blue { background: rgba(59,130,246,.15); }
-  .qi-green { background: rgba(34,197,94,.15); }
-  .qi-purple { background: rgba(168,85,247,.15); }
-  .qi-amber { background: rgba(245,158,11,.15); }
-  .qi-teal { background: rgba(20,184,166,.15); }
-  .qi-rose { background: rgba(244,63,94,.15); }
+    .stat-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      animation: fadeUp 0.4s ease both;
+    }
 
-  /* ── Animations ── */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(14px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+    .stat-card:nth-child(1) { animation-delay: 0.05s; }
+    .stat-card:nth-child(2) { animation-delay: 0.1s; }
+    .stat-card:nth-child(3) { animation-delay: 0.15s; }
+    .stat-card:nth-child(4) { animation-delay: 0.2s; }
 
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 5px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--navy-light); border-radius: 99px; }
-</style>
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .stat-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .stat-icon {
+      width: 42px; height: 42px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .icon-blue { background: var(--blue-light); }
+    .icon-green { background: var(--green-light); }
+    .icon-red { background: var(--red-light); }
+    .icon-yellow { background: var(--yellow-light); }
+
+    .stat-label { font-size: 0.78rem; color: var(--muted); font-weight: 500; }
+    .stat-num {
+      font-size: 1.9rem;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .stat-change {
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .change-up { color: var(--green); }
+    .change-down { color: var(--red); }
+    .change-neutral { color: var(--muted); }
+
+    /* ── Main Grid ── */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px;
+      animation: fadeUp 0.4s ease both;
+      animation-delay: 0.25s;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .card-title { font-size: 1rem; font-weight: 700; }
+
+    .view-all {
+      font-size: 0.78rem;
+      color: var(--primary);
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* ── Ward Grid ── */
+    .ward-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .ward-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      transition: box-shadow 0.2s;
+    }
+
+    .ward-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+
+    .ward-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .ward-name { font-size: 0.9rem; font-weight: 700; }
+    .ward-floor { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+
+    .ward-status {
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+
+    .status-available { background: var(--green-light); color: var(--green); }
+    .status-limited { background: var(--yellow-light); color: var(--yellow); }
+    .status-full { background: var(--red-light); color: var(--red); }
+
+    .ward-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .ward-stat-item { text-align: center; }
+    .ward-stat-num { font-size: 1.1rem; font-weight: 800; }
+    .ward-stat-label { font-size: 0.65rem; color: var(--muted); margin-top: 1px; }
+
+    .progress-wrap {
+      background: var(--bg);
+      border-radius: 4px;
+      height: 6px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 1s ease;
+    }
+
+    .bar-green { background: var(--green); }
+    .bar-yellow { background: var(--yellow); }
+    .bar-red { background: var(--red); }
+    .bar-blue { background: var(--primary); }
+
+    /* ── Right Panel ── */
+    .right-panel { display: flex; flex-direction: column; gap: 16px; }
+
+    /* ── Bed Type Summary ── */
+    .bed-type-list { display: flex; flex-direction: column; gap: 14px; }
+
+    .bed-type-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .bed-type-icon {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .bed-type-info { flex: 1; }
+    .bed-type-name { font-size: 0.85rem; font-weight: 600; }
+    .bed-type-sub { font-size: 0.72rem; color: var(--muted); margin-top: 1px; }
+
+    .bed-type-count {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    /* ── Recent Activity ── */
+    .activity-list { display: flex; flex-direction: column; }
+
+    .activity-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .activity-item:last-child { border-bottom: none; }
+
+    .activity-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+
+    .dot-green { background: var(--green); }
+    .dot-red { background: var(--red); }
+    .dot-yellow { background: var(--yellow); }
+    .dot-blue { background: var(--primary); }
+
+    .activity-info { flex: 1; }
+    .activity-text { font-size: 0.82rem; font-weight: 500; }
+    .activity-time { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+
+    /* ── Full Beds Table ── */
+    .table-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      animation: fadeUp 0.4s ease both;
+      animation-delay: 0.3s;
+      overflow: hidden;
+    }
+
+    .table-header {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 3px;
+    }
+
+    .tab {
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--muted);
+      transition: all 0.2s;
+    }
+
+    .tab.active { background: white; color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+    table { width: 100%; border-collapse: collapse; }
+
+    th {
+      background: var(--bg);
+      padding: 11px 22px;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      padding: 13px 22px;
+      font-size: 0.85rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--bg); }
+
+    .bed-id { font-weight: 700; color: var(--primary); font-size: 0.8rem; }
+    .patient-name { font-weight: 600; }
+    .ward-tag {
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      background: var(--blue-light);
+      color: var(--primary);
+    }
+
+    .status-chip {
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+
+    .chip-occupied { background: var(--red-light); color: var(--red); }
+    .chip-available { background: var(--green-light); color: var(--green); }
+    .chip-cleaning { background: var(--yellow-light); color: var(--yellow); }
+    .chip-reserved { background: var(--blue-light); color: var(--primary); }
+
+    .action-btns { display: flex; gap: 6px; }
+
+    .action-btn {
+      width: 30px; height: 30px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .action-btn:hover { background: var(--bg); }
+
+    /* ── Live Indicator ── */
+    .live-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--green-light);
+      border: 1px solid rgba(16,185,129,0.3);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--green);
+    }
+
+    .pulse {
+      width: 7px; height: 7px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    @media (max-width: 1100px) {
+      .main-grid { grid-template-columns: 1fr; }
+      .ward-grid { grid-template-columns: repeat(2, 1fr); }
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
 </head>
 <body>
 
-<!-- ═══════════════ SIDEBAR ═══════════════ -->
-<aside class="sidebar">
-  <div class="logo">
-    <div class="logo-icon">+</div>
-    <div class="logo-text">
-      <h2>CITY HOSPITAL</h2>
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">+</div>
+    <div class="brand-text">
+      <h3>CITY HOSPITAL</h3>
       <p>Hospital Admin Panel</p>
     </div>
   </div>
-
-  <nav>
-    <a class="nav-item active" href="#">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      Dashboard
-    </a>
-    <a class="nav-item" href="#">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-      Appointments
-    </a>
-    <a class="nav-item" href="#">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      Patients
-    </a>
-    <a class="nav-item" href="#">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6M12 9v6"/><circle cx="12" cy="12" r="9"/></svg>
-      Doctors
-    </a>
-    <a class="nav-item" href="#">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-      Departments
-    </a>
-    <a class="nav-item" href="#">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      Staff
-    </a>
-    <a class="nav-item" href="#">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-      Billing & Payments
-    </a>
-    <a class="nav-item" href="#">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3h18v18H3zM8 12h8M12 8v8"/></svg>
-      Pharmacy
-    </a>
-    <a class="nav-item" href="#">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 9H22M2 15H22M5 3v18M19 3v18"/></svg>
-      Bed Management
-    </a>
-    <a class="nav-item" href="#">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-      Reports
-    </a>
-    <a class="nav-item" href="#">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
-      Settings
-    </a>
-    <a class="nav-item" href="#">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      Profile
-    </a>
+  <nav class="nav">
+    <div class="nav-item"><span class="nav-icon">🏠</span> Dashboard</div>
+    <div class="nav-item"><span class="nav-icon">📅</span> Appointments</div>
+    <div class="nav-item"><span class="nav-icon">👥</span> Patients</div>
+    <div class="nav-item"><span class="nav-icon">👨‍⚕️</span> Doctors</div>
+    <div class="nav-item"><span class="nav-icon">🏢</span> Departments</div>
+    <div class="nav-item"><span class="nav-icon">👔</span> Staff</div>
+    <div class="nav-item"><span class="nav-icon">💳</span> Billing & Payments</div>
+    <div class="nav-item"><span class="nav-icon">💊</span> Pharmacy</div>
+    <div class="nav-item active"><span class="nav-icon">🛏️</span> Bed Management</div>
+    <div class="nav-item"><span class="nav-icon">📊</span> Reports</div>
+    <div class="nav-item"><span class="nav-icon">⚙️</span> Settings</div>
+    <div class="nav-item"><span class="nav-icon">👤</span> Profile</div>
   </nav>
-
-  <div class="nav-logout">
-    <a class="nav-item" href="#">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      Logout
-    </a>
+  <div class="sidebar-footer">
+    <div class="logout-btn">
+      <span>↩</span> Logout
+    </div>
   </div>
-</aside>
+</div>
 
-<!-- ═══════════════ MAIN ═══════════════ -->
+<!-- Main -->
 <div class="main">
 
   <!-- Topbar -->
-  <header class="topbar">
-    <button class="menu-btn">
-      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    </button>
-    <div class="search">
-      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" placeholder="Search patients, appointments, doctors...">
+  <div class="topbar">
+    <div class="topbar-left">
+      <span style="font-size:1.2rem;cursor:pointer">☰</span>
+      <div class="search-box">
+        <span>🔍</span>
+        <input type="text" placeholder="Search beds, wards, patients..."/>
+      </div>
     </div>
     <div class="topbar-right">
-      <div class="notif-btn">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        <span class="badge">3</span>
+      <div class="live-pill">
+        <div class="pulse"></div>
+        Live Updates
       </div>
-      <div class="user-chip">
-        <div class="avatar">A</div>
-        <div>
-          <span>Admin</span>
-          <small>City Hospital</small>
+      <div class="notif-btn">
+        🔔
+        <div class="notif-badge">3</div>
+      </div>
+      <div class="admin-chip">
+        <div class="admin-avatar">A</div>
+        <div class="admin-info">
+          <div class="admin-name">Admin</div>
+          <div class="admin-role">City Hospital</div>
         </div>
-        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        <span style="color:var(--muted);font-size:0.8rem">▾</span>
       </div>
     </div>
-  </header>
+  </div>
 
   <!-- Content -->
   <div class="content">
 
     <!-- Page Header -->
     <div class="page-header">
-      <div>
-        <h1>Welcome, Admin 👋</h1>
-        <p>Here's what's happening at City Hospital today.</p>
+      <div class="page-title">
+        <h1>🛏️ Bed Management</h1>
+        <p>Real-time bed availability across all wards — City Hospital</p>
       </div>
-      <div class="date-chip">
-        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-        25 May 2024, Saturday
-      </div>
-    </div>
-
-    <!-- Stats -->
-    <div class="stats">
-      <div class="stat-card blue">
-        <div class="stat-icon blue">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        </div>
-        <div class="stat-label">Total Patients</div>
-        <div class="stat-value">1,248</div>
-        <div class="stat-change up">
-          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
-          12% from yesterday
-        </div>
-      </div>
-      <div class="stat-card teal">
-        <div class="stat-icon teal">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-        </div>
-        <div class="stat-label">Appointments Today</div>
-        <div class="stat-value">86</div>
-        <div class="stat-change up" style="color:var(--teal)">
-          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
-          8% from yesterday
-        </div>
-      </div>
-      <div class="stat-card purple">
-        <div class="stat-icon purple">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6M12 9v6"/><circle cx="12" cy="12" r="9"/></svg>
-        </div>
-        <div class="stat-label">Doctors</div>
-        <div class="stat-value">42</div>
-        <div class="stat-change neutral">— No change</div>
-      </div>
-      <div class="stat-card amber">
-        <div class="stat-icon amber">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 9H22M2 15H22M5 3v18M19 3v18"/></svg>
-        </div>
-        <div class="stat-label">Occupied Beds</div>
-        <div class="stat-value">68</div>
-        <div class="stat-change up" style="color:var(--amber)">
-          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
-          5% from yesterday
-        </div>
+      <div class="header-actions">
+        <button class="btn btn-outline">📤 Export Report</button>
+        <button class="btn btn-primary">+ Add Bed</button>
       </div>
     </div>
 
-    <!-- Middle Row -->
-    <div class="mid-row">
-
-      <!-- Chart Card -->
-      <div class="card chart-card">
-        <div class="card-header">
-          <span class="card-title">Appointments Overview</span>
-          <div class="chart-filter">This Week ▾</div>
+    <!-- Stats Row -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-top">
+          <div class="stat-icon icon-blue">🛏️</div>
+          <div class="stat-label">Total Beds</div>
         </div>
-        <div class="chart-wrap">
-          <svg class="chart" viewBox="0 0 320 150" preserveAspectRatio="none">
-            <defs>
-              <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#3b82f6" stop-opacity=".3"/>
-                <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
-              </linearGradient>
-            </defs>
-            <!-- Grid lines -->
-            <line x1="0" y1="20" x2="320" y2="20" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
-            <line x1="0" y1="50" x2="320" y2="50" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
-            <line x1="0" y1="80" x2="320" y2="80" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
-            <line x1="0" y1="110" x2="320" y2="110" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
-            <!-- Area fill -->
-            <path d="M0,110 C20,100 40,90 60,75 C80,60 90,55 110,50 C130,45 140,25 160,22 C175,20 185,45 200,65 C215,85 225,90 240,80 C258,68 275,30 290,15 L290,140 L0,140 Z"
-                  fill="url(#chartGrad)"/>
-            <!-- Line -->
-            <path d="M0,110 C20,100 40,90 60,75 C80,60 90,55 110,50 C130,45 140,25 160,22 C175,20 185,45 200,65 C215,85 225,90 240,80 C258,68 275,30 290,15"
-                  fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round"/>
-            <!-- End dot -->
-            <circle cx="290" cy="15" r="5" fill="#3b82f6" stroke="#fff" stroke-width="2"/>
-          </svg>
-          <div class="chart-badge">86<small>Appointments</small></div>
-        </div>
-        <!-- X axis labels -->
-        <div style="display:flex;justify-content:space-between;margin-top:8px;padding:0 2px;">
-          <span style="font-size:9px;color:var(--muted)">19 May</span>
-          <span style="font-size:9px;color:var(--muted)">20 May</span>
-          <span style="font-size:9px;color:var(--muted)">21 May</span>
-          <span style="font-size:9px;color:var(--muted)">22 May</span>
-          <span style="font-size:9px;color:var(--muted)">23 May</span>
-          <span style="font-size:9px;color:var(--muted)">24 May</span>
-          <span style="font-size:9px;color:var(--accent-glow)">25 May</span>
-        </div>
+        <div class="stat-num">320</div>
+        <div class="stat-change change-up">↑ 2% from last month</div>
       </div>
+      <div class="stat-card">
+        <div class="stat-top">
+          <div class="stat-icon icon-green">✅</div>
+          <div class="stat-label">Available</div>
+        </div>
+        <div class="stat-num" style="color:var(--green)">124</div>
+        <div class="stat-change change-up">↑ 5% from yesterday</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-top">
+          <div class="stat-icon icon-red">🔴</div>
+          <div class="stat-label">Occupied</div>
+        </div>
+        <div class="stat-num" style="color:var(--red)">168</div>
+        <div class="stat-change change-down">↓ 3% from yesterday</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-top">
+          <div class="stat-icon icon-yellow">🧹</div>
+          <div class="stat-label">Under Cleaning</div>
+        </div>
+        <div class="stat-num" style="color:var(--yellow)">28</div>
+        <div class="stat-change change-neutral">— No change</div>
+      </div>
+    </div>
 
-      <!-- Recent Appointments -->
+    <!-- Main Grid -->
+    <div class="main-grid">
+
+      <!-- Ward Overview -->
       <div class="card">
         <div class="card-header">
-          <span class="card-title">Recent Appointments</span>
-          <a class="view-all" href="#">View All</a>
+          <div class="card-title">Ward-wise Bed Overview</div>
+          <div class="view-all">View All →</div>
         </div>
-        <div class="appt-item">
-          <span class="appt-time">09:00 AM</span>
-          <div class="appt-info"><strong>Rahul Sharma</strong><span>OPD · Dr. Amit Verma</span></div>
-          <span class="tag cardio">Cardiology</span>
-          <span class="status confirmed">Confirmed</span>
-        </div>
-        <div class="appt-item">
-          <span class="appt-time">10:00 AM</span>
-          <div class="appt-info"><strong>Priya Singh</strong><span>OPD · Dr. Neha Gupta</span></div>
-          <span class="tag derm">Dermatology</span>
-          <span class="status confirmed">Confirmed</span>
-        </div>
-        <div class="appt-item">
-          <span class="appt-time">11:00 AM</span>
-          <div class="appt-info"><strong>Anil Kumar</strong><span>OPD · Dr. Rajesh Patel</span></div>
-          <span class="tag neuro">Neurology</span>
-          <span class="status pending">Pending</span>
-        </div>
-        <div class="appt-item">
-          <span class="appt-time">12:00 PM</span>
-          <div class="appt-info"><strong>Sneha Varma</strong><span>OPD · Dr. Pooja Mehta</span></div>
-          <span class="tag pedia">Pediatrics</span>
-          <span class="status confirmed">Confirmed</span>
-        </div>
-        <div class="appt-item">
-          <span class="appt-time">01:00 PM</span>
-          <div class="appt-info"><strong>Vikram Mehta</strong><span>OPD · Dr. Amit Verma</span></div>
-          <span class="tag cardio">Cardiology</span>
-          <span class="status pending">Pending</span>
+        <div class="ward-grid">
+
+          <!-- General Ward -->
+          <div class="ward-card">
+            <div class="ward-header">
+              <div>
+                <div class="ward-name">🏥 General Ward</div>
+                <div class="ward-floor">Ground Floor</div>
+              </div>
+              <div class="ward-status status-available">Available</div>
+            </div>
+            <div class="ward-stats">
+              <div class="ward-stat-item">
+                <div class="ward-stat-num" style="color:var(--green)">42</div>
+                <div class="ward-stat-label">Available</div>
+              </div>
+              <div class="ward-stat-item">
+                <div class="ward-stat-num" style="color:var(--red)">48</div>
+                <div class="ward-stat-label">Occupied</div>
+              </div>
+              <div class="ward-stat-item">
+                <div class="ward-stat-num">90</div>
+                <div class="ward-stat-label">Total</div>
+              </div>
+            </div>
+            <div class="progress-wrap">
+              <div class="progress-bar bar-red" style="width:53%"></div>
+            </div>
+          </div>
+
+          <!-- ICU -->
+          <div class="ward-card">
+            <div class="ward-header">
+              <div>
+                <div class="ward-name">🚨 ICU</div>
+                <div class="ward-floor">2nd Floor</div>
+              </div>
+              <div class="ward-status status-limited">Limited</div>
+            </div>
+            <div class="ward-stats">
+              <div class="ward-stat-item">
+                <div class="ward-stat-num" style="color:var(--green)">4</div>
+                <div class="ward-stat-label">Available</div>
+              </div>
+              <div class="ward-stat-item">
+                <div class="ward-stat-num" style="color:var(--red)">26</div>
+                <div class="ward-stat-label">Occupied</div>
+              </div>
+              <div class="ward-stat-item">
+                <div class="ward-stat-num">30</div>
+                <div class="ward-stat-label">Total</div>
+              </div>
+            </div>
+            <div class="progress-wrap">
+              <div class="progress-bar bar-yellow" style="width:87%"></div>
+            </div>
+          </div>
+
+          <!-- Pediatrics -->
+          <div class="ward-card">
+            <div class="ward-header">
+              <div>
+                <div class="ward-name">👶 Pediatrics</div>
+                <div class="ward-floor">1st Floor</div>
+              </div>
+              <div class="ward-status status-available">Available</div>
+            </div>
+            <div class="ward-stats">
+              <div class="ward-stat-item">
+                <div class="ward-stat-num" style="color:var(--green)">18</div>
+                <div class="ward-stat-label">Available</div>
+              </div>
+              <div class="ward-stat-item">
+                <div class="ward-stat-num" style="color:var(--red)">22</div>
+                <div class="ward-stat-label">Occupied</div>
+              </div>
+              <div class="ward-stat-item">
+                <div class="ward-stat-num">40</div>
+                <div class="ward-stat-label">Total</div>
+              </div>
+            </div>
+            <div class="progress-wrap">
+              <div class="progress-bar bar-green" style="width:55%"></div>
+            </div>
+          </div>
+
+          <!-- Maternity -->
+          <div class="ward-card">
+            <div class="ward-header">
+              <div>
+                <div class="ward-name">🤱 Maternity</div>
+                <div class="ward-floor">3rd Floor</div>
+              </div>
+              <div class="ward-status status-available">Available</div>
+            </div>
+            <div class="ward-stats">
+              <div class="ward-stat-item">
+                <div class="ward-stat-num" style="color:var(--green)">20</div>
+                <div class="ward-stat-label">Available</div>
+              </div>
+              <div class="ward-stat-item">
+                <div class="ward-stat-num" style="color:var(--red)">20</div>
+                <div class="ward-stat-label">Occupied</div>
+              </div>
+              <div class="ward-stat-item">
+                <div class="ward-stat-num">40</div>
+                <div class="ward-stat-label">Total</div>
+              </div>
+            </div>
+            <div class="progress-wrap">
+              <div class="progress-bar bar-blue" style="width:50%"></div>
+            </div>
+          </div>
+
+          <!-- Emergency -->
+          <div class="ward-card">
+            <div class="ward-header">
+              <div>
+                <div class="ward-name">⚡ Emergency</div>
+                <div class="ward-floor">Ground Floor</div>
+              </div>
+              <div class="ward-status status-limited">Limited</div>
+            </div>
+            <div class="ward-stats">
+              <div class="ward-stat-item">
+                <div class="ward-stat-num" style="color:var(--green)">6</div>
+                <div class="ward-stat-label">Available</div>
+              </div>
+              <div class="ward-stat-item">
+                <div class="ward-stat-num" style="color:var(--red)">14</div>
+                <div class="ward-stat-label">Occupied</div>
+              </div>
+              <div class="ward-stat-item">
+                <div class="ward-stat-num">20</div>
+                <div class="ward-stat-label">Total</div>
+              </div>
+            </div>
+            <div class="progress-wrap">
+              <div class="progress-bar bar-yellow" style="width:70%"></div>
+            </div>
+          </div>
+
+          <!-- Oxygen -->
+          <div class="ward-card">
+            <div class="ward-header">
+              <div>
+                <div class="ward-name">🫁 Oxygen Ward</div>
+                <div class="ward-floor">2nd Floor</div>
+              </div>
+              <div class="ward-status status-full">Full</div>
+            </div>
+            <div class="ward-stats">
+              <div class="ward-stat-item">
+                <div class="ward-stat-num" style="color:var(--green)">0</div>
+                <div class="ward-stat-label">Available</div>
+              </div>
+              <div class="ward-stat-item">
+                <div class="ward-stat-num" style="color:var(--red)">20</div>
+                <div class="ward-stat-label">Occupied</div>
+              </div>
+              <div class="ward-stat-item">
+                <div class="ward-stat-num">20</div>
+                <div class="ward-stat-label">Total</div>
+              </div>
+            </div>
+            <div class="progress-wrap">
+              <div class="progress-bar bar-red" style="width:100%"></div>
+            </div>
+          </div>
+
         </div>
       </div>
 
-      <!-- New Bookings -->
-      <div class="card">
-        <div class="card-header">
-          <span class="card-title">New Bookings (Today)</span>
-          <a class="view-all" href="#">View All</a>
+      <!-- Right Panel -->
+      <div class="right-panel">
+
+        <!-- Bed Type Summary -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Bed Type Summary</div>
+          </div>
+          <div class="bed-type-list">
+            <div class="bed-type-item">
+              <div class="bed-type-icon icon-blue">🛏️</div>
+              <div class="bed-type-info">
+                <div class="bed-type-name">General Beds</div>
+                <div class="bed-type-sub">42 available</div>
+              </div>
+              <div class="bed-type-count">90</div>
+            </div>
+            <div class="bed-type-item">
+              <div class="bed-type-icon icon-red">🚨</div>
+              <div class="bed-type-info">
+                <div class="bed-type-name">ICU Beds</div>
+                <div class="bed-type-sub">4 available</div>
+              </div>
+              <div class="bed-type-count">30</div>
+            </div>
+            <div class="bed-type-item">
+              <div class="bed-type-icon icon-yellow">🫁</div>
+              <div class="bed-type-info">
+                <div class="bed-type-name">Oxygen Beds</div>
+                <div class="bed-type-sub">0 available</div>
+              </div>
+              <div class="bed-type-count">20</div>
+            </div>
+            <div class="bed-type-item">
+              <div class="bed-type-icon icon-green">👶</div>
+              <div class="bed-type-info">
+                <div class="bed-type-name">Pediatric Beds</div>
+                <div class="bed-type-sub">18 available</div>
+              </div>
+              <div class="bed-type-count">40</div>
+            </div>
+          </div>
         </div>
-        <div class="booking-item">
-          <span class="booking-time">02:00 PM</span>
-          <div class="booking-info"><strong>Karan Jain</strong><span>OPD · Dr. Amit Verma</span></div>
-          <span class="status new">New</span>
+
+        <!-- Recent Activity -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Recent Activity</div>
+            <div class="view-all">View All →</div>
+          </div>
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-dot dot-green"></div>
+              <div class="activity-info">
+                <div class="activity-text">Bed G-12 discharged — Rahul Sharma</div>
+                <div class="activity-time">2 minutes ago • General Ward</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot dot-red"></div>
+              <div class="activity-info">
+                <div class="activity-text">ICU-04 admitted — Priya Singh</div>
+                <div class="activity-time">15 minutes ago • ICU</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot dot-yellow"></div>
+              <div class="activity-info">
+                <div class="activity-text">Bed E-03 under cleaning</div>
+                <div class="activity-time">30 minutes ago • Emergency</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot dot-blue"></div>
+              <div class="activity-info">
+                <div class="activity-text">Bed M-07 reserved — Neha Gupta</div>
+                <div class="activity-time">1 hour ago • Maternity</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot dot-red"></div>
+              <div class="activity-info">
+                <div class="activity-text">O2-20 full — Oxygen ward capacity reached</div>
+                <div class="activity-time">2 hours ago • Oxygen Ward</div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="booking-item">
-          <span class="booking-time">02:30 PM</span>
-          <div class="booking-info"><strong>Neha Yadav</strong><span>OPD · Dr. Neha Gupta</span></div>
-          <span class="status new">New</span>
-        </div>
-        <div class="booking-item">
-          <span class="booking-time">03:00 PM</span>
-          <div class="booking-info"><strong>Mohit Gupta</strong><span>OPD · Dr. Rajesh Patel</span></div>
-          <span class="status new">New</span>
-        </div>
-        <div class="booking-item">
-          <span class="booking-time">03:30 PM</span>
-          <div class="booking-info"><strong>Pooja Sinha</strong><span>OPD · Dr. Pooja Mehta</span></div>
-          <span class="status new">New</span>
-        </div>
-        <div class="booking-item">
-          <span class="booking-time">04:00 PM</span>
-          <div class="booking-info"><strong>Ramesh Choudhary</strong><span>OPD · Dr. Amit Verma</span></div>
-          <span class="status new">New</span>
-        </div>
+
       </div>
     </div>
 
-    <!-- Bottom Row -->
-    <div class="bottom-row">
-
-      <!-- All Bookings Table -->
-      <div class="card" style="animation-delay:.35s">
-        <div class="card-header">
-          <span class="card-title">All Bookings</span>
-          <a class="view-all" href="#">View All</a>
-        </div>
-        <div class="tabs">
-          <div class="tab active">Upcoming</div>
-          <div class="tab">Confirmed</div>
-          <div class="tab">Completed</div>
-          <div class="tab">Cancelled</div>
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Date &amp; Time</th>
-              <th>Patient Name</th>
-              <th>Doctor</th>
-              <th>Department</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td style="color:var(--muted);font-size:11px">25 May 2024, 02:00 PM</td>
-              <td><strong>Karan Jain</strong></td>
-              <td style="color:var(--muted)">Dr. Amit Verma</td>
-              <td>Cardiology</td>
-              <td><span class="status new">New</span></td>
-              <td><button class="eye-btn">👁</button></td>
-            </tr>
-            <tr>
-              <td style="color:var(--muted);font-size:11px">25 May 2024, 02:30 PM</td>
-              <td><strong>Neha Yadav</strong></td>
-              <td style="color:var(--muted)">Dr. Neha Gupta</td>
-              <td>Dermatology</td>
-              <td><span class="status new">New</span></td>
-              <td><button class="eye-btn">👁</button></td>
-            </tr>
-            <tr>
-              <td style="color:var(--muted);font-size:11px">25 May 2024, 03:00 PM</td>
-              <td><strong>Mohit Gupta</strong></td>
-              <td style="color:var(--muted)">Dr. Rajesh Patel</td>
-              <td>Neurology</td>
-              <td><span class="status new">New</span></td>
-              <td><button class="eye-btn">👁</button></td>
-            </tr>
-            <tr>
-              <td style="color:var(--muted);font-size:11px">25 May 2024, 03:30 PM</td>
-              <td><strong>Pooja Sinha</strong></td>
-              <td style="color:var(--muted)">Dr. Pooja Mehta</td>
-              <td>Pediatrics</td>
-              <td><span class="status new">New</span></td>
-              <td><button class="eye-btn">👁</button></td>
-            </tr>
-            <tr>
-              <td style="color:var(--muted);font-size:11px">25 May 2024, 04:00 PM</td>
-              <td><strong>Ramesh Choudhary</strong></td>
-              <td style="color:var(--muted)">Dr. Amit Verma</td>
-              <td>Cardiology</td>
-              <td><span class="status new">New</span></td>
-              <td><button class="eye-btn">👁</button></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Quick Actions -->
-      <div class="card" style="animation-delay:.4s">
-        <div class="card-header">
-          <span class="card-title">Quick Actions</span>
-        </div>
-        <div class="quick-grid">
-          <div class="quick-btn">
-            <div class="quick-icon qi-blue">📅</div>
-            New Appointment
+    <!-- Beds Table -->
+    <div class="table-card">
+      <div class="table-header">
+        <div class="card-title">🛏️ All Beds</div>
+        <div style="display:flex;gap:12px;align-items:center">
+          <div class="tabs">
+            <div class="tab active" onclick="filterBeds('all',this)">All</div>
+            <div class="tab" onclick="filterBeds('occupied',this)">Occupied</div>
+            <div class="tab" onclick="filterBeds('available',this)">Available</div>
+            <div class="tab" onclick="filterBeds('cleaning',this)">Cleaning</div>
           </div>
-          <div class="quick-btn">
-            <div class="quick-icon qi-green">👤</div>
-            Add Patient
-          </div>
-          <div class="quick-btn">
-            <div class="quick-icon qi-purple">🩺</div>
-            Add Doctor
-          </div>
-          <div class="quick-btn">
-            <div class="quick-icon qi-amber">🛏️</div>
-            Bed Availability
-          </div>
-          <div class="quick-btn">
-            <div class="quick-icon qi-teal">📄</div>
-            Generate Report
-          </div>
-          <div class="quick-btn">
-            <div class="quick-icon qi-rose">💳</div>
-            Billing
-          </div>
+          <button class="btn btn-outline" style="padding:7px 14px;font-size:0.8rem">🔍 Search</button>
         </div>
       </div>
-
+      <table id="bedTable">
+        <thead>
+          <tr>
+            <th>Bed ID</th>
+            <th>Ward</th>
+            <th>Patient Name</th>
+            <th>Doctor</th>
+            <th>Admitted On</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="bedTableBody">
+        </tbody>
+      </table>
     </div>
-  </div><!-- /content -->
-</div><!-- /main -->
+
+  </div>
+</div>
 
 <script>
-  // Tab switching
-  document.querySelectorAll('.tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      tab.closest('.tabs').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-    });
-  });
+  const beds = [
+    { id:"G-01", ward:"General", patient:"Rahul Sharma", doctor:"Dr. Amit Verma", date:"20 May 2024", status:"occupied" },
+    { id:"G-02", ward:"General", patient:"Priya Singh", doctor:"Dr. Neha Gupta", date:"22 May 2024", status:"occupied" },
+    { id:"G-03", ward:"General", patient:"—", doctor:"—", date:"—", status:"available" },
+    { id:"G-04", ward:"General", patient:"—", doctor:"—", date:"—", status:"cleaning" },
+    { id:"ICU-01", ward:"ICU", patient:"Anil Kumar", doctor:"Dr. Rajesh Patel", date:"18 May 2024", status:"occupied" },
+    { id:"ICU-02", ward:"ICU", patient:"Sneha Verma", doctor:"Dr. Pooja Mehta", date:"21 May 2024", status:"occupied" },
+    { id:"ICU-03", ward:"ICU", patient:"—", doctor:"—", date:"—", status:"available" },
+    { id:"E-01", ward:"Emergency", patient:"Vikram Mehta", doctor:"Dr. Amit Verma", date:"25 May 2024", status:"occupied" },
+    { id:"E-02", ward:"Emergency", patient:"—", doctor:"—", date:"—", status:"available" },
+    { id:"M-01", ward:"Maternity", patient:"Neha Gupta", doctor:"Dr. Pooja Mehta", date:"24 May 2024", status:"occupied" },
+    { id:"M-02", ward:"Maternity", patient:"—", doctor:"—", date:"—", status:"reserved" },
+    { id:"O2-01", ward:"Oxygen", patient:"Ramesh Choudhary", doctor:"Dr. Rajesh Patel", date:"19 May 2024", status:"occupied" },
+  ];
 
-  // Nav item highlighting
-  document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', e => {
-      e.preventDefault();
-      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-      item.classList.add('active');
-    });
-  });
+  const statusMap = {
+    occupied: `<span class="status-chip chip-occupied">Occupied</span>`,
+    available: `<span class="status-chip chip-available">Available</span>`,
+    cleaning: `<span class="status-chip chip-cleaning">Cleaning</span>`,
+    reserved: `<span class="status-chip chip-reserved">Reserved</span>`,
+  };
+
+  function renderTable(filter) {
+    const filtered = filter === 'all' ? beds : beds.filter(b => b.status === filter);
+    const tbody = document.getElementById('bedTableBody');
+    tbody.innerHTML = filtered.map(b => `
+      <tr>
+        <td><span class="bed-id">${b.id}</span></td>
+        <td><span class="ward-tag">${b.ward}</span></td>
+        <td><span class="patient-name">${b.patient}</span></td>
+        <td>${b.doctor}</td>
+        <td>${b.date}</td>
+        <td>${statusMap[b.status]}</td>
+        <td>
+          <div class="action-btns">
+            <div class="action-btn" title="View">👁️</div>
+            <div class="action-btn" title="Edit">✏️</div>
+            <div class="action-btn" title="Update Status">🔄</div>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function filterBeds(filter, el) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    renderTable(filter);
+  }
+
+  renderTable('all');
+
+  // Auto refresh every 30 seconds
+  setInterval(() => {
+    const badge = document.querySelector('.live-pill');
+    badge.style.opacity = '0.5';
+    setTimeout(() => badge.style.opacity = '1', 500);
+  }, 30000);
 </script>
 </body>
 </html>
