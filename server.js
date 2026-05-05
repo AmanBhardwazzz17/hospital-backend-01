@@ -8,20 +8,22 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Routes
+// ✅ Routes
 const authRoutes = require("./routes/authRoutes");
 const appointmentRoutes = require('./routes/appointmentRoutes');
+const hospitalRoutes = require('./routes/hospitalRoutes');
 
-// Basic route
+// ✅ Basic route
 app.get("/", (req, res) => {
   res.send("Hospital Backend API is running ✅");
 });
 
-// Use routes
+// ✅ Use routes
 app.use("/api/auth", authRoutes);
 app.use('/api/appointments', appointmentRoutes);
+app.use('/api/hospitals', hospitalRoutes);
 
-// MongoDB
+// ✅ MongoDB connect
 const MONGO_URI = process.env.MONGO_URI;
 if (!MONGO_URI) {
   console.log("❌ MONGO_URI missing in .env file");
@@ -33,7 +35,7 @@ mongoose
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.log("❌ MongoDB connection error:", err));
 
-// Start server
+// ✅ Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
