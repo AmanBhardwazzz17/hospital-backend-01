@@ -32,6 +32,17 @@ const userSchema = new mongoose.Schema(
       ref: "Hospital",
       default: null,
     },
+    // ✅ Email verification
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    verifyToken: {
+      type: String,
+    },
+    verifyTokenExpiry: {
+      type: Date,
+    },
   },
   { timestamps: true }
 );

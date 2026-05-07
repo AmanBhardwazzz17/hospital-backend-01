@@ -2,7 +2,9 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
+const crypto = require("crypto");
 const User = require("../models/User");
+const sendVerificationEmail = require("../utils/sendEmail");
 
 const router = express.Router();
 
@@ -26,7 +28,7 @@ async function verifyRecaptcha(token) {
   }
 }
 
-// ✅ REGISTER — sirf patient register kar sakta hai
+// ✅ REGISTER
 router.post("/register", async (req, res) => {
   try {
     const { name, email, password, recaptchaToken } = req.body;
@@ -50,23 +52,70 @@ router.post("/register", async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const user = await User.create({
+    const verifyToken = crypto.randomBytes(32).toString("hex");
+    const verifyTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    await User.create({
       name,
       email,
       password: hashedPassword,
-      role: "patient", // default role
+      role: "patient",
+      isVerified: false,
+      verifyToken,
+      verifyTokenExpiry,
     });
 
+    await sendVerificationEmail(email, verifyToken);
+
     return res.status(201).json({
-      message: "User registered successfully",
-      user: { id: user._id, name: user.name, email: user.email, role: user.role },
+      success: true,
+      message: "Registered! Please check your email to verify your account.",
     });
   } catch (err) {
     return res.status(500).json({ message: "Server error", error: err.message });
   }
 });
 
-// ✅ LOGIN — sab login kar sakte hain (admin, hospital, patient)
+// ✅ EMAIL VERIFY
+router.get("/verify/:token", async (req, res) => {
+  try {
+    const user = await User.findOne({
+      verifyToken: req.params.token,
+      verifyTokenExpiry: { $gt: new Date() },
+    });
+
+    if (!user) {
+      return res.status(400).send(`
+        <div style="font-family:sans-serif;text-align:center;padding:48px;">
+          <h2 style="color:#C0392B;">❌ Link expired ya invalid hai!</h2>
+          <p>Please register again.</p>
+          <a href="https://amanbhardwazzz17.github.io/hospital-backend-01/index.html"
+             style="display:inline-block;margin-top:16px;padding:12px 24px;background:#C0392B;color:white;border-radius:8px;text-decoration:none;font-weight:700;">
+            Register Karo →
+          </a>
+        </div>`);
+    }
+
+    user.isVerified = true;
+    user.verifyToken = undefined;
+    user.verifyTokenExpiry = undefined;
+    await user.save();
+
+    return res.send(`
+      <div style="font-family:sans-serif;text-align:center;padding:48px;">
+        <h2 style="color:#1E8449;">✅ Email Verified!</h2>
+        <p>Tumhara HospTrack account active ho gaya!</p>
+        <a href="https://amanbhardwazzz17.github.io/hospital-backend-01/index.html"
+           style="display:inline-block;margin-top:16px;padding:12px 24px;background:#C0392B;color:white;border-radius:8px;text-decoration:none;font-weight:700;">
+          Login Karo →
+        </a>
+      </div>`);
+  } catch (err) {
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+// ✅ LOGIN
 router.post("/login", async (req, res) => {
   try {
     const { email, password, recaptchaToken } = req.body;
@@ -92,12 +141,18 @@ router.post("/login", async (req, res) => {
       return res.status(403).json({ message: "Account is deactivated. Contact admin." });
     }
 
+    // ✅ Email verification check
+    if (!user.isVerified) {
+      return res.status(403).json({ 
+        message: "Email verified nahi hai. Apna inbox check karo." 
+      });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // ✅ Token mein role bhi save hoga
     const token = jwt.sign(
       { id: user._id, email: user.email, role: user.role },
       process.env.JWT_SECRET || "default_secret",
@@ -124,7 +179,6 @@ router.post("/create-user", async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
-    // Token check
     const authHeader = req.headers.authorization;
     if (!authHeader) {
       return res.status(401).json({ message: "No token provided" });
@@ -133,7 +187,6 @@ router.post("/create-user", async (req, res) => {
     const token = authHeader.split(" ")[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET || "default_secret");
 
-    // Sirf admin hi naya user bana sakta hai
     if (decoded.role !== "admin") {
       return res.status(403).json({ message: "Only admin can create users" });
     }
@@ -159,6 +212,7 @@ router.post("/create-user", async (req, res) => {
       email,
       password: hashedPassword,
       role,
+      isVerified: true, // Admin ke banaye users directly verified honge
     });
 
     return res.status(201).json({
