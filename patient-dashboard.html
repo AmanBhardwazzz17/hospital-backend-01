@@ -6,6 +6,7 @@
 <title>Patient Dashboard – HospTrack</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AlzaSyB417w_XxIF5w04rucpz0v5SAxk_zKDjs0&libraries=places&callback=initMap" async defer></script>
 <style>
 :root {
   --primary: #C0392B;
@@ -31,7 +32,6 @@ body { font-family: var(--font); background: var(--off-white); color: var(--text
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 5px; }
 
-/* TOP BAR */
 .top-bar {
   background: var(--accent); padding: 8px 32px;
   display: flex; align-items: center; justify-content: space-between;
@@ -40,12 +40,8 @@ body { font-family: var(--font); background: var(--off-white); color: var(--text
 .top-bar-item { font-size: 12px; color: rgba(255,255,255,0.8); display: flex; align-items: center; gap: 6px; }
 .dot { width: 7px; height: 7px; border-radius: 50%; background: #2ecc71; }
 .pulse-live { animation: pulse 1.5s infinite; }
-@keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.5; transform:scale(1.3); } }
-.top-bar-right { display: flex; gap: 16px; }
-.top-bar-link { font-size: 12px; color: rgba(255,255,255,0.7); cursor: pointer; }
-.top-bar-link:hover { color: white; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(1.3);} }
 
-/* NAV */
 nav {
   background: white; padding: 0 32px; display: flex; align-items: center;
   justify-content: space-between; border-bottom: 1px solid var(--border);
@@ -56,53 +52,30 @@ nav {
 .logo span.red { color: var(--primary); }
 .logo span.pro { font-size: 11px; background: var(--primary); color: white; padding: 2px 6px; border-radius: 4px; vertical-align: middle; margin-left: 4px; font-family: var(--font); }
 .nav-links { display: flex; gap: 4px; }
-.nav-link {
-  padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 500;
-  color: var(--muted); cursor: pointer; transition: all 0.2s; border: none;
-  background: none; font-family: var(--font);
-}
+.nav-link { padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer; transition: all 0.2s; border: none; background: none; font-family: var(--font); }
 .nav-link:hover, .nav-link.active { background: var(--primary-light); color: var(--primary); }
 .nav-right { display: flex; align-items: center; gap: 10px; }
-.btn-sos {
-  padding: 9px 18px; background: var(--primary); color: white;
-  border: none; border-radius: 8px; font-size: 13px; font-weight: 700;
-  cursor: pointer; font-family: var(--font); display: flex; align-items: center; gap: 6px;
-  animation: sos-pulse 2s infinite;
-}
-@keyframes sos-pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(192,57,43,0.4); } 50% { box-shadow: 0 0 0 8px rgba(192,57,43,0); } }
-.user-avatar {
-  width: 36px; height: 36px; border-radius: 10px;
-  background: linear-gradient(135deg, var(--primary), #e74c3c);
-  display: flex; align-items: center; justify-content: center;
-  color: white; font-weight: 800; font-size: 14px; cursor: pointer;
-}
+.btn-sos { padding: 9px 18px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--font); animation: sos-pulse 2s infinite; }
+@keyframes sos-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,0.4);}50%{box-shadow:0 0 0 8px rgba(192,57,43,0);} }
+.user-avatar { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--primary), #e74c3c); display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 14px; cursor: pointer; }
 
-/* PAGES */
 .page { display: none; }
 .page.active { display: block; }
 
-/* ==================== DASHBOARD PAGE ==================== */
-.dashboard-wrap { max-width: 1300px; margin: 0 auto; padding: 28px 32px; }
+/* DASHBOARD */
+.wrap { max-width: 1300px; margin: 0 auto; padding: 28px 32px; }
 
-/* WELCOME */
 .welcome-section {
   background: linear-gradient(135deg, #1A252F 0%, #2C3E50 50%, #C0392B 100%);
   border-radius: 20px; padding: 28px 32px; margin-bottom: 24px;
   display: flex; justify-content: space-between; align-items: center;
   position: relative; overflow: hidden;
 }
-.welcome-section::before {
-  content: ''; position: absolute; top: -50px; right: -50px;
-  width: 200px; height: 200px; background: rgba(255,255,255,0.05); border-radius: 50%;
-}
+.welcome-section::before { content:''; position:absolute; top:-50px; right:-50px; width:200px; height:200px; background:rgba(255,255,255,0.05); border-radius:50%; }
 .welcome-text h2 { font-size: 26px; font-weight: 800; color: white; margin-bottom: 6px; }
 .welcome-text p { font-size: 14px; color: rgba(255,255,255,0.7); }
 .welcome-chips { display: flex; gap: 10px; margin-top: 14px; }
-.chip {
-  padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
-  backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);
-  color: white; cursor: pointer;
-}
+.chip { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); color: white; cursor: pointer; }
 .chip.red { background: rgba(192,57,43,0.4); }
 .chip.green { background: rgba(30,132,73,0.4); }
 .chip.blue { background: rgba(26,82,118,0.4); }
@@ -111,12 +84,8 @@ nav {
 .w-stat-val { font-size: 30px; font-weight: 800; color: white; }
 .w-stat-label { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 2px; }
 
-/* STATS */
 .stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
-.stat-card {
-  background: white; border-radius: 14px; padding: 18px 20px;
-  border: 1px solid var(--border); transition: transform 0.2s;
-}
+.stat-card { background: white; border-radius: 14px; padding: 18px 20px; border: 1px solid var(--border); transition: transform 0.2s; }
 .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
 .stat-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .stat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
@@ -126,31 +95,19 @@ nav {
 .si-amber { background: var(--amber-bg); }
 .stat-badge { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 20px; }
 .sb-green { background: var(--green-bg); color: var(--green); }
-.sb-red { background: var(--primary-light); color: var(--primary); }
 .sb-amber { background: var(--amber-bg); color: var(--amber); }
 .stat-val { font-size: 28px; font-weight: 800; margin-bottom: 3px; }
 .stat-lbl { font-size: 12px; color: var(--muted); }
 
-/* MAIN GRID */
 .main-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px; margin-bottom: 24px; }
-
-/* PANELS */
 .panel { background: white; border-radius: 16px; padding: 22px; border: 1px solid var(--border); }
 .panel-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
-.panel-title { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.panel-title { font-size: 15px; font-weight: 700; }
 .panel-action { font-size: 12px; color: var(--primary); cursor: pointer; font-weight: 600; background: none; border: none; font-family: var(--font); }
 
-/* APPOINTMENTS */
-.appt-item {
-  display: flex; align-items: center; gap: 14px; padding: 14px;
-  border-radius: 12px; background: var(--off-white); margin-bottom: 10px;
-  border: 1px solid var(--border); transition: all 0.2s; cursor: pointer;
-}
+.appt-item { display: flex; align-items: center; gap: 14px; padding: 14px; border-radius: 12px; background: var(--off-white); margin-bottom: 10px; border: 1px solid var(--border); transition: all 0.2s; }
 .appt-item:hover { border-color: var(--primary); background: var(--primary-light); }
-.appt-avatar {
-  width: 44px; height: 44px; border-radius: 12px;
-  display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
-}
+.appt-avatar { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
 .aa-red { background: var(--primary-light); }
 .aa-blue { background: var(--blue-bg); }
 .aa-green { background: var(--green-bg); }
@@ -164,76 +121,140 @@ nav {
 .as-pending { background: var(--amber-bg); color: var(--amber); }
 .as-cancelled { background: var(--primary-light); color: var(--primary); }
 
-/* HEALTH CARD */
-.health-card {
-  background: linear-gradient(135deg, #1A252F, #2C3E50);
-  border-radius: 16px; padding: 20px; color: white;
-  margin-bottom: 16px; position: relative; overflow: hidden;
-}
-.health-card::before {
-  content: ''; position: absolute; top: -30px; right: -30px;
-  width: 120px; height: 120px; background: rgba(192,57,43,0.2); border-radius: 50%;
-}
+.health-card { background: linear-gradient(135deg, #1A252F, #2C3E50); border-radius: 16px; padding: 20px; color: white; margin-bottom: 16px; position: relative; overflow: hidden; }
+.health-card::before { content:''; position:absolute; top:-30px; right:-30px; width:120px; height:120px; background:rgba(192,57,43,0.2); border-radius:50%; }
 .hc-label { font-size: 10px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
 .hc-id { font-size: 20px; font-weight: 800; letter-spacing: 2px; margin-bottom: 16px; }
 .hc-row { display: flex; gap: 20px; }
 .hc-item label { font-size: 10px; color: rgba(255,255,255,0.4); display: block; margin-bottom: 2px; }
 .hc-item span { font-size: 13px; font-weight: 600; }
-.hc-chip {
-  position: absolute; top: 16px; right: 16px;
-  background: rgba(30,132,73,0.3); border: 1px solid rgba(46,204,113,0.4);
-  padding: 4px 10px; border-radius: 20px; font-size: 11px; color: #2ecc71; font-weight: 600;
-}
+.hc-chip { position: absolute; top: 16px; right: 16px; background: rgba(30,132,73,0.3); border: 1px solid rgba(46,204,113,0.4); padding: 4px 10px; border-radius: 20px; font-size: 11px; color: #2ecc71; font-weight: 600; }
 
-/* VITALS */
 .vitals-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.vital-box {
-  background: var(--off-white); border-radius: 12px; padding: 14px;
-  border: 1px solid var(--border); text-align: center;
-}
+.vital-box { background: var(--off-white); border-radius: 12px; padding: 14px; border: 1px solid var(--border); text-align: center; }
 .vb-icon { font-size: 22px; margin-bottom: 6px; }
 .vb-val { font-size: 18px; font-weight: 800; margin-bottom: 2px; }
 .vb-label { font-size: 11px; color: var(--muted); }
 .vb-status { font-size: 10px; font-weight: 700; margin-top: 4px; padding: 2px 8px; border-radius: 20px; display: inline-block; }
 .vbs-normal { background: var(--green-bg); color: var(--green); }
-.vbs-high { background: var(--primary-light); color: var(--primary); }
 
-/* ==================== BED DASHBOARD PAGE ==================== */
-.beds-wrap { max-width: 1300px; margin: 0 auto; padding: 28px 32px; }
-.beds-header { margin-bottom: 24px; }
-.beds-header h1 { font-size: 26px; font-weight: 800; margin-bottom: 6px; }
-.beds-header p { font-size: 14px; color: var(--muted); }
+.bottom-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+.hosp-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px; transition: all 0.2s; cursor: pointer; }
+.hosp-item:hover { border-color: var(--primary); background: var(--primary-light); }
+.hosp-logo { width: 42px; height: 42px; border-radius: 10px; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.hosp-info { flex: 1; }
+.hosp-name { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+.hosp-detail { font-size: 11px; color: var(--muted); }
+.hosp-beds { text-align: right; }
+.beds-num { font-size: 18px; font-weight: 800; color: var(--green); }
+.beds-lbl { font-size: 10px; color: var(--muted); }
 
-.live-pill {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: var(--green-bg); border: 1px solid rgba(30,132,73,0.2);
-  padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700;
-  color: var(--green); margin-bottom: 16px;
-}
+.med-item { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 10px; margin-bottom: 8px; background: var(--off-white); border: 1px solid var(--border); }
+.med-icon { width: 36px; height: 36px; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.med-info { flex: 1; }
+.med-name { font-size: 13px; font-weight: 600; }
+.med-dose { font-size: 11px; color: var(--muted); }
+.med-time { font-size: 11px; font-weight: 700; color: var(--primary); }
+
+.qa-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.qa-btn { padding: 14px; border-radius: 12px; border: 1px solid var(--border); background: var(--off-white); cursor: pointer; text-align: center; transition: all 0.2s; font-family: var(--font); }
+.qa-btn:hover { border-color: var(--primary); background: var(--primary-light); transform: translateY(-2px); }
+.qa-icon { font-size: 22px; margin-bottom: 6px; }
+.qa-text { font-size: 12px; font-weight: 600; }
+
+/* MAP PAGE */
+.map-wrap { max-width: 1300px; margin: 0 auto; padding: 28px 32px; }
+.map-header { margin-bottom: 20px; }
+.map-header h1 { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
+.map-header p { font-size: 14px; color: var(--muted); }
+.map-layout { display: grid; grid-template-columns: 1fr 380px; gap: 20px; }
+#googleMap { width: 100%; height: 600px; border-radius: 16px; border: 1px solid var(--border); }
+.map-sidebar { display: flex; flex-direction: column; gap: 14px; overflow-y: auto; max-height: 600px; }
+.map-hosp-card { background: white; border-radius: 14px; padding: 16px; border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; }
+.map-hosp-card:hover, .map-hosp-card.selected { border-color: var(--primary); box-shadow: 0 4px 16px rgba(192,57,43,0.12); }
+.mhc-name { font-size: 14px; font-weight: 800; margin-bottom: 4px; }
+.mhc-addr { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+.mhc-beds { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.mhc-bed { background: var(--off-white); border-radius: 8px; padding: 8px; text-align: center; }
+.mhc-bed-val { font-size: 16px; font-weight: 800; }
+.mhc-bed-val.safe { color: var(--green); }
+.mhc-bed-val.warn { color: var(--amber); }
+.mhc-bed-val.danger { color: var(--primary); }
+.mhc-bed-lbl { font-size: 10px; color: var(--muted); }
+.mhc-footer { display: flex; gap: 8px; }
+.mhc-btn { flex: 1; padding: 7px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--font); border: 1px solid var(--border); background: white; transition: all 0.2s; }
+.mhc-btn:hover { border-color: var(--primary); color: var(--primary); }
+.mhc-btn.primary { background: var(--primary); border: none; color: white; }
+.locate-btn { padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--font); display: flex; align-items: center; gap: 8px; }
+
+/* EMERGENCY */
+.emg-wrap { max-width: 900px; margin: 0 auto; padding: 28px 32px; }
+.emg-hero { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: 20px; padding: 32px; margin-bottom: 28px; text-align: center; position: relative; overflow: hidden; animation: emg-pulse 2s infinite; }
+@keyframes emg-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,0.3);}50%{box-shadow:0 0 0 16px rgba(192,57,43,0);} }
+.emg-hero h1 { font-size: 28px; font-weight: 800; color: white; margin-bottom: 8px; }
+.emg-hero p { color: rgba(255,255,255,0.8); font-size: 14px; }
+.quick-emg { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 24px; }
+.qe-btn { padding: 18px; border-radius: 14px; border: 2px solid var(--border); background: white; cursor: pointer; text-align: center; transition: all 0.2s; font-family: var(--font); }
+.qe-btn:hover { border-color: var(--primary); background: var(--primary-light); transform: translateY(-2px); }
+.qe-icon { font-size: 28px; margin-bottom: 8px; }
+.qe-text { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+.qe-num { font-size: 16px; font-weight: 800; color: var(--primary); }
+.emg-form-box { background: white; border-radius: 16px; padding: 28px; border: 1px solid var(--border); }
+.emg-form-hdr { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+.emg-form-icon { width: 50px; height: 50px; background: var(--primary-light); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+.emg-form-title { font-size: 17px; font-weight: 800; margin-bottom: 4px; }
+.emg-form-sub { font-size: 13px; color: var(--muted); }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.form-input, .form-select { padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; font-family: var(--font); outline: none; transition: border 0.2s; }
+.form-input:focus, .form-select:focus { border-color: var(--primary); }
+.btn-send { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer; font-family: var(--font); }
+.btn-send:hover { background: var(--primary-dark); }
+
+/* ANALYTICS */
+.analytics-wrap { max-width: 1300px; margin: 0 auto; padding: 28px 32px; }
+.chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+.chart-box { background: white; border-radius: 16px; padding: 22px; border: 1px solid var(--border); }
+.chart-title { font-size: 15px; font-weight: 700; margin-bottom: 16px; }
+.chart-full { background: white; border-radius: 16px; padding: 22px; border: 1px solid var(--border); margin-bottom: 20px; }
+
+/* MODAL */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; justify-content: center; align-items: center; }
+.modal-overlay.show { display: flex; }
+.modal-box { background: white; border-radius: 20px; padding: 32px; max-width: 440px; width: 90%; animation: modalIn 0.3s ease; }
+@keyframes modalIn { from{opacity:0;transform:scale(0.8);}to{opacity:1;transform:scale(1);} }
+.modal-icon { font-size: 48px; text-align: center; margin-bottom: 16px; }
+.modal-title { font-size: 20px; font-weight: 800; text-align: center; margin-bottom: 8px; }
+.modal-desc { font-size: 14px; color: var(--muted); text-align: center; margin-bottom: 24px; line-height: 1.6; }
+.modal-btns { display: flex; gap: 10px; }
+.modal-btn { flex: 1; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: var(--font); border: none; }
+.mb-cancel { background: var(--light-gray); color: var(--text); }
+.mb-confirm { background: var(--primary); color: white; }
+
+.toast { position: fixed; bottom: 24px; right: 24px; z-index: 9999; background: var(--accent); color: white; padding: 14px 20px; border-radius: 12px; font-size: 14px; font-weight: 600; transform: translateY(100px); opacity: 0; transition: all 0.3s; max-width: 320px; }
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { background: var(--green); }
+.toast.error { background: var(--primary); }
+
+.live-pill { display: inline-flex; align-items: center; gap: 6px; background: var(--green-bg); border: 1px solid rgba(30,132,73,0.2); padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; color: var(--green); margin-bottom: 16px; }
 .live-dot-green { width: 7px; height: 7px; background: var(--green); border-radius: 50%; animation: pulse 1.5s infinite; }
 
+/* BED PAGE */
+.beds-wrap { max-width: 1300px; margin: 0 auto; padding: 28px 32px; }
 .summary-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
 .sum-card { background: white; border-radius: 14px; padding: 20px; border: 1px solid var(--border); }
 .sum-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 12px; }
 .sum-val { font-size: 30px; font-weight: 800; margin-bottom: 4px; }
 .sum-lbl { font-size: 12px; color: var(--muted); }
 .sum-sub { font-size: 12px; font-weight: 600; color: var(--green); margin-top: 6px; }
-
 .beds-filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
-.flt-btn {
-  padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border);
-  background: white; color: var(--muted); font-size: 12px; font-weight: 600;
-  cursor: pointer; font-family: var(--font); transition: all 0.2s;
-}
+.flt-btn { padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border); background: white; color: var(--muted); font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--font); transition: all 0.2s; }
 .flt-btn:hover, .flt-btn.active { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
 .search-wrap { margin-left: auto; display: flex; align-items: center; gap: 8px; background: white; border: 1px solid var(--border); border-radius: 10px; padding: 8px 14px; }
 .search-wrap input { border: none; outline: none; font-size: 13px; font-family: var(--font); width: 180px; }
-
 .hospitals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 20px; }
-.hosp-card {
-  background: white; border-radius: 18px; padding: 22px;
-  border: 1px solid var(--border); transition: all 0.3s;
-}
+.hosp-card { background: white; border-radius: 18px; padding: 22px; border: 1px solid var(--border); transition: all 0.3s; }
 .hosp-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.1); border-color: var(--primary); }
 .hc-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
 .hc-name { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
@@ -242,7 +263,6 @@ nav {
 .ab-high { background: var(--green-bg); color: var(--green); }
 .ab-mid { background: var(--amber-bg); color: var(--amber); }
 .ab-low { background: var(--primary-light); color: var(--primary); }
-
 .bed-types { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
 .bed-type { background: var(--off-white); border-radius: 10px; padding: 12px; border: 1px solid var(--border); }
 .bt-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
@@ -260,276 +280,92 @@ nav {
 .hc-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 14px; border-top: 1px solid var(--border); }
 .hc-time { font-size: 11px; color: var(--muted); }
 .hc-btns { display: flex; gap: 8px; }
-.hc-btn { padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--font); transition: all 0.2s; border: 1px solid var(--border); background: white; color: var(--text); }
+.hc-btn { padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--font); transition: all 0.2s; border: 1px solid var(--border); background: white; }
 .hc-btn:hover { border-color: var(--primary); color: var(--primary); }
 .hc-btn.primary { background: var(--primary); border: none; color: white; }
-.hc-btn.primary:hover { background: var(--primary-dark); }
 
-/* ==================== EMERGENCY PAGE ==================== */
-.emg-wrap { max-width: 900px; margin: 0 auto; padding: 28px 32px; }
-.emg-hero {
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-  border-radius: 20px; padding: 32px; margin-bottom: 28px;
-  text-align: center; position: relative; overflow: hidden;
-  animation: emg-pulse 2s infinite;
-}
-@keyframes emg-pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(192,57,43,0.3); } 50% { box-shadow: 0 0 0 16px rgba(192,57,43,0); } }
-.emg-hero h1 { font-size: 28px; font-weight: 800; color: white; margin-bottom: 8px; }
-.emg-hero p { color: rgba(255,255,255,0.8); font-size: 14px; }
-.emg-form-box { background: white; border-radius: 16px; padding: 28px; border: 1px solid var(--border); margin-bottom: 20px; }
-.emg-form-hdr { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
-.emg-form-icon { width: 50px; height: 50px; background: var(--primary-light); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
-.emg-form-title { font-size: 17px; font-weight: 800; margin-bottom: 4px; }
-.emg-form-sub { font-size: 13px; color: var(--muted); }
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-.form-group { display: flex; flex-direction: column; gap: 6px; }
-.form-label { font-size: 12px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: 0.5px; }
-.form-input, .form-select {
-  padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 10px;
-  font-size: 14px; font-family: var(--font); color: var(--text); outline: none;
-  transition: border 0.2s;
-}
-.form-input:focus, .form-select:focus { border-color: var(--primary); }
-.btn-send-alert {
-  width: 100%; padding: 14px; background: var(--primary); color: white; border: none;
-  border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer;
-  font-family: var(--font); transition: all 0.2s; display: flex; align-items: center;
-  justify-content: center; gap: 8px;
-}
-.btn-send-alert:hover { background: var(--primary-dark); transform: translateY(-2px); }
-
-.quick-emg { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 24px; }
-.qe-btn {
-  padding: 18px; border-radius: 14px; border: 2px solid var(--border);
-  background: white; cursor: pointer; text-align: center; transition: all 0.2s; font-family: var(--font);
-}
-.qe-btn:hover { border-color: var(--primary); background: var(--primary-light); transform: translateY(-2px); }
-.qe-icon { font-size: 28px; margin-bottom: 8px; }
-.qe-text { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-.qe-num { font-size: 16px; font-weight: 800; color: var(--primary); }
-
-/* ==================== ANALYTICS PAGE ==================== */
-.analytics-wrap { max-width: 1300px; margin: 0 auto; padding: 28px 32px; }
-.analytics-header { margin-bottom: 24px; }
-.analytics-header h1 { font-size: 26px; font-weight: 800; margin-bottom: 6px; }
-.analytics-header p { font-size: 14px; color: var(--muted); }
-.chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
-.chart-box { background: white; border-radius: 16px; padding: 22px; border: 1px solid var(--border); }
-.chart-title { font-size: 15px; font-weight: 700; margin-bottom: 16px; }
-.chart-full { background: white; border-radius: 16px; padding: 22px; border: 1px solid var(--border); margin-bottom: 20px; }
-
-/* BOTTOM GRID */
-.bottom-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
-
-/* HOSPITAL ITEMS */
-.hosp-item {
-  display: flex; align-items: center; gap: 12px; padding: 12px;
-  border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px;
-  transition: all 0.2s; cursor: pointer;
-}
-.hosp-item:hover { border-color: var(--primary); background: var(--primary-light); }
-.hosp-logo {
-  width: 42px; height: 42px; border-radius: 10px; background: var(--primary-light);
-  display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
-}
-.hosp-info { flex: 1; }
-.hosp-name { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
-.hosp-detail { font-size: 11px; color: var(--muted); }
-.hosp-beds { text-align: right; }
-.beds-num { font-size: 18px; font-weight: 800; color: var(--green); }
-.beds-lbl { font-size: 10px; color: var(--muted); }
-
-/* MEDICINES */
-.med-item {
-  display: flex; align-items: center; gap: 10px; padding: 10px;
-  border-radius: 10px; margin-bottom: 8px; background: var(--off-white); border: 1px solid var(--border);
-}
-.med-icon { width: 36px; height: 36px; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-.med-info { flex: 1; }
-.med-name { font-size: 13px; font-weight: 600; }
-.med-dose { font-size: 11px; color: var(--muted); }
-.med-time { font-size: 11px; font-weight: 700; color: var(--primary); }
-
-/* QUICK ACTIONS */
-.qa-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.qa-btn {
-  padding: 14px; border-radius: 12px; border: 1px solid var(--border);
-  background: var(--off-white); cursor: pointer; text-align: center;
-  transition: all 0.2s; font-family: var(--font);
-}
-.qa-btn:hover { border-color: var(--primary); background: var(--primary-light); transform: translateY(-2px); }
-.qa-icon { font-size: 22px; margin-bottom: 6px; }
-.qa-text { font-size: 12px; font-weight: 600; }
-
-/* MODAL */
-.modal-overlay {
-  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-  z-index: 999; justify-content: center; align-items: center;
-}
-.modal-overlay.show { display: flex; }
-.modal-box {
-  background: white; border-radius: 20px; padding: 32px; max-width: 440px;
-  width: 90%; animation: modalIn 0.3s ease;
-}
-@keyframes modalIn { from { opacity:0; transform:scale(0.8); } to { opacity:1; transform:scale(1); } }
-.modal-icon { font-size: 48px; text-align: center; margin-bottom: 16px; }
-.modal-title { font-size: 20px; font-weight: 800; text-align: center; margin-bottom: 8px; }
-.modal-desc { font-size: 14px; color: var(--muted); text-align: center; margin-bottom: 24px; line-height: 1.6; }
-.modal-btns { display: flex; gap: 10px; }
-.modal-btn { flex: 1; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: var(--font); border: none; }
-.mb-cancel { background: var(--light-gray); color: var(--text); }
-.mb-confirm { background: var(--primary); color: white; }
-
-/* TOAST */
-.toast {
-  position: fixed; bottom: 24px; right: 24px; z-index: 9999;
-  background: var(--accent); color: white; padding: 14px 20px;
-  border-radius: 12px; font-size: 14px; font-weight: 600;
-  transform: translateY(100px); opacity: 0; transition: all 0.3s;
-  max-width: 320px; display: flex; align-items: center; gap: 10px;
-}
-.toast.show { transform: translateY(0); opacity: 1; }
-.toast.success { background: var(--green); }
-.toast.error { background: var(--primary); }
-
-/* RESPONSIVE */
 @media(max-width:1024px) {
-  .stats-row { grid-template-columns: repeat(2,1fr); }
+  .stats-row,.summary-grid { grid-template-columns: repeat(2,1fr); }
   .main-grid { grid-template-columns: 1fr; }
   .bottom-grid { grid-template-columns: 1fr 1fr; }
   .chart-grid { grid-template-columns: 1fr; }
+  .map-layout { grid-template-columns: 1fr; }
 }
 @media(max-width:768px) {
-  .dashboard-wrap, .beds-wrap, .emg-wrap, .analytics-wrap { padding: 16px; }
-  .stats-row, .summary-grid { grid-template-columns: repeat(2,1fr); }
+  .wrap,.map-wrap,.emg-wrap,.analytics-wrap,.beds-wrap { padding: 16px; }
+  .stats-row,.summary-grid { grid-template-columns: repeat(2,1fr); }
   .hospitals-grid { grid-template-columns: 1fr; }
   .form-grid { grid-template-columns: 1fr; }
   .quick-emg { grid-template-columns: 1fr 1fr; }
   .bottom-grid { grid-template-columns: 1fr; }
   .welcome-stats { display: none; }
-  .top-bar { display: none; }
-  .nav-links { display: none; }
+  .top-bar,.nav-links { display: none; }
 }
 </style>
 </head>
 <body>
 
-<!-- TOP BAR -->
 <div class="top-bar">
   <div class="top-bar-left">
-    <div class="top-bar-item"><div class="dot pulse-live"></div> Live Data Active</div>
-    <div class="top-bar-item">📞 National Emergency: 112</div>
+    <div class="top-bar-item"><div class="dot pulse-live"></div>Live Data Active</div>
+    <div class="top-bar-item">📞 Emergency: 112</div>
     <div class="top-bar-item">🚑 Ambulance: 108</div>
   </div>
   <div class="top-bar-right">
-    <span class="top-bar-link">India</span>
-    <span class="top-bar-link" onclick="showPage('beds')">Bed Availability</span>
+    <span class="top-bar-link" onclick="showPage('map')">🗺️ Nearby Hospitals</span>
     <span class="top-bar-link" onclick="logout()">Logout</span>
   </div>
 </div>
 
-<!-- NAV -->
 <nav>
-  <div class="logo">🏥Hosp<span class="black">Track</span><span 
+  <div class="logo">Hosp<span class="red">Track</span><span class="pro">PRO</span></div>
   <div class="nav-links">
-    <button class="nav-link active" onclick="showPage('dashboard', this)">🏠 Dashboard</button>
-    <button class="nav-link" onclick="showPage('beds', this)">🛏️ Bed Availability</button>
-    <button class="nav-link" onclick="showPage('emergency', this)">🚨 Emergency</button>
-    <button class="nav-link" onclick="showPage('analytics', this)">📊 Analytics</button>
+    <button class="nav-link active" onclick="showPage('dashboard',this)">🏠 Dashboard</button>
+    <button class="nav-link" onclick="showPage('map',this)">🗺️ Nearby Hospitals</button>
+    <button class="nav-link" onclick="showPage('beds',this)">🛏️ Bed Availability</button>
+    <button class="nav-link" onclick="showPage('emergency',this)">🚨 Emergency</button>
+    <button class="nav-link" onclick="showPage('analytics',this)">📊 Analytics</button>
   </div>
   <div class="nav-right">
-    <button class="btn-sos" onclick="showPage('emergency')">🆘 SOS Emergency</button>
+    <button class="btn-sos" onclick="showPage('emergency')">🆘 SOS</button>
     <div class="user-avatar" id="userAvatar">P</div>
   </div>
 </nav>
 
-<!-- ==================== DASHBOARD PAGE ==================== -->
+<!-- DASHBOARD -->
 <div id="page-dashboard" class="page active">
-  <div class="dashboard-wrap">
-
-    <!-- WELCOME -->
+  <div class="wrap">
     <div class="welcome-section">
       <div class="welcome-text">
         <h2 id="greetMsg">Good Morning! 👋</h2>
         <p>Welcome back, <strong id="patientNameWelcome" style="color:white">Patient</strong>. Here's your health overview.</p>
         <div class="welcome-chips">
           <div class="chip red" onclick="showPage('emergency')">🚨 Emergency SOS</div>
-          <div class="chip green" onclick="showPage('beds')">🛏️ Find Beds</div>
+          <div class="chip green" onclick="showPage('map')">🗺️ Nearby Hospitals</div>
           <div class="chip blue" onclick="showPage('analytics')">📊 My Analytics</div>
         </div>
       </div>
       <div class="welcome-stats">
         <div class="w-stat"><div class="w-stat-val">2</div><div class="w-stat-label">Appointments</div></div>
         <div class="w-stat"><div class="w-stat-val">4</div><div class="w-stat-label">Medicines</div></div>
-        <div class="w-stat"><div class="w-stat-val">12</div><div class="w-stat-label">Hospitals</div></div>
+        <div class="w-stat"><div class="w-stat-val" id="dashHospCount">—</div><div class="w-stat-label">Hospitals</div></div>
       </div>
     </div>
 
-    <!-- STATS -->
     <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-top"><div class="stat-icon si-red">📅</div><span class="stat-badge sb-green">Active</span></div>
-        <div class="stat-val">2</div><div class="stat-lbl">Upcoming Appointments</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-top"><div class="stat-icon si-blue">👨‍⚕️</div><span class="stat-badge sb-green">+2 New</span></div>
-        <div class="stat-val">5</div><div class="stat-lbl">My Doctors</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-top"><div class="stat-icon si-amber">💊</div><span class="stat-badge sb-amber">1 Due</span></div>
-        <div class="stat-val">4</div><div class="stat-lbl">Active Medicines</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-top"><div class="stat-icon si-green">🏥</div><span class="stat-badge sb-green">Nearby</span></div>
-        <div class="stat-val" id="dashHospCount">—</div><div class="stat-lbl">Hospitals with Beds</div>
-      </div>
+      <div class="stat-card"><div class="stat-top"><div class="stat-icon si-red">📅</div><span class="stat-badge sb-green">Active</span></div><div class="stat-val">2</div><div class="stat-lbl">Upcoming Appointments</div></div>
+      <div class="stat-card"><div class="stat-top"><div class="stat-icon si-blue">👨‍⚕️</div><span class="stat-badge sb-green">+2 New</span></div><div class="stat-val">5</div><div class="stat-lbl">My Doctors</div></div>
+      <div class="stat-card"><div class="stat-top"><div class="stat-icon si-amber">💊</div><span class="stat-badge sb-amber">1 Due</span></div><div class="stat-val">4</div><div class="stat-lbl">Active Medicines</div></div>
+      <div class="stat-card"><div class="stat-top"><div class="stat-icon si-green">🏥</div><span class="stat-badge sb-green">Nearby</span></div><div class="stat-val" id="dashBedCount">—</div><div class="stat-lbl">Hospitals with Beds</div></div>
     </div>
 
-    <!-- MAIN GRID -->
     <div class="main-grid">
-
-      <!-- APPOINTMENTS -->
       <div class="panel">
-        <div class="panel-hdr">
-          <span class="panel-title">📅 My Appointments</span>
-          <button class="panel-action">View All →</button>
-        </div>
-        <div class="appt-item">
-          <div class="appt-avatar aa-red">👨‍⚕️</div>
-          <div class="appt-info">
-            <div class="appt-doc">Dr. Rajesh Kumar</div>
-            <div class="appt-hosp">🏥 City Hospital • Cardiology</div>
-          </div>
-          <div class="appt-right">
-            <div class="appt-date">May 8, 10:30 AM</div>
-            <span class="appt-status as-confirmed">✓ Confirmed</span>
-          </div>
-        </div>
-        <div class="appt-item">
-          <div class="appt-avatar aa-blue">👩‍⚕️</div>
-          <div class="appt-info">
-            <div class="appt-doc">Dr. Priya Sharma</div>
-            <div class="appt-hosp">🏥 Apollo Medical • Neurology</div>
-          </div>
-          <div class="appt-right">
-            <div class="appt-date">May 12, 2:00 PM</div>
-            <span class="appt-status as-pending">⏳ Pending</span>
-          </div>
-        </div>
-        <div class="appt-item">
-          <div class="appt-avatar aa-green">🧬</div>
-          <div class="appt-info">
-            <div class="appt-doc">Dr. Amit Verma</div>
-            <div class="appt-hosp">🏥 LifeCare • General Medicine</div>
-          </div>
-          <div class="appt-right">
-            <div class="appt-date">Apr 28, 11:00 AM</div>
-            <span class="appt-status as-cancelled">✕ Cancelled</span>
-          </div>
-        </div>
+        <div class="panel-hdr"><span class="panel-title">📅 My Appointments</span><button class="panel-action">View All →</button></div>
+        <div class="appt-item"><div class="appt-avatar aa-red">👨‍⚕️</div><div class="appt-info"><div class="appt-doc">Dr. Rajesh Kumar</div><div class="appt-hosp">🏥 City Hospital • Cardiology</div></div><div class="appt-right"><div class="appt-date">May 8, 10:30 AM</div><span class="appt-status as-confirmed">✓ Confirmed</span></div></div>
+        <div class="appt-item"><div class="appt-avatar aa-blue">👩‍⚕️</div><div class="appt-info"><div class="appt-doc">Dr. Priya Sharma</div><div class="appt-hosp">🏥 Apollo Medical • Neurology</div></div><div class="appt-right"><div class="appt-date">May 12, 2:00 PM</div><span class="appt-status as-pending">⏳ Pending</span></div></div>
+        <div class="appt-item"><div class="appt-avatar aa-green">🧬</div><div class="appt-info"><div class="appt-doc">Dr. Amit Verma</div><div class="appt-hosp">🏥 LifeCare • General</div></div><div class="appt-right"><div class="appt-date">Apr 28, 11:00 AM</div><span class="appt-status as-cancelled">✕ Cancelled</span></div></div>
       </div>
-
-      <!-- RIGHT -->
       <div style="display:flex;flex-direction:column;gap:16px;">
         <div class="health-card">
           <div class="hc-chip">✓ Active</div>
@@ -553,23 +389,20 @@ nav {
       </div>
     </div>
 
-    <!-- BOTTOM -->
     <div class="bottom-grid">
       <div class="panel">
-        <div class="panel-hdr"><span class="panel-title">🏥 Nearby Hospitals</span><button class="panel-action" onclick="showPage('beds')">View All →</button></div>
-        <div id="dashHospList">
-          <div class="hosp-item"><div class="hosp-logo">🏥</div><div class="hosp-info"><div class="hosp-name">Loading...</div></div></div>
-        </div>
+        <div class="panel-hdr"><span class="panel-title">🏥 Nearby Hospitals</span><button class="panel-action" onclick="showPage('map')">View Map →</button></div>
+        <div id="dashHospList"><div style="color:var(--muted);text-align:center;padding:16px">Loading...</div></div>
       </div>
       <div class="panel">
         <div class="panel-hdr"><span class="panel-title">⚡ Quick Actions</span></div>
         <div class="qa-grid">
           <div class="qa-btn" onclick="showPage('emergency')"><div class="qa-icon">🚨</div><div class="qa-text">Emergency SOS</div></div>
+          <div class="qa-btn" onclick="showPage('map')"><div class="qa-icon">🗺️</div><div class="qa-text">Find on Map</div></div>
           <div class="qa-btn" onclick="showPage('beds')"><div class="qa-icon">🛏️</div><div class="qa-text">Find Beds</div></div>
           <div class="qa-btn"><div class="qa-icon">📋</div><div class="qa-text">Medical Records</div></div>
-          <div class="qa-btn"><div class="qa-icon">🧪</div><div class="qa-text">Lab Tests</div></div>
           <div class="qa-btn" onclick="showPage('analytics')"><div class="qa-icon">📊</div><div class="qa-text">Analytics</div></div>
-          <div class="qa-btn"><div class="qa-icon">💬</div><div class="qa-text">Consult Doctor</div></div>
+          <div class="qa-btn"><div class="qa-icon">💊</div><div class="qa-text">Medicines</div></div>
         </div>
       </div>
       <div class="panel">
@@ -580,89 +413,83 @@ nav {
         <div class="med-item"><div class="med-icon">🔴</div><div class="med-info"><div class="med-name">Atorvastatin</div><div class="med-dose">1 tablet • Night</div></div><div class="med-time">9 PM</div></div>
       </div>
     </div>
-
   </div>
 </div>
 
-<!-- ==================== BED AVAILABILITY PAGE ==================== -->
+<!-- MAP PAGE -->
+<div id="page-map" class="page">
+  <div class="map-wrap">
+    <div class="map-header">
+      <div class="live-pill"><div class="live-dot-green"></div>Live Location Active</div>
+      <h1>🗺️ Nearby Hospitals Map</h1>
+      <p>Find hospitals near you with real-time bed availability</p>
+    </div>
+    <div style="display:flex;gap:12px;margin-bottom:16px;align-items:center;flex-wrap:wrap;">
+      <button class="locate-btn" onclick="locateMe()">📍 Use My Location</button>
+      <input id="mapSearchInput" type="text" placeholder="Search city or hospital..." style="padding:10px 16px;border:1px solid var(--border);border-radius:10px;font-size:13px;font-family:var(--font);outline:none;flex:1;min-width:200px;">
+      <button class="locate-btn" onclick="searchMapLocation()" style="background:var(--blue)">🔍 Search</button>
+    </div>
+    <div class="map-layout">
+      <div id="googleMap"></div>
+      <div class="map-sidebar" id="mapSidebar">
+        <div style="color:var(--muted);text-align:center;padding:24px">
+          <div style="font-size:32px;margin-bottom:8px">📍</div>
+          Click "Use My Location" to find nearby hospitals
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BED AVAILABILITY -->
 <div id="page-beds" class="page">
   <div class="beds-wrap">
-    <div class="beds-header">
+    <div style="margin-bottom:20px;">
       <div class="live-pill"><div class="live-dot-green"></div>LIVE — Auto refresh every 30s</div>
-      <h1>🛏️ Live Bed Availability</h1>
-      <p>Real-time hospital bed data — find available beds near you instantly</p>
+      <h1 style="font-size:24px;font-weight:800;margin-bottom:6px;">🛏️ Live Bed Availability</h1>
+      <p style="font-size:14px;color:var(--muted)">Real-time hospital bed data</p>
     </div>
-
     <div class="summary-grid">
-      <div class="sum-card"><div class="sum-icon si-green">🏥</div><div class="sum-val" id="bedTotalHosp">—</div><div class="sum-lbl">Total Hospitals</div><div class="sum-sub" id="bedActiveHosp">— with beds</div></div>
-      <div class="sum-card"><div class="sum-icon si-blue">🛏️</div><div class="sum-val" id="bedTotalBeds">—</div><div class="sum-lbl">Total Beds</div><div class="sum-sub" id="bedAvailBeds">— Available</div></div>
-      <div class="sum-card"><div class="sum-icon si-red">🏥</div><div class="sum-val" id="bedTotalICU">—</div><div class="sum-lbl">ICU Beds</div><div class="sum-sub" id="bedAvailICU">— Available</div></div>
-      <div class="sum-card"><div class="sum-icon si-amber">💨</div><div class="sum-val" id="bedTotalOxy">—</div><div class="sum-lbl">Oxygen Beds</div><div class="sum-sub" id="bedAvailOxy">— Available</div></div>
+      <div class="sum-card"><div class="sum-icon si-green">🏥</div><div class="sum-val" id="bedTotalHosp">—</div><div class="sum-lbl">Total Hospitals</div><div class="sum-sub" id="bedActiveHosp">—</div></div>
+      <div class="sum-card"><div class="sum-icon si-blue">🛏️</div><div class="sum-val" id="bedTotalBeds">—</div><div class="sum-lbl">Total Beds</div><div class="sum-sub" id="bedAvailBeds">—</div></div>
+      <div class="sum-card"><div class="sum-icon si-red">🏥</div><div class="sum-val" id="bedTotalICU">—</div><div class="sum-lbl">ICU Beds</div><div class="sum-sub" id="bedAvailICU">—</div></div>
+      <div class="sum-card"><div class="sum-icon si-amber">💨</div><div class="sum-val" id="bedTotalOxy">—</div><div class="sum-lbl">Oxygen Beds</div><div class="sum-sub" id="bedAvailOxy">—</div></div>
     </div>
-
     <div class="beds-filters">
       <button class="flt-btn active" onclick="filterBeds('all',this)">All</button>
       <button class="flt-btn" onclick="filterBeds('available',this)">✅ Available</button>
       <button class="flt-btn" onclick="filterBeds('icu',this)">🏥 ICU</button>
       <button class="flt-btn" onclick="filterBeds('emergency',this)">🚨 Emergency</button>
-      <div class="search-wrap">🔍 <input type="text" id="bedSearch" placeholder="Search hospital or city..." oninput="searchBeds()"></div>
+      <div class="search-wrap">🔍<input type="text" id="bedSearch" placeholder="Search..." oninput="searchBeds()"></div>
     </div>
-
     <div id="hospitalsGrid" class="hospitals-grid">
-      <div style="text-align:center;padding:40px;grid-column:1/-1;color:var(--muted)">
-        <div style="font-size:32px;margin-bottom:10px">⏳</div>Loading hospitals...
-      </div>
+      <div style="text-align:center;padding:40px;grid-column:1/-1;color:var(--muted)"><div style="font-size:32px;margin-bottom:10px">⏳</div>Loading...</div>
     </div>
   </div>
 </div>
 
-<!-- ==================== EMERGENCY PAGE ==================== -->
+<!-- EMERGENCY -->
 <div id="page-emergency" class="page">
   <div class="emg-wrap">
     <div class="emg-hero">
       <div style="font-size:48px;margin-bottom:12px">🚨</div>
       <h1>Emergency Alert System</h1>
-      <p>Alert hospitals before you arrive — give them time to prepare for your arrival</p>
+      <p>Alert hospitals before you arrive — give them time to prepare</p>
     </div>
-
     <div class="quick-emg">
-      <div class="qe-btn" onclick="quickCall('108')">
-        <div class="qe-icon">🚑</div>
-        <div class="qe-text">Ambulance</div>
-        <div class="qe-num">108</div>
-      </div>
-      <div class="qe-btn" onclick="quickCall('112')">
-        <div class="qe-icon">🆘</div>
-        <div class="qe-text">National Emergency</div>
-        <div class="qe-num">112</div>
-      </div>
-      <div class="qe-btn" onclick="quickCall('102')">
-        <div class="qe-icon">👶</div>
-        <div class="qe-text">Maternity Helpline</div>
-        <div class="qe-num">102</div>
-      </div>
+      <div class="qe-btn" onclick="quickCall('108')"><div class="qe-icon">🚑</div><div class="qe-text">Ambulance</div><div class="qe-num">108</div></div>
+      <div class="qe-btn" onclick="quickCall('112')"><div class="qe-icon">🆘</div><div class="qe-text">National Emergency</div><div class="qe-num">112</div></div>
+      <div class="qe-btn" onclick="quickCall('102')"><div class="qe-icon">👶</div><div class="qe-text">Maternity</div><div class="qe-num">102</div></div>
     </div>
-
     <div class="emg-form-box">
       <div class="emg-form-hdr">
         <div class="emg-form-icon">🚨</div>
-        <div>
-          <div class="emg-form-title">Send Emergency Alert to Nearby Hospitals</div>
-          <div class="emg-form-sub">Fill the form — our system alerts 3 nearest hospitals immediately</div>
-        </div>
+        <div><div class="emg-form-title">Send Emergency Alert</div><div class="emg-form-sub">3 nearest hospitals will be alerted immediately</div></div>
       </div>
-
       <div class="form-grid">
-        <div class="form-group">
-          <label class="form-label">Your Location</label>
-          <input class="form-input" id="emgLocation" placeholder="City, Area or PIN code...">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Patient Name</label>
-          <input class="form-input" id="emgName" placeholder="Full name...">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Emergency Type</label>
+        <div class="form-group"><label class="form-label">Your Location</label><input class="form-input" id="emgLocation" placeholder="City, Area or PIN code..."></div>
+        <div class="form-group"><label class="form-label">Patient Name</label><input class="form-input" id="emgName" placeholder="Full name..."></div>
+        <div class="form-group"><label class="form-label">Emergency Type</label>
           <select class="form-select" id="emgType">
             <option value="">— Select Emergency —</option>
             <option>🧠 Head / Brain Injury</option>
@@ -671,65 +498,37 @@ nav {
             <option>🩸 Heavy Bleeding</option>
             <option>🫁 Breathing Difficulty</option>
             <option>👶 Pregnancy Emergency</option>
-            <option>🧪 Poisoning / Overdose</option>
             <option>😵 Unconscious / Stroke</option>
             <option>Other Emergency</option>
           </select>
         </div>
-        <div class="form-group">
-          <label class="form-label">Severity Level</label>
+        <div class="form-group"><label class="form-label">Severity</label>
           <select class="form-select" id="emgSeverity">
-            <option value="">— Select Severity —</option>
-            <option>🔴 Critical — Immediate attention needed</option>
-            <option>🟠 High — Urgent care required</option>
-            <option>🟡 Medium — Needs attention soon</option>
+            <option value="">— Select —</option>
+            <option>🔴 Critical</option>
+            <option>🟠 High</option>
+            <option>🟡 Medium</option>
           </select>
         </div>
       </div>
-
-      <button class="btn-send-alert" onclick="sendAlert()">
-        🚨 Alert Hospitals & Send Ambulance
-      </button>
+      <button class="btn-send" onclick="sendAlert()">🚨 Alert Hospitals & Send Ambulance</button>
     </div>
-
   </div>
 </div>
 
-<!-- ==================== ANALYTICS PAGE ==================== -->
+<!-- ANALYTICS -->
 <div id="page-analytics" class="page">
   <div class="analytics-wrap">
-    <div class="analytics-header">
-      <h1>📊 Health Analytics</h1>
-      <p>Peak emergency hours, bed availability trends, and your health insights</p>
-    </div>
-
-    <div class="chart-full">
-      <div class="chart-title">⏰ Peak Emergency Hours (Last 7 Days)</div>
-      <canvas id="peakHoursChart" height="80"></canvas>
-    </div>
-
+    <div style="margin-bottom:24px;"><h1 style="font-size:24px;font-weight:800;margin-bottom:6px;">📊 Health Analytics</h1><p style="font-size:14px;color:var(--muted)">Peak emergency hours, bed trends, your health insights</p></div>
+    <div class="chart-full"><div class="chart-title">⏰ Peak Emergency Hours</div><canvas id="peakHoursChart" height="80"></canvas></div>
     <div class="chart-grid">
-      <div class="chart-box">
-        <div class="chart-title">🛏️ Bed Availability Trend</div>
-        <canvas id="bedTrendChart" height="150"></canvas>
-      </div>
-      <div class="chart-box">
-        <div class="chart-title">🏥 Emergency Types Distribution</div>
-        <canvas id="emgTypesChart" height="150"></canvas>
-      </div>
+      <div class="chart-box"><div class="chart-title">🛏️ Bed Availability Trend</div><canvas id="bedTrendChart" height="150"></canvas></div>
+      <div class="chart-box"><div class="chart-title">🏥 Emergency Types</div><canvas id="emgTypesChart" height="150"></canvas></div>
     </div>
-
     <div class="chart-grid">
-      <div class="chart-box">
-        <div class="chart-title">📅 My Appointment History</div>
-        <canvas id="apptChart" height="150"></canvas>
-      </div>
-      <div class="chart-box">
-        <div class="chart-title">❤️ My Health Score Trend</div>
-        <canvas id="healthChart" height="150"></canvas>
-      </div>
+      <div class="chart-box"><div class="chart-title">📅 Appointment History</div><canvas id="apptChart" height="150"></canvas></div>
+      <div class="chart-box"><div class="chart-title">❤️ Health Score Trend</div><canvas id="healthChart" height="150"></canvas></div>
     </div>
-
   </div>
 </div>
 
@@ -738,45 +537,36 @@ nav {
   <div class="modal-box">
     <div class="modal-icon">🚨</div>
     <div class="modal-title">Send Emergency Alert?</div>
-    <div class="modal-desc" id="modalDesc">3 nearest hospitals will be alerted immediately. Ambulance will be dispatched.</div>
+    <div class="modal-desc" id="modalDesc">3 nearest hospitals will be alerted immediately.</div>
     <div class="modal-btns">
       <button class="modal-btn mb-cancel" onclick="closeModal()">Cancel</button>
       <button class="modal-btn mb-confirm" onclick="confirmAlert()">🚨 Send Alert</button>
     </div>
   </div>
 </div>
-
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
 const API_URL = "https://hospital-backend-01.onrender.com";
+const MAPS_KEY = "AlzaSyB417w_XxIF5w04rucpz0v5SAxk_zKDjs0";
 
-// ✅ Auth check
+// Auth check
 const token = localStorage.getItem("token");
 const role = localStorage.getItem("role");
 const userName = localStorage.getItem("userName");
 const userId = localStorage.getItem("userId");
+if (!token || role !== "patient") { alert("Access Denied!"); window.location.href = "index.html"; }
 
-if (!token || role !== "patient") {
-  alert("Access Denied! Patient login required.");
-  window.location.href = "index.html";
-}
-
-// ✅ Set user info
 if (userName) {
   document.getElementById("userAvatar").textContent = userName.charAt(0).toUpperCase();
   document.getElementById("patientNameWelcome").textContent = userName;
 }
-if (userId) {
-  document.getElementById("patientIdCard").textContent = "HOSP-" + userId.slice(-6).toUpperCase();
-}
+if (userId) document.getElementById("patientIdCard").textContent = "HOSP-" + userId.slice(-6).toUpperCase();
 
 const hour = new Date().getHours();
-const greeting = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
-document.getElementById("greetMsg").textContent = `${greeting}! 👋`;
+document.getElementById("greetMsg").textContent = `${hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening'}! 👋`;
 
-// ✅ Page navigation
+// Page navigation
 function showPage(page, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
@@ -784,10 +574,194 @@ function showPage(page, btn) {
   if (btn) btn.classList.add('active');
   if (page === 'beds') loadBeds();
   if (page === 'analytics') loadCharts();
+  if (page === 'map') { if (mapInitialized) locateMe(); }
+}
+
+// ==================== GOOGLE MAPS ====================
+let map, userMarker, infoWindow;
+let mapInitialized = false;
+let allHospitals = [];
+let mapMarkers = [];
+
+function initMap() {
+  mapInitialized = true;
+  map = new google.maps.Map(document.getElementById('googleMap'), {
+    center: { lat: 20.5937, lng: 78.9629 }, // India center
+    zoom: 5,
+    styles: [
+      { featureType: 'poi.business', stylers: [{ visibility: 'off' }] },
+      { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#e9f5fb' }] },
+    ]
+  });
+  infoWindow = new google.maps.InfoWindow();
+}
+
+function locateMe() {
+  if (!navigator.geolocation) { showToast('⚠️ Geolocation not supported!', 'error'); return; }
+  showToast('📍 Getting your location...', '');
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const { latitude: lat, longitude: lng } = pos.coords;
+      map.setCenter({ lat, lng });
+      map.setZoom(13);
+
+      if (userMarker) userMarker.setMap(null);
+      userMarker = new google.maps.Marker({
+        position: { lat, lng }, map,
+        title: 'Your Location',
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 10, fillColor: '#C0392B', fillOpacity: 1,
+          strokeColor: 'white', strokeWeight: 3
+        }
+      });
+
+      showToast('✅ Location found! Searching nearby hospitals...', 'success');
+      searchNearbyHospitals(lat, lng);
+    },
+    () => {
+      showToast('❌ Location access denied. Please enable location.', 'error');
+      // Default to Delhi
+      searchNearbyHospitals(28.6139, 77.2090);
+    }
+  );
+}
+
+function searchNearbyHospitals(lat, lng) {
+  mapMarkers.forEach(m => m.setMap(null));
+  mapMarkers = [];
+
+  const service = new google.maps.places.PlacesService(map);
+  service.nearbySearch({
+    location: { lat, lng },
+    radius: 10000,
+    type: 'hospital'
+  }, (results, status) => {
+    if (status === google.maps.places.PlacesServiceStatus.OK) {
+      renderMapSidebar(results, lat, lng);
+      results.forEach((place, i) => {
+        const marker = new google.maps.Marker({
+          position: place.geometry.location, map,
+          title: place.name,
+          label: { text: '🏥', fontSize: '20px' },
+          animation: google.maps.Animation.DROP
+        });
+
+        // Match with bed data
+        const bedData = allHospitals.find(h =>
+          h.name.toLowerCase().includes(place.name.toLowerCase().split(' ')[0])
+        );
+
+        const content = `
+          <div style="font-family:'DM Sans',sans-serif;padding:8px;max-width:220px;">
+            <div style="font-size:15px;font-weight:800;margin-bottom:4px;">🏥 ${place.name}</div>
+            <div style="font-size:12px;color:#5D6D7E;margin-bottom:8px;">${place.vicinity || ''}</div>
+            ${bedData ? `
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
+                <div style="background:#E9F7EF;border-radius:6px;padding:6px;text-align:center;">
+                  <div style="font-size:16px;font-weight:800;color:#1E8449;">${bedData.availableBeds}</div>
+                  <div style="font-size:10px;color:#5D6D7E;">General</div>
+                </div>
+                <div style="background:#EBF5FB;border-radius:6px;padding:6px;text-align:center;">
+                  <div style="font-size:16px;font-weight:800;color:#1A5276;">${bedData.icuAvailable}</div>
+                  <div style="font-size:10px;color:#5D6D7E;">ICU</div>
+                </div>
+              </div>
+            ` : '<div style="font-size:12px;color:#5D6D7E;margin-bottom:8px;">Bed data not available</div>'}
+            <div style="display:flex;gap:6px;">
+              ${place.formatted_phone_number ? `<a href="tel:${place.formatted_phone_number}" style="flex:1;padding:6px;background:#FADBD8;color:#C0392B;border-radius:6px;text-align:center;text-decoration:none;font-size:11px;font-weight:700;">📞 Call</a>` : ''}
+              <button onclick="getDirections(${place.geometry.location.lat()},${place.geometry.location.lng()})" style="flex:1;padding:6px;background:#C0392B;color:white;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">🗺️ Directions</button>
+            </div>
+          </div>`;
+
+        marker.addListener('click', () => {
+          infoWindow.setContent(content);
+          infoWindow.open(map, marker);
+        });
+
+        mapMarkers.push(marker);
+      });
+    } else {
+      showToast('⚠️ No hospitals found nearby', 'error');
+    }
+  });
+}
+
+function renderMapSidebar(places, userLat, userLng) {
+  const sidebar = document.getElementById('mapSidebar');
+  sidebar.innerHTML = `<div style="font-size:13px;font-weight:700;color:var(--muted);padding:4px 0 8px;">Found ${places.length} hospitals nearby</div>`;
+
+  places.slice(0, 10).forEach((place, i) => {
+    const lat = place.geometry.location.lat();
+    const lng = place.geometry.location.lng();
+    const dist = getDistance(userLat, userLng, lat, lng).toFixed(1);
+    const bedData = allHospitals.find(h => h.name.toLowerCase().includes(place.name.toLowerCase().split(' ')[0]));
+
+    const card = document.createElement('div');
+    card.className = 'map-hosp-card';
+    card.innerHTML = `
+      <div class="mhc-name">🏥 ${place.name}</div>
+      <div class="mhc-addr">📍 ${place.vicinity || ''} • ${dist} km away</div>
+      ${bedData ? `
+        <div class="mhc-beds">
+          <div class="mhc-bed"><div class="mhc-bed-val ${bedData.availableBeds > 10 ? 'safe' : bedData.availableBeds > 3 ? 'warn' : 'danger'}">${bedData.availableBeds}</div><div class="mhc-bed-lbl">General</div></div>
+          <div class="mhc-bed"><div class="mhc-bed-val ${bedData.icuAvailable > 5 ? 'safe' : bedData.icuAvailable > 1 ? 'warn' : 'danger'}">${bedData.icuAvailable}</div><div class="mhc-bed-lbl">ICU</div></div>
+          <div class="mhc-bed"><div class="mhc-bed-val ${bedData.oxygenAvailable > 5 ? 'safe' : bedData.oxygenAvailable > 1 ? 'warn' : 'danger'}">${bedData.oxygenAvailable}</div><div class="mhc-bed-lbl">Oxygen</div></div>
+          <div class="mhc-bed"><div class="mhc-bed-val">${bedData.emergencyAvailable ? '✅' : '❌'}</div><div class="mhc-bed-lbl">Emergency</div></div>
+        </div>
+      ` : '<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Live bed data not available</div>'}
+      <div class="mhc-footer">
+        <button class="mhc-btn" onclick="getDirections(${lat},${lng})">🗺️ Directions</button>
+        <button class="mhc-btn primary" onclick="focusMarker(${i})">📍 View on Map</button>
+      </div>`;
+
+    card.onclick = () => {
+      document.querySelectorAll('.map-hosp-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      map.panTo({ lat, lng });
+      map.setZoom(15);
+      mapMarkers[i]?.dispatchEvent(new Event('click'));
+    };
+
+    sidebar.appendChild(card);
+  });
+}
+
+function focusMarker(i) {
+  if (mapMarkers[i]) {
+    map.panTo(mapMarkers[i].getPosition());
+    map.setZoom(16);
+    google.maps.event.trigger(mapMarkers[i], 'click');
+  }
+}
+
+function getDirections(lat, lng) {
+  window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, '_blank');
+}
+
+function getDistance(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function searchMapLocation() {
+  const query = document.getElementById('mapSearchInput').value;
+  if (!query) return;
+  const geocoder = new google.maps.Geocoder();
+  geocoder.geocode({ address: query }, (results, status) => {
+    if (status === 'OK') {
+      const loc = results[0].geometry.location;
+      map.setCenter(loc);
+      map.setZoom(13);
+      searchNearbyHospitals(loc.lat(), loc.lng());
+    } else { showToast('❌ Location not found', 'error'); }
+  });
 }
 
 // ==================== BED DATA ====================
-let allHospitals = [];
 let bedFilter = 'all';
 
 function timeAgo(date) {
@@ -797,15 +771,15 @@ function timeAgo(date) {
   return `${Math.floor(s/3600)}h ago`;
 }
 
-function getBedStatus(avail, total) {
-  if (!total) return 'danger';
-  const p = (avail / total) * 100;
+function getBedStatus(a, t) {
+  if (!t) return 'danger';
+  const p = (a/t)*100;
   return p > 40 ? 'safe' : p > 15 ? 'warn' : 'danger';
 }
 
-function getAvailBadge(avail, total) {
-  if (!total) return '<span class="avail-badge ab-low">No Data</span>';
-  const p = (avail / total) * 100;
+function getAvailBadge(a, t) {
+  if (!t) return '<span class="avail-badge ab-low">No Data</span>';
+  const p = (a/t)*100;
   if (p > 40) return '<span class="avail-badge ab-high">✓ Available</span>';
   if (p > 15) return '<span class="avail-badge ab-mid">⚠ Limited</span>';
   return '<span class="avail-badge ab-low">✗ Critical</span>';
@@ -813,86 +787,41 @@ function getAvailBadge(avail, total) {
 
 function renderBeds(hospitals) {
   const grid = document.getElementById('hospitalsGrid');
-  if (!hospitals.length) {
-    grid.innerHTML = '<div style="text-align:center;padding:40px;grid-column:1/-1;color:var(--muted)"><div style="font-size:32px;margin-bottom:10px">🏥</div>No hospitals found</div>';
-    return;
-  }
-  grid.innerHTML = hospitals.map((h, i) => {
-    const gs = getBedStatus(h.availableBeds, h.totalBeds);
-    const is = getBedStatus(h.icuAvailable, h.icuTotal);
-    const os = getBedStatus(h.oxygenAvailable, h.oxygenTotal);
-    const vs = getBedStatus(h.ventilatorAvailable, h.ventilatorTotal);
-    const gp = h.totalBeds > 0 ? Math.round((h.availableBeds / h.totalBeds) * 100) : 0;
-    const ip = h.icuTotal > 0 ? Math.round((h.icuAvailable / h.icuTotal) * 100) : 0;
-    const op = h.oxygenTotal > 0 ? Math.round((h.oxygenAvailable / h.oxygenTotal) * 100) : 0;
-    const vp = h.ventilatorTotal > 0 ? Math.round((h.ventilatorAvailable / h.ventilatorTotal) * 100) : 0;
-
-    return `<div class="hosp-card" style="animation-delay:${i*0.05}s">
-      <div class="hc-top">
-        <div><div class="hc-name">🏥 ${h.name}</div><div class="hc-city">📍 ${h.city}${h.address ? ' • '+h.address : ''}</div></div>
-        <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
-          ${getAvailBadge(h.availableBeds, h.totalBeds)}
-          ${h.emergencyAvailable ? '<span class="avail-badge ab-high" style="font-size:10px">🚨 Emergency Open</span>' : '<span class="avail-badge ab-low" style="font-size:10px">🚨 Closed</span>'}
-        </div>
-      </div>
+  if (!hospitals.length) { grid.innerHTML = '<div style="text-align:center;padding:40px;grid-column:1/-1;color:var(--muted)"><div style="font-size:32px">🏥</div>No hospitals found</div>'; return; }
+  grid.innerHTML = hospitals.map((h,i) => {
+    const gs=getBedStatus(h.availableBeds,h.totalBeds), is=getBedStatus(h.icuAvailable,h.icuTotal), os=getBedStatus(h.oxygenAvailable,h.oxygenTotal), vs=getBedStatus(h.ventilatorAvailable,h.ventilatorTotal);
+    const gp=h.totalBeds>0?Math.round((h.availableBeds/h.totalBeds)*100):0, ip=h.icuTotal>0?Math.round((h.icuAvailable/h.icuTotal)*100):0, op=h.oxygenTotal>0?Math.round((h.oxygenAvailable/h.oxygenTotal)*100):0, vp=h.ventilatorTotal>0?Math.round((h.ventilatorAvailable/h.ventilatorTotal)*100):0;
+    return `<div class="hosp-card">
+      <div class="hc-top"><div><div class="hc-name">🏥 ${h.name}</div><div class="hc-city">📍 ${h.city}${h.address?' • '+h.address:''}</div></div>
+      <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">${getAvailBadge(h.availableBeds,h.totalBeds)}${h.emergencyAvailable?'<span class="avail-badge ab-high" style="font-size:10px">🚨 Emergency Open</span>':'<span class="avail-badge ab-low" style="font-size:10px">🚨 Closed</span>'}</div></div>
       <div class="bed-types">
-        <div class="bed-type">
-          <div class="bt-header"><span class="bt-label">🛏️ General</span><span class="bt-count ${gs}">${h.availableBeds}</span></div>
-          <div class="bed-bar"><div class="bed-fill bf-${gs}" style="width:${gp}%"></div></div>
-          <div class="bt-sub">${h.availableBeds}/${h.totalBeds} (${gp}%)</div>
-        </div>
-        <div class="bed-type">
-          <div class="bt-header"><span class="bt-label">🏥 ICU</span><span class="bt-count ${is}">${h.icuAvailable}</span></div>
-          <div class="bed-bar"><div class="bed-fill bf-${is}" style="width:${ip}%"></div></div>
-          <div class="bt-sub">${h.icuAvailable}/${h.icuTotal} (${ip}%)</div>
-        </div>
-        <div class="bed-type">
-          <div class="bt-header"><span class="bt-label">💨 Oxygen</span><span class="bt-count ${os}">${h.oxygenAvailable}</span></div>
-          <div class="bed-bar"><div class="bed-fill bf-${os}" style="width:${op}%"></div></div>
-          <div class="bt-sub">${h.oxygenAvailable}/${h.oxygenTotal} (${op}%)</div>
-        </div>
-        <div class="bed-type">
-          <div class="bt-header"><span class="bt-label">🫁 Ventilator</span><span class="bt-count ${vs}">${h.ventilatorAvailable}</span></div>
-          <div class="bed-bar"><div class="bed-fill bf-${vs}" style="width:${vp}%"></div></div>
-          <div class="bt-sub">${h.ventilatorAvailable}/${h.ventilatorTotal} (${vp}%)</div>
-        </div>
+        <div class="bed-type"><div class="bt-header"><span class="bt-label">🛏️ General</span><span class="bt-count ${gs}">${h.availableBeds}</span></div><div class="bed-bar"><div class="bed-fill bf-${gs}" style="width:${gp}%"></div></div><div class="bt-sub">${h.availableBeds}/${h.totalBeds} (${gp}%)</div></div>
+        <div class="bed-type"><div class="bt-header"><span class="bt-label">🏥 ICU</span><span class="bt-count ${is}">${h.icuAvailable}</span></div><div class="bed-bar"><div class="bed-fill bf-${is}" style="width:${ip}%"></div></div><div class="bt-sub">${h.icuAvailable}/${h.icuTotal} (${ip}%)</div></div>
+        <div class="bed-type"><div class="bt-header"><span class="bt-label">💨 Oxygen</span><span class="bt-count ${os}">${h.oxygenAvailable}</span></div><div class="bed-bar"><div class="bed-fill bf-${os}" style="width:${op}%"></div></div><div class="bt-sub">${h.oxygenAvailable}/${h.oxygenTotal} (${op}%)</div></div>
+        <div class="bed-type"><div class="bt-header"><span class="bt-label">🫁 Ventilator</span><span class="bt-count ${vs}">${h.ventilatorAvailable}</span></div><div class="bed-bar"><div class="bed-fill bf-${vs}" style="width:${vp}%"></div></div><div class="bt-sub">${h.ventilatorAvailable}/${h.ventilatorTotal} (${vp}%)</div></div>
       </div>
-      <div class="hc-footer">
-        <span class="hc-time">🕐 ${timeAgo(h.updatedAt)}</span>
-        <div class="hc-btns">
-          ${h.phone ? `<button class="hc-btn" onclick="window.location.href='tel:${h.phone}'">📞 Call</button>` : ''}
-          <button class="hc-btn primary" onclick="showToast('📅 Booking bed at ${h.name}...', 'success')">Book Bed →</button>
-        </div>
-      </div>
+      <div class="hc-footer"><span class="hc-time">🕐 ${timeAgo(h.updatedAt)}</span><div class="hc-btns">${h.phone?`<button class="hc-btn" onclick="window.location.href='tel:${h.phone}'">📞 Call</button>`:''}<button class="hc-btn primary" onclick="showToast('📅 Booking at ${h.name}...','success')">Book Bed →</button></div></div>
     </div>`;
   }).join('');
 }
 
-function updateBedSummary(hospitals) {
-  const tb = hospitals.reduce((s,h) => s+h.totalBeds, 0);
-  const ab = hospitals.reduce((s,h) => s+h.availableBeds, 0);
-  const ti = hospitals.reduce((s,h) => s+h.icuTotal, 0);
-  const ai = hospitals.reduce((s,h) => s+h.icuAvailable, 0);
-  const to = hospitals.reduce((s,h) => s+h.oxygenTotal, 0);
-  const ao = hospitals.reduce((s,h) => s+h.oxygenAvailable, 0);
-  document.getElementById('bedTotalHosp').textContent = hospitals.length;
-  document.getElementById('bedActiveHosp').textContent = `${hospitals.filter(h=>h.availableBeds>0).length} with beds`;
-  document.getElementById('bedTotalBeds').textContent = tb;
-  document.getElementById('bedAvailBeds').textContent = `${ab} Available`;
-  document.getElementById('bedTotalICU').textContent = ti;
-  document.getElementById('bedAvailICU').textContent = `${ai} Available`;
-  document.getElementById('bedTotalOxy').textContent = to;
-  document.getElementById('bedAvailOxy').textContent = `${ao} Available`;
-}
-
-function updateDashHospitals(hospitals) {
-  const avail = hospitals.filter(h => h.availableBeds > 0).slice(0, 3);
-  document.getElementById('dashHospCount').textContent = avail.length;
-  document.getElementById('dashHospList').innerHTML = avail.map(h => `
+function updateBedSummary(h) {
+  const tb=h.reduce((s,x)=>s+x.totalBeds,0), ab=h.reduce((s,x)=>s+x.availableBeds,0), ti=h.reduce((s,x)=>s+x.icuTotal,0), ai=h.reduce((s,x)=>s+x.icuAvailable,0), to=h.reduce((s,x)=>s+x.oxygenTotal,0), ao=h.reduce((s,x)=>s+x.oxygenAvailable,0);
+  document.getElementById('bedTotalHosp').textContent=h.length;
+  document.getElementById('bedActiveHosp').textContent=`${h.filter(x=>x.availableBeds>0).length} with beds`;
+  document.getElementById('bedTotalBeds').textContent=tb;
+  document.getElementById('bedAvailBeds').textContent=`${ab} Available`;
+  document.getElementById('bedTotalICU').textContent=ti;
+  document.getElementById('bedAvailICU').textContent=`${ai} Available`;
+  document.getElementById('bedTotalOxy').textContent=to;
+  document.getElementById('bedAvailOxy').textContent=`${ao} Available`;
+  document.getElementById('dashBedCount').textContent=h.filter(x=>x.availableBeds>0).length;
+  document.getElementById('dashHospCount').textContent=h.length;
+  document.getElementById('dashHospList').innerHTML = h.filter(x=>x.availableBeds>0).slice(0,3).map(x=>`
     <div class="hosp-item" onclick="showPage('beds')">
       <div class="hosp-logo">🏥</div>
-      <div class="hosp-info"><div class="hosp-name">${h.name}</div><div class="hosp-detail">📍 ${h.city}</div></div>
-      <div class="hosp-beds"><div class="beds-num">${h.availableBeds}</div><div class="beds-lbl">Beds</div></div>
+      <div class="hosp-info"><div class="hosp-name">${x.name}</div><div class="hosp-detail">📍 ${x.city}</div></div>
+      <div class="hosp-beds"><div class="beds-num">${x.availableBeds}</div><div class="beds-lbl">Beds</div></div>
     </div>`).join('') || '<div style="color:var(--muted);text-align:center;padding:16px">No hospitals with available beds</div>';
 }
 
@@ -900,158 +829,74 @@ async function loadBeds() {
   try {
     const res = await fetch(`${API_URL}/api/hospitals/beds`);
     const data = await res.json();
-    if (data.success && data.hospitals.length) {
-      allHospitals = data.hospitals;
-      updateBedSummary(data.hospitals);
-      updateDashHospitals(data.hospitals);
-      applyBedFilter(bedFilter);
-    } else { loadDemoHospitals(); }
+    if (data.success && data.hospitals.length) { allHospitals=data.hospitals; updateBedSummary(data.hospitals); applyBedFilter(bedFilter); }
+    else loadDemoHospitals();
   } catch { loadDemoHospitals(); }
 }
 
 function loadDemoHospitals() {
   const demo = [
-    { _id:'1', name:'City Hospital', city:'Mumbai', address:'Andheri West', totalBeds:200, availableBeds:85, icuTotal:30, icuAvailable:12, oxygenTotal:50, oxygenAvailable:22, ventilatorTotal:15, ventilatorAvailable:6, emergencyAvailable:true, phone:'022-12345678', updatedAt:new Date() },
-    { _id:'2', name:'Apollo Medical', city:'Delhi', address:'Saket', totalBeds:350, availableBeds:45, icuTotal:60, icuAvailable:5, oxygenTotal:80, oxygenAvailable:8, ventilatorTotal:25, ventilatorAvailable:2, emergencyAvailable:true, phone:'011-98765432', updatedAt:new Date(Date.now()-300000) },
-    { _id:'3', name:'LifeCare Hospital', city:'Bangalore', address:'Koramangala', totalBeds:150, availableBeds:3, icuTotal:20, icuAvailable:0, oxygenTotal:35, oxygenAvailable:1, ventilatorTotal:10, ventilatorAvailable:0, emergencyAvailable:false, phone:'080-11223344', updatedAt:new Date(Date.now()-600000) },
-    { _id:'4', name:'Green Cross', city:'Pune', address:'Kothrud', totalBeds:120, availableBeds:67, icuTotal:18, icuAvailable:9, oxygenTotal:30, oxygenAvailable:18, ventilatorTotal:8, ventilatorAvailable:5, emergencyAvailable:true, phone:'020-55667788', updatedAt:new Date(Date.now()-120000) },
+    {_id:'1',name:'City Hospital',city:'Mumbai',address:'Andheri West',totalBeds:200,availableBeds:85,icuTotal:30,icuAvailable:12,oxygenTotal:50,oxygenAvailable:22,ventilatorTotal:15,ventilatorAvailable:6,emergencyAvailable:true,phone:'022-12345678',updatedAt:new Date()},
+    {_id:'2',name:'Apollo Medical',city:'Delhi',address:'Saket',totalBeds:350,availableBeds:45,icuTotal:60,icuAvailable:5,oxygenTotal:80,oxygenAvailable:8,ventilatorTotal:25,ventilatorAvailable:2,emergencyAvailable:true,phone:'011-98765432',updatedAt:new Date(Date.now()-300000)},
+    {_id:'3',name:'LifeCare Hospital',city:'Bangalore',address:'Koramangala',totalBeds:150,availableBeds:3,icuTotal:20,icuAvailable:0,oxygenTotal:35,oxygenAvailable:1,ventilatorTotal:10,ventilatorAvailable:0,emergencyAvailable:false,phone:'080-11223344',updatedAt:new Date(Date.now()-600000)},
+    {_id:'4',name:'Green Cross',city:'Pune',address:'Kothrud',totalBeds:120,availableBeds:67,icuTotal:18,icuAvailable:9,oxygenTotal:30,oxygenAvailable:18,ventilatorTotal:8,ventilatorAvailable:5,emergencyAvailable:true,phone:'020-55667788',updatedAt:new Date(Date.now()-120000)},
   ];
-  allHospitals = demo;
-  updateBedSummary(demo);
-  updateDashHospitals(demo);
-  applyBedFilter(bedFilter);
+  allHospitals=demo; updateBedSummary(demo); applyBedFilter(bedFilter);
 }
 
-function filterBeds(type, btn) {
-  bedFilter = type;
-  document.querySelectorAll('.flt-btn').forEach(b => b.classList.remove('active'));
+function filterBeds(type,btn) {
+  bedFilter=type;
+  document.querySelectorAll('.flt-btn').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
   applyBedFilter(type);
 }
-
 function applyBedFilter(type) {
-  let f = [...allHospitals];
-  if (type === 'available') f = f.filter(h => h.availableBeds > 0);
-  if (type === 'icu') f = f.filter(h => h.icuAvailable > 0);
-  if (type === 'emergency') f = f.filter(h => h.emergencyAvailable);
+  let f=[...allHospitals];
+  if(type==='available') f=f.filter(h=>h.availableBeds>0);
+  if(type==='icu') f=f.filter(h=>h.icuAvailable>0);
+  if(type==='emergency') f=f.filter(h=>h.emergencyAvailable);
   renderBeds(f);
 }
-
 function searchBeds() {
-  const q = document.getElementById('bedSearch').value.toLowerCase();
-  const f = allHospitals.filter(h => h.name.toLowerCase().includes(q) || h.city.toLowerCase().includes(q));
-  renderBeds(f);
+  const q=document.getElementById('bedSearch').value.toLowerCase();
+  renderBeds(allHospitals.filter(h=>h.name.toLowerCase().includes(q)||h.city.toLowerCase().includes(q)));
 }
 
-// ==================== EMERGENCY ====================
-function quickCall(num) {
-  if (confirm(`Call ${num}?`)) window.location.href = `tel:${num}`;
-}
-
+// Emergency
+function quickCall(num) { if(confirm(`Call ${num}?`)) window.location.href=`tel:${num}`; }
 function sendAlert() {
-  const loc = document.getElementById('emgLocation').value;
-  const type = document.getElementById('emgType').value;
-  const severity = document.getElementById('emgSeverity').value;
-  if (!loc || !type || !severity) { showToast('⚠️ Please fill all fields!', 'error'); return; }
-  document.getElementById('modalDesc').textContent = `Emergency: ${type}\nLocation: ${loc}\nSeverity: ${severity}\n\n3 nearest hospitals will be alerted immediately!`;
+  if(!document.getElementById('emgLocation').value||!document.getElementById('emgType').value||!document.getElementById('emgSeverity').value) { showToast('⚠️ Please fill all fields!','error'); return; }
   document.getElementById('alertModal').classList.add('show');
 }
-
 function confirmAlert() {
   closeModal();
-  showToast('🚨 Emergency alert sent! 3 hospitals notified. Ambulance dispatched!', 'success');
-  document.getElementById('emgLocation').value = '';
-  document.getElementById('emgType').value = '';
-  document.getElementById('emgSeverity').value = '';
+  showToast('🚨 Emergency alert sent! 3 hospitals notified. Ambulance dispatched!','success');
+  document.getElementById('emgLocation').value='';
+  document.getElementById('emgType').value='';
+  document.getElementById('emgSeverity').value='';
 }
-
 function closeModal() { document.getElementById('alertModal').classList.remove('show'); }
 
-// ==================== CHARTS ====================
+// Charts
 let chartsLoaded = false;
 function loadCharts() {
-  if (chartsLoaded) return;
-  chartsLoaded = true;
-
-  // Peak Emergency Hours
-  new Chart(document.getElementById('peakHoursChart'), {
-    type: 'bar',
-    data: {
-      labels: ['12AM','2AM','4AM','6AM','8AM','10AM','12PM','2PM','4PM','6PM','8PM','10PM'],
-      datasets: [{
-        label: 'Emergency Cases',
-        data: [12,8,5,15,35,42,38,45,52,48,62,38],
-        backgroundColor: (ctx) => {
-          const v = ctx.raw;
-          return v > 50 ? '#C0392B' : v > 35 ? '#D4A017' : '#1E8449';
-        },
-        borderRadius: 8,
-      }]
-    },
-    options: { responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} }
-  });
-
-  // Bed Trend
-  new Chart(document.getElementById('bedTrendChart'), {
-    type: 'line',
-    data: {
-      labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
-      datasets: [
-        { label:'Available Beds', data:[120,95,85,110,130,100,145], borderColor:'#1E8449', backgroundColor:'rgba(30,132,73,0.1)', fill:true, tension:0.4 },
-        { label:'ICU Beds', data:[20,15,12,18,22,14,26], borderColor:'#C0392B', backgroundColor:'rgba(192,57,43,0.1)', fill:true, tension:0.4 }
-      ]
-    },
-    options: { responsive:true, scales:{y:{beginAtZero:true}} }
-  });
-
-  // Emergency Types
-  new Chart(document.getElementById('emgTypesChart'), {
-    type: 'doughnut',
-    data: {
-      labels: ['Heart Attack','Accident','Fracture','Breathing','Other'],
-      datasets: [{ data:[28,22,18,16,16], backgroundColor:['#C0392B','#1A5276','#1E8449','#D4A017','#5D6D7E'], borderWidth:0 }]
-    },
-    options: { responsive:true, cutout:'65%' }
-  });
-
-  // Appointments
-  new Chart(document.getElementById('apptChart'), {
-    type: 'bar',
-    data: {
-      labels: ['Jan','Feb','Mar','Apr','May','Jun'],
-      datasets: [{ label:'Appointments', data:[2,1,3,2,2,1], backgroundColor:'#1A5276', borderRadius:8 }]
-    },
-    options: { responsive:true, plugins:{legend:{display:false}} }
-  });
-
-  // Health Score
-  new Chart(document.getElementById('healthChart'), {
-    type: 'line',
-    data: {
-      labels: ['Jan','Feb','Mar','Apr','May','Jun'],
-      datasets: [{ label:'Health Score', data:[72,75,70,78,82,85], borderColor:'#C0392B', backgroundColor:'rgba(192,57,43,0.1)', fill:true, tension:0.4 }]
-    },
-    options: { responsive:true, scales:{y:{min:60,max:100}} }
-  });
+  if(chartsLoaded) return;
+  chartsLoaded=true;
+  new Chart(document.getElementById('peakHoursChart'),{type:'bar',data:{labels:['12AM','2AM','4AM','6AM','8AM','10AM','12PM','2PM','4PM','6PM','8PM','10PM'],datasets:[{label:'Cases',data:[12,8,5,15,35,42,38,45,52,48,62,38],backgroundColor:(ctx)=>ctx.raw>50?'#C0392B':ctx.raw>35?'#D4A017':'#1E8449',borderRadius:8}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
+  new Chart(document.getElementById('bedTrendChart'),{type:'line',data:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],datasets:[{label:'Available Beds',data:[120,95,85,110,130,100,145],borderColor:'#1E8449',backgroundColor:'rgba(30,132,73,0.1)',fill:true,tension:0.4},{label:'ICU',data:[20,15,12,18,22,14,26],borderColor:'#C0392B',backgroundColor:'rgba(192,57,43,0.1)',fill:true,tension:0.4}]},options:{responsive:true}});
+  new Chart(document.getElementById('emgTypesChart'),{type:'doughnut',data:{labels:['Heart Attack','Accident','Fracture','Breathing','Other'],datasets:[{data:[28,22,18,16,16],backgroundColor:['#C0392B','#1A5276','#1E8449','#D4A017','#5D6D7E'],borderWidth:0}]},options:{responsive:true,cutout:'65%'}});
+  new Chart(document.getElementById('apptChart'),{type:'bar',data:{labels:['Jan','Feb','Mar','Apr','May','Jun'],datasets:[{label:'Appointments',data:[2,1,3,2,2,1],backgroundColor:'#1A5276',borderRadius:8}]},options:{responsive:true,plugins:{legend:{display:false}}}});
+  new Chart(document.getElementById('healthChart'),{type:'line',data:{labels:['Jan','Feb','Mar','Apr','May','Jun'],datasets:[{label:'Health Score',data:[72,75,70,78,82,85],borderColor:'#C0392B',backgroundColor:'rgba(192,57,43,0.1)',fill:true,tension:0.4}]},options:{responsive:true,scales:{y:{min:60,max:100}}}});
 }
 
-// ==================== TOAST ====================
-function showToast(msg, type='') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = `toast ${type} show`;
-  setTimeout(() => t.classList.remove('show'), 4000);
+function showToast(msg,type='') {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className=`toast ${type} show`;
+  setTimeout(()=>t.classList.remove('show'),4000);
 }
 
-// ==================== LOGOUT ====================
-function logout() {
-  if (confirm("Logout karna chahte ho?")) {
-    localStorage.clear();
-    window.location.href = "index.html";
-  }
-}
+function logout() { if(confirm("Logout?")){ localStorage.clear(); window.location.href="index.html"; } }
 
-// ==================== INIT ====================
 loadBeds();
 setInterval(loadBeds, 30000);
 </script>
