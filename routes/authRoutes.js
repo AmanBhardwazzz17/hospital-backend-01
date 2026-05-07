@@ -65,7 +65,7 @@ router.post("/register", async (req, res) => {
       verifyTokenExpiry,
     });
 
-    // await sendVerificationEmail(email, verifyToken);
+     await sendVerificationEmail(email, verifyToken);
 
     return res.status(201).json({
       success: true,
