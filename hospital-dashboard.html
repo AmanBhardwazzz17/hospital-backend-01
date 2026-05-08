@@ -1,1091 +1,774 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Bed Management — City Hospital Admin</title>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
-  <style>
-    :root {
-      --primary: #1a56db;
-      --primary-light: #e8f0fe;
-      --sidebar: #0f1f3d;
-      --sidebar-active: #1a56db;
-      --bg: #f4f7fe;
-      --white: #ffffff;
-      --border: #e2e8f0;
-      --text: #1e293b;
-      --muted: #64748b;
-      --green: #10b981;
-      --green-light: #d1fae5;
-      --red: #ef4444;
-      --red-light: #fee2e2;
-      --yellow: #f59e0b;
-      --yellow-light: #fef3c7;
-      --blue-light: #dbeafe;
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      display: flex;
-      min-height: 100vh;
-    }
-
-    /* ── Sidebar ── */
-    .sidebar {
-      width: 220px;
-      background: var(--sidebar);
-      display: flex;
-      flex-direction: column;
-      position: fixed;
-      top: 0; left: 0; bottom: 0;
-      z-index: 100;
-    }
-
-    .sidebar-brand {
-      padding: 20px 20px 16px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .brand-icon {
-      width: 36px; height: 36px;
-      background: var(--primary);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
-      font-weight: 800;
-      color: white;
-    }
-
-    .brand-text { color: white; }
-    .brand-text h3 { font-size: 0.95rem; font-weight: 700; }
-    .brand-text p { font-size: 0.7rem; color: rgba(255,255,255,0.5); margin-top: 1px; }
-
-    .nav { flex: 1; padding: 12px 0; }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 20px;
-      color: rgba(255,255,255,0.6);
-      font-size: 0.85rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      border-left: 3px solid transparent;
-    }
-
-    .nav-item:hover { color: white; background: rgba(255,255,255,0.05); }
-
-    .nav-item.active {
-      color: white;
-      background: rgba(26,86,219,0.3);
-      border-left-color: var(--primary);
-    }
-
-    .nav-icon { font-size: 1rem; width: 18px; text-align: center; }
-
-    .sidebar-footer {
-      padding: 16px 20px;
-      border-top: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .logout-btn {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: rgba(255,255,255,0.5);
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: color 0.2s;
-    }
-
-    .logout-btn:hover { color: var(--red); }
-
-    /* ── Main ── */
-    .main {
-      margin-left: 220px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* ── Topbar ── */
-    .topbar {
-      background: var(--white);
-      border-bottom: 1px solid var(--border);
-      padding: 14px 28px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 50;
-    }
-
-    .topbar-left { display: flex; align-items: center; gap: 16px; }
-
-    .search-box {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 14px;
-      width: 280px;
-    }
-
-    .search-box input {
-      border: none;
-      background: none;
-      outline: none;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 0.85rem;
-      color: var(--text);
-      width: 100%;
-    }
-
-    .search-box input::placeholder { color: var(--muted); }
-
-    .topbar-right { display: flex; align-items: center; gap: 16px; }
-
-    .notif-btn {
-      position: relative;
-      width: 36px; height: 36px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 1rem;
-    }
-
-    .notif-badge {
-      position: absolute;
-      top: -4px; right: -4px;
-      background: var(--red);
-      color: white;
-      font-size: 0.6rem;
-      font-weight: 700;
-      width: 16px; height: 16px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .admin-chip {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-    }
-
-    .admin-avatar {
-      width: 36px; height: 36px;
-      background: var(--primary);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: 700;
-      font-size: 0.85rem;
-    }
-
-    .admin-info { line-height: 1.2; }
-    .admin-name { font-size: 0.85rem; font-weight: 600; }
-    .admin-role { font-size: 0.7rem; color: var(--muted); }
-
-    /* ── Content ── */
-    .content { padding: 24px 28px; }
-
-    .page-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 24px;
-    }
-
-    .page-title h1 { font-size: 1.4rem; font-weight: 700; }
-    .page-title p { font-size: 0.85rem; color: var(--muted); margin-top: 3px; }
-
-    .header-actions { display: flex; gap: 10px; }
-
-    .btn {
-      padding: 9px 18px;
-      border-radius: 8px;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      border: none;
-    }
-
-    .btn-primary { background: var(--primary); color: white; }
-    .btn-primary:hover { background: #1648c7; }
-    .btn-outline {
-      background: white;
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-    .btn-outline:hover { background: var(--bg); }
-
-    /* ── Stats Row ── */
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-
-    .stat-card {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px;
-      animation: fadeUp 0.4s ease both;
-    }
-
-    .stat-card:nth-child(1) { animation-delay: 0.05s; }
-    .stat-card:nth-child(2) { animation-delay: 0.1s; }
-    .stat-card:nth-child(3) { animation-delay: 0.15s; }
-    .stat-card:nth-child(4) { animation-delay: 0.2s; }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .stat-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 12px;
-    }
-
-    .stat-icon {
-      width: 42px; height: 42px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-    }
-
-    .icon-blue { background: var(--blue-light); }
-    .icon-green { background: var(--green-light); }
-    .icon-red { background: var(--red-light); }
-    .icon-yellow { background: var(--yellow-light); }
-
-    .stat-label { font-size: 0.78rem; color: var(--muted); font-weight: 500; }
-    .stat-num {
-      font-size: 1.9rem;
-      font-weight: 800;
-      line-height: 1;
-      margin-bottom: 6px;
-    }
-
-    .stat-change {
-      font-size: 0.75rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .change-up { color: var(--green); }
-    .change-down { color: var(--red); }
-    .change-neutral { color: var(--muted); }
-
-    /* ── Main Grid ── */
-    .main-grid {
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 20px;
-      margin-bottom: 20px;
-    }
-
-    .card {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 22px;
-      animation: fadeUp 0.4s ease both;
-      animation-delay: 0.25s;
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .card-title { font-size: 1rem; font-weight: 700; }
-
-    .view-all {
-      font-size: 0.78rem;
-      color: var(--primary);
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    /* ── Ward Grid ── */
-    .ward-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-    }
-
-    .ward-card {
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 16px;
-      transition: box-shadow 0.2s;
-    }
-
-    .ward-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-
-    .ward-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 14px;
-    }
-
-    .ward-name { font-size: 0.9rem; font-weight: 700; }
-    .ward-floor { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
-
-    .ward-status {
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 0.7rem;
-      font-weight: 600;
-    }
-
-    .status-available { background: var(--green-light); color: var(--green); }
-    .status-limited { background: var(--yellow-light); color: var(--yellow); }
-    .status-full { background: var(--red-light); color: var(--red); }
-
-    .ward-stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 14px;
-    }
-
-    .ward-stat-item { text-align: center; }
-    .ward-stat-num { font-size: 1.1rem; font-weight: 800; }
-    .ward-stat-label { font-size: 0.65rem; color: var(--muted); margin-top: 1px; }
-
-    .progress-wrap {
-      background: var(--bg);
-      border-radius: 4px;
-      height: 6px;
-      overflow: hidden;
-    }
-
-    .progress-bar {
-      height: 100%;
-      border-radius: 4px;
-      transition: width 1s ease;
-    }
-
-    .bar-green { background: var(--green); }
-    .bar-yellow { background: var(--yellow); }
-    .bar-red { background: var(--red); }
-    .bar-blue { background: var(--primary); }
-
-    /* ── Right Panel ── */
-    .right-panel { display: flex; flex-direction: column; gap: 16px; }
-
-    /* ── Bed Type Summary ── */
-    .bed-type-list { display: flex; flex-direction: column; gap: 14px; }
-
-    .bed-type-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .bed-type-icon {
-      width: 36px; height: 36px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-      flex-shrink: 0;
-    }
-
-    .bed-type-info { flex: 1; }
-    .bed-type-name { font-size: 0.85rem; font-weight: 600; }
-    .bed-type-sub { font-size: 0.72rem; color: var(--muted); margin-top: 1px; }
-
-    .bed-type-count {
-      font-size: 1rem;
-      font-weight: 800;
-      color: var(--text);
-    }
-
-    /* ── Recent Activity ── */
-    .activity-list { display: flex; flex-direction: column; }
-
-    .activity-item {
-      display: flex;
-      gap: 12px;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .activity-item:last-child { border-bottom: none; }
-
-    .activity-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      margin-top: 5px;
-      flex-shrink: 0;
-    }
-
-    .dot-green { background: var(--green); }
-    .dot-red { background: var(--red); }
-    .dot-yellow { background: var(--yellow); }
-    .dot-blue { background: var(--primary); }
-
-    .activity-info { flex: 1; }
-    .activity-text { font-size: 0.82rem; font-weight: 500; }
-    .activity-time { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
-
-    /* ── Full Beds Table ── */
-    .table-card {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      animation: fadeUp 0.4s ease both;
-      animation-delay: 0.3s;
-      overflow: hidden;
-    }
-
-    .table-header {
-      padding: 18px 22px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .tabs {
-      display: flex;
-      gap: 4px;
-      background: var(--bg);
-      border-radius: 8px;
-      padding: 3px;
-    }
-
-    .tab {
-      padding: 6px 14px;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-      color: var(--muted);
-      transition: all 0.2s;
-    }
-
-    .tab.active { background: white; color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-
-    table { width: 100%; border-collapse: collapse; }
-
-    th {
-      background: var(--bg);
-      padding: 11px 22px;
-      text-align: left;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    td {
-      padding: 13px 22px;
-      font-size: 0.85rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: var(--bg); }
-
-    .bed-id { font-weight: 700; color: var(--primary); font-size: 0.8rem; }
-    .patient-name { font-weight: 600; }
-    .ward-tag {
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 0.72rem;
-      font-weight: 600;
-      background: var(--blue-light);
-      color: var(--primary);
-    }
-
-    .status-chip {
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 0.72rem;
-      font-weight: 600;
-    }
-
-    .chip-occupied { background: var(--red-light); color: var(--red); }
-    .chip-available { background: var(--green-light); color: var(--green); }
-    .chip-cleaning { background: var(--yellow-light); color: var(--yellow); }
-    .chip-reserved { background: var(--blue-light); color: var(--primary); }
-
-    .action-btns { display: flex; gap: 6px; }
-
-    .action-btn {
-      width: 30px; height: 30px;
-      border-radius: 6px;
-      border: 1px solid var(--border);
-      background: white;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.85rem;
-      transition: all 0.2s;
-    }
-
-    .action-btn:hover { background: var(--bg); }
-
-    /* ── Live Indicator ── */
-    .live-pill {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--green-light);
-      border: 1px solid rgba(16,185,129,0.3);
-      border-radius: 20px;
-      padding: 4px 12px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--green);
-    }
-
-    .pulse {
-      width: 7px; height: 7px;
-      background: var(--green);
-      border-radius: 50%;
-      animation: pulse 1.5s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-
-    @media (max-width: 1100px) {
-      .main-grid { grid-template-columns: 1fr; }
-      .ward-grid { grid-template-columns: repeat(2, 1fr); }
-      .stats-row { grid-template-columns: repeat(2, 1fr); }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hospital Dashboard – HospTrack</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root {
+  --primary: #0EA5E9;
+  --primary-dark: #0284C7;
+  --primary-light: #E0F2FE;
+  --accent: #F59E0B;
+  --danger: #EF4444;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --sidebar: #0F172A;
+  --sidebar-hover: #1E293B;
+  --white: #FFFFFF;
+  --off-white: #F8FAFC;
+  --border: #E2E8F0;
+  --text: #0F172A;
+  --muted: #64748B;
+  --green: #10B981;
+  --green-bg: #ECFDF5;
+  --red: #EF4444;
+  --red-bg: #FEF2F2;
+  --amber: #F59E0B;
+  --amber-bg: #FFFBEB;
+  --blue-bg: #EFF6FF;
+  --font: 'DM Sans', sans-serif;
+  --font-display: 'Syne', sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: var(--font); background: var(--off-white); color: var(--text); display: flex; min-height: 100vh; }
+
+/* SIDEBAR */
+.sidebar {
+  width: 240px; background: var(--sidebar); min-height: 100vh;
+  display: flex; flex-direction: column; position: fixed; top: 0; left: 0; z-index: 100;
+  transition: width 0.3s;
+}
+.sidebar-logo {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex; align-items: center; gap: 10px;
+}
+.logo-icon {
+  width: 36px; height: 36px; background: var(--primary);
+  border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.logo-text { font-family: var(--font-display); font-size: 18px; font-weight: 800; color: white; }
+.logo-text span { color: var(--primary); }
+.logo-sub { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 1px; }
+
+.sidebar-nav { padding: 16px 12px; flex: 1; }
+.nav-section-title { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 1px; padding: 8px 8px 6px; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+  border-radius: 10px; cursor: pointer; transition: all 0.2s; margin-bottom: 2px;
+  color: rgba(255,255,255,0.6); font-size: 13px; font-weight: 500; border: none; background: none; width: 100%; text-align: left; font-family: var(--font);
+}
+.nav-item:hover { background: var(--sidebar-hover); color: white; }
+.nav-item.active { background: var(--primary); color: white; }
+.nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+.nav-badge { margin-left: auto; background: var(--danger); color: white; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 10px; }
+.nav-badge.green { background: var(--success); }
+
+.sidebar-bottom {
+  padding: 12px; border-top: 1px solid rgba(255,255,255,0.08);
+}
+.hospital-info {
+  display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+  background: var(--sidebar-hover); border-radius: 10px; margin-bottom: 8px;
+}
+.hospital-avatar { width: 32px; height: 32px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+.hospital-name { font-size: 12px; font-weight: 700; color: white; }
+.hospital-role { font-size: 10px; color: rgba(255,255,255,0.4); }
+
+/* MAIN */
+.main { margin-left: 240px; flex: 1; min-height: 100vh; }
+
+/* TOPBAR */
+.topbar {
+  background: white; padding: 0 28px; height: 60px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 99;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.topbar-left { display: flex; align-items: center; gap: 16px; }
+.page-title { font-family: var(--font-display); font-size: 18px; font-weight: 800; }
+.breadcrumb { font-size: 12px; color: var(--muted); }
+.search-bar {
+  display: flex; align-items: center; gap: 8px; background: var(--off-white);
+  border: 1px solid var(--border); border-radius: 10px; padding: 8px 14px;
+}
+.search-bar input { border: none; outline: none; font-size: 13px; font-family: var(--font); background: none; width: 220px; }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.notif-btn {
+  width: 36px; height: 36px; border-radius: 10px; background: var(--off-white);
+  border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+  cursor: pointer; position: relative; font-size: 16px;
+}
+.notif-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--danger); border-radius: 50%; border: 2px solid white; }
+.user-chip { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: var(--off-white); border: 1px solid var(--border); border-radius: 10px; cursor: pointer; }
+.user-chip-avatar { width: 26px; height: 26px; background: var(--primary); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 800; }
+.user-chip-name { font-size: 12px; font-weight: 600; }
+
+/* CONTENT */
+.content { padding: 24px 28px; }
+
+/* PAGE */
+.page { display: none; }
+.page.active { display: block; }
+
+/* STAT CARDS */
+.stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
+.stat-card {
+  background: white; border-radius: 16px; padding: 20px;
+  border: 1px solid var(--border); transition: all 0.2s; position: relative; overflow: hidden;
+}
+.stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+.stat-card::before { content:''; position:absolute; top:-20px; right:-20px; width:80px; height:80px; border-radius:50%; opacity:0.08; }
+.stat-card.blue::before { background: var(--primary); }
+.stat-card.green::before { background: var(--success); }
+.stat-card.amber::before { background: var(--amber); }
+.stat-card.red::before { background: var(--danger); }
+.stat-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+.stat-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+.si-blue { background: var(--primary-light); }
+.si-green { background: var(--green-bg); }
+.si-amber { background: var(--amber-bg); }
+.si-red { background: var(--red-bg); }
+.stat-change { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 20px; }
+.sc-up { background: var(--green-bg); color: var(--green); }
+.sc-down { background: var(--red-bg); color: var(--red); }
+.sc-neutral { background: var(--off-white); color: var(--muted); }
+.stat-val { font-size: 32px; font-weight: 800; margin-bottom: 4px; font-family: var(--font-display); }
+.stat-lbl { font-size: 12px; color: var(--muted); font-weight: 500; }
+
+/* GRID LAYOUTS */
+.grid-2 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; margin-bottom: 24px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+
+/* PANEL */
+.panel { background: white; border-radius: 16px; padding: 22px; border: 1px solid var(--border); }
+.panel-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+.panel-title { font-size: 14px; font-weight: 700; }
+.panel-action { font-size: 12px; color: var(--primary); cursor: pointer; font-weight: 600; background: none; border: none; font-family: var(--font); padding: 6px 12px; border-radius: 8px; transition: all 0.2s; }
+.panel-action:hover { background: var(--primary-light); }
+
+/* BED STATUS */
+.bed-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.bed-box { background: var(--off-white); border-radius: 12px; padding: 14px; border: 1px solid var(--border); }
+.bed-box-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.bed-box-label { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.bed-box-val { font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+.bed-box-val.safe { color: var(--green); }
+.bed-box-val.warn { color: var(--amber); }
+.bed-box-val.danger { color: var(--red); }
+.bed-progress { height: 6px; background: var(--border); border-radius: 10px; overflow: hidden; }
+.bed-fill { height: 100%; border-radius: 10px; transition: width 1s; }
+.bf-safe { background: var(--green); }
+.bf-warn { background: var(--amber); }
+.bf-danger { background: var(--red); }
+.bed-sub { font-size: 11px; color: var(--muted); margin-top: 6px; }
+
+/* TABLE */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+td { padding: 12px 14px; font-size: 13px; border-bottom: 1px solid var(--border); }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--off-white); }
+.badge { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; }
+.badge-green { background: var(--green-bg); color: var(--green); }
+.badge-amber { background: var(--amber-bg); color: var(--amber); }
+.badge-red { background: var(--red-bg); color: var(--red); }
+.badge-blue { background: var(--primary-light); color: var(--primary-dark); }
+
+/* DOCTOR ITEM */
+.doctor-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px; transition: all 0.2s; cursor: pointer; }
+.doctor-item:hover { border-color: var(--primary); background: var(--primary-light); }
+.doctor-avatar { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.da-blue { background: var(--primary-light); }
+.da-green { background: var(--green-bg); }
+.da-amber { background: var(--amber-bg); }
+.doctor-info { flex: 1; }
+.doctor-name { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+.doctor-spec { font-size: 11px; color: var(--muted); }
+.doctor-status { font-size: 11px; font-weight: 700; }
+.ds-available { color: var(--green); }
+.ds-busy { color: var(--amber); }
+.ds-off { color: var(--red); }
+
+/* QUICK ACTIONS */
+.qa-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.qa-btn { padding: 16px 12px; border-radius: 12px; border: 1.5px solid var(--border); background: white; cursor: pointer; text-align: center; transition: all 0.2s; font-family: var(--font); }
+.qa-btn:hover { border-color: var(--primary); background: var(--primary-light); transform: translateY(-2px); }
+.qa-icon { font-size: 22px; margin-bottom: 6px; }
+.qa-text { font-size: 11px; font-weight: 600; color: var(--text); }
+
+/* ALERT ITEM */
+.alert-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px; border-radius: 12px; margin-bottom: 8px; }
+.alert-item.red { background: var(--red-bg); border: 1px solid rgba(239,68,68,0.2); }
+.alert-item.amber { background: var(--amber-bg); border: 1px solid rgba(245,158,11,0.2); }
+.alert-item.green { background: var(--green-bg); border: 1px solid rgba(16,185,129,0.2); }
+.alert-item.blue { background: var(--primary-light); border: 1px solid rgba(14,165,233,0.2); }
+.alert-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.alert-text { font-size: 12px; font-weight: 600; margin-bottom: 2px; }
+.alert-sub { font-size: 11px; color: var(--muted); }
+.alert-time { font-size: 10px; color: var(--muted); margin-left: auto; white-space: nowrap; }
+
+/* UPDATE FORM */
+.form-group { margin-bottom: 14px; }
+.form-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block; }
+.form-input { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; font-family: var(--font); outline: none; transition: border 0.2s; }
+.form-input:focus { border-color: var(--primary); }
+.form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.btn-primary { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: var(--font); transition: all 0.2s; }
+.btn-primary:hover { background: var(--primary-dark); }
+
+/* LIVE PILL */
+.live-pill { display: inline-flex; align-items: center; gap: 6px; background: var(--green-bg); border: 1px solid rgba(16,185,129,0.2); padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; color: var(--green); }
+.live-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(1.4);} }
+
+/* TOAST */
+.toast { position: fixed; bottom: 24px; right: 24px; z-index: 9999; background: var(--sidebar); color: white; padding: 14px 20px; border-radius: 12px; font-size: 13px; font-weight: 600; transform: translateY(100px); opacity: 0; transition: all 0.3s; }
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { background: var(--green); }
+.toast.error { background: var(--red); }
+
+/* TABS */
+.tabs { display: flex; gap: 4px; background: var(--off-white); border-radius: 10px; padding: 4px; margin-bottom: 16px; }
+.tab { padding: 7px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; background: none; font-family: var(--font); color: var(--muted); transition: all 0.2s; }
+.tab.active { background: white; color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+
+/* EMERGENCY BANNER */
+.emergency-banner { background: linear-gradient(135deg, #EF4444, #DC2626); border-radius: 16px; padding: 20px 24px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; }
+.emg-text h3 { font-size: 16px; font-weight: 800; color: white; margin-bottom: 4px; }
+.emg-text p { font-size: 12px; color: rgba(255,255,255,0.8); }
+.emg-btn { padding: 10px 20px; background: white; color: var(--red); border: none; border-radius: 10px; font-size: 13px; font-weight: 800; cursor: pointer; font-family: var(--font); }
+
+@media(max-width:1024px) {
+  .stats-grid { grid-template-columns: repeat(2,1fr); }
+  .grid-2,.grid-3 { grid-template-columns: 1fr; }
+  .bed-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
 </head>
 <body>
 
-<!-- Sidebar -->
-<div class="sidebar">
-  <div class="sidebar-brand">
-    <div class="brand-icon">+</div>
-    <div class="brand-text">
-      <h3>CITY HOSPITAL</h3>
-      <p>Hospital Admin Panel</p>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🏥</div>
+    <div>
+      <div class="logo-text">Hosp<span>Track</span></div>
+      <div class="logo-sub">Hospital Panel</div>
     </div>
   </div>
-  <nav class="nav">
-    <div class="nav-item"><span class="nav-icon">🏠</span> Dashboard</div>
-    <div class="nav-item"><span class="nav-icon">📅</span> Appointments</div>
-    <div class="nav-item"><span class="nav-icon">👥</span> Patients</div>
-    <div class="nav-item"><span class="nav-icon">👨‍⚕️</span> Doctors</div>
-    <div class="nav-item"><span class="nav-icon">🏢</span> Departments</div>
-    <div class="nav-item"><span class="nav-icon">👔</span> Staff</div>
-    <div class="nav-item"><span class="nav-icon">💳</span> Billing & Payments</div>
-    <div class="nav-item"><span class="nav-icon">💊</span> Pharmacy</div>
-    <div class="nav-item active"><span class="nav-icon">🛏️</span> Bed Management</div>
-    <div class="nav-item"><span class="nav-icon">📊</span> Reports</div>
-    <div class="nav-item"><span class="nav-icon">⚙️</span> Settings</div>
-    <div class="nav-item"><span class="nav-icon">👤</span> Profile</div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-title">Main</div>
+    <button class="nav-item active" onclick="showPage('dashboard',this)">
+      <span class="nav-icon">🏠</span> Dashboard
+    </button>
+    <button class="nav-item" onclick="showPage('beds',this)">
+      <span class="nav-icon">🛏️</span> Bed Management
+    </button>
+    <button class="nav-item" onclick="showPage('appointments',this)">
+      <span class="nav-icon">📅</span> Appointments
+      <span class="nav-badge">5</span>
+    </button>
+    <button class="nav-item" onclick="showPage('doctors',this)">
+      <span class="nav-icon">👨‍⚕️</span> Doctors
+    </button>
+    <button class="nav-item" onclick="showPage('emergency',this)">
+      <span class="nav-icon">🚨</span> Emergency
+      <span class="nav-badge">2</span>
+    </button>
+
+    <div class="nav-section-title" style="margin-top:12px;">Reports</div>
+    <button class="nav-item" onclick="showPage('analytics',this)">
+      <span class="nav-icon">📊</span> Analytics
+    </button>
+    <button class="nav-item" onclick="showPage('update',this)">
+      <span class="nav-icon">🔄</span> Update Beds
+    </button>
   </nav>
-  <div class="sidebar-footer">
-    <div class="logout-btn">
-      <span>↩</span> Logout
+
+  <div class="sidebar-bottom">
+    <div class="hospital-info">
+      <div class="hospital-avatar">🏥</div>
+      <div>
+        <div class="hospital-name" id="hospitalName">City Hospital</div>
+        <div class="hospital-role">Hospital Admin</div>
+      </div>
     </div>
+    <button class="nav-item" onclick="logout()" style="color:rgba(255,100,100,0.8)">
+      <span class="nav-icon">🚪</span> Logout
+    </button>
   </div>
-</div>
+</aside>
 
-<!-- Main -->
+<!-- MAIN -->
 <div class="main">
-
-  <!-- Topbar -->
+  <!-- TOPBAR -->
   <div class="topbar">
     <div class="topbar-left">
-      <span style="font-size:1.2rem;cursor:pointer">☰</span>
-      <div class="search-box">
-        <span>🔍</span>
-        <input type="text" placeholder="Search beds, wards, patients..."/>
+      <div>
+        <div class="page-title" id="pageTitle">Dashboard</div>
+        <div class="breadcrumb">HospTrack • Hospital Panel</div>
       </div>
+    </div>
+    <div class="search-bar">
+      <span>🔍</span>
+      <input type="text" placeholder="Search patients, doctors...">
     </div>
     <div class="topbar-right">
-      <div class="live-pill">
-        <div class="pulse"></div>
-        Live Updates
-      </div>
-      <div class="notif-btn">
-        🔔
-        <div class="notif-badge">3</div>
-      </div>
-      <div class="admin-chip">
-        <div class="admin-avatar">A</div>
-        <div class="admin-info">
-          <div class="admin-name">Admin</div>
-          <div class="admin-role">City Hospital</div>
-        </div>
-        <span style="color:var(--muted);font-size:0.8rem">▾</span>
+      <div class="notif-btn">🔔<div class="notif-dot"></div></div>
+      <div class="live-pill"><div class="live-dot"></div>Live</div>
+      <div class="user-chip">
+        <div class="user-chip-avatar" id="userInitial">H</div>
+        <span class="user-chip-name" id="userName">Hospital</span>
       </div>
     </div>
   </div>
 
-  <!-- Content -->
   <div class="content">
 
-    <!-- Page Header -->
-    <div class="page-header">
-      <div class="page-title">
-        <h1>🛏️ Bed Management</h1>
-        <p>Real-time bed availability across all wards — City Hospital</p>
+    <!-- DASHBOARD PAGE -->
+    <div id="page-dashboard" class="page active">
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-top">
+            <div class="stat-icon si-blue">🛏️</div>
+            <span class="stat-change sc-up" id="bedChangeChip">↑ 5%</span>
+          </div>
+          <div class="stat-val" id="dashAvailBeds">—</div>
+          <div class="stat-lbl">Available Beds</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-top">
+            <div class="stat-icon si-green">👨‍⚕️</div>
+            <span class="stat-change sc-neutral">— No change</span>
+          </div>
+          <div class="stat-val">12</div>
+          <div class="stat-lbl">Active Doctors</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-top">
+            <div class="stat-icon si-amber">📅</div>
+            <span class="stat-change sc-up">↑ 8%</span>
+          </div>
+          <div class="stat-val">24</div>
+          <div class="stat-lbl">Today's Appointments</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-top">
+            <div class="stat-icon si-red">🚨</div>
+            <span class="stat-change sc-down">↑ 2</span>
+          </div>
+          <div class="stat-val">2</div>
+          <div class="stat-lbl">Emergency Cases</div>
+        </div>
       </div>
-      <div class="header-actions">
-        <button class="btn btn-outline">📤 Export Report</button>
-        <button class="btn btn-primary">+ Add Bed</button>
+
+      <div class="grid-2">
+        <!-- BED STATUS -->
+        <div class="panel">
+          <div class="panel-hdr">
+            <span class="panel-title">🛏️ Bed Status</span>
+            <button class="panel-action" onclick="showPage('update',document.querySelector('[onclick*=update]'))">Update →</button>
+          </div>
+          <div class="bed-grid" id="dashBedGrid">
+            <div style="text-align:center;padding:20px;grid-column:1/-1;color:var(--muted)">Loading...</div>
+          </div>
+        </div>
+
+        <!-- ALERTS -->
+        <div class="panel">
+          <div class="panel-hdr"><span class="panel-title">🔔 Live Alerts</span><button class="panel-action">View All →</button></div>
+          <div class="alert-item red">
+            <div class="alert-icon">🚨</div>
+            <div>
+              <div class="alert-text">ICU Bed Critical!</div>
+              <div class="alert-sub">Only 2 ICU beds remaining</div>
+            </div>
+            <div class="alert-time">2m ago</div>
+          </div>
+          <div class="alert-item amber">
+            <div class="alert-icon">⚠️</div>
+            <div>
+              <div class="alert-text">Oxygen Supply Low</div>
+              <div class="alert-sub">Restock needed soon</div>
+            </div>
+            <div class="alert-time">15m ago</div>
+          </div>
+          <div class="alert-item green">
+            <div class="alert-icon">✅</div>
+            <div>
+              <div class="alert-text">Bed Update Successful</div>
+              <div class="alert-sub">General beds updated</div>
+            </div>
+            <div class="alert-time">1h ago</div>
+          </div>
+          <div class="alert-item blue">
+            <div class="alert-icon">📅</div>
+            <div>
+              <div class="alert-text">5 New Appointments</div>
+              <div class="alert-sub">Today's schedule updated</div>
+            </div>
+            <div class="alert-time">2h ago</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <!-- DOCTORS ON DUTY -->
+        <div class="panel">
+          <div class="panel-hdr"><span class="panel-title">👨‍⚕️ Doctors On Duty</span><button class="panel-action">All →</button></div>
+          <div class="doctor-item"><div class="doctor-avatar da-blue">👨‍⚕️</div><div class="doctor-info"><div class="doctor-name">Dr. Rajesh Kumar</div><div class="doctor-spec">Cardiology</div></div><span class="doctor-status ds-available">● Available</span></div>
+          <div class="doctor-item"><div class="doctor-avatar da-amber">👩‍⚕️</div><div class="doctor-info"><div class="doctor-name">Dr. Priya Sharma</div><div class="doctor-spec">Neurology</div></div><span class="doctor-status ds-busy">● In Surgery</span></div>
+          <div class="doctor-item"><div class="doctor-avatar da-green">👨‍⚕️</div><div class="doctor-info"><div class="doctor-name">Dr. Amit Verma</div><div class="doctor-spec">Orthopedics</div></div><span class="doctor-status ds-available">● Available</span></div>
+          <div class="doctor-item"><div class="doctor-avatar da-blue">👩‍⚕️</div><div class="doctor-info"><div class="doctor-name">Dr. Neha Gupta</div><div class="doctor-spec">Pediatrics</div></div><span class="doctor-status ds-off">● Off Duty</span></div>
+        </div>
+
+        <!-- TODAY'S APPOINTMENTS -->
+        <div class="panel">
+          <div class="panel-hdr"><span class="panel-title">📅 Today's Appointments</span><button class="panel-action">All →</button></div>
+          <div class="table-wrap">
+            <table>
+              <tr><th>Time</th><th>Patient</th><th>Status</th></tr>
+              <tr><td>9:00 AM</td><td>Rahul Sharma</td><td><span class="badge badge-green">✓ Done</span></td></tr>
+              <tr><td>10:30 AM</td><td>Priya Singh</td><td><span class="badge badge-blue">→ Next</span></td></tr>
+              <tr><td>11:00 AM</td><td>Anil Kumar</td><td><span class="badge badge-amber">⏳ Wait</span></td></tr>
+              <tr><td>12:00 PM</td><td>Sneha Verma</td><td><span class="badge badge-amber">⏳ Wait</span></td></tr>
+              <tr><td>2:00 PM</td><td>Vikram Mehta</td><td><span class="badge badge-amber">⏳ Wait</span></td></tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- QUICK ACTIONS -->
+        <div class="panel">
+          <div class="panel-hdr"><span class="panel-title">⚡ Quick Actions</span></div>
+          <div class="qa-grid">
+            <div class="qa-btn" onclick="showPage('update',null)"><div class="qa-icon">🔄</div><div class="qa-text">Update Beds</div></div>
+            <div class="qa-btn" onclick="showPage('appointments',null)"><div class="qa-icon">📅</div><div class="qa-text">Appointments</div></div>
+            <div class="qa-btn" onclick="showPage('emergency',null)"><div class="qa-icon">🚨</div><div class="qa-text">Emergency</div></div>
+            <div class="qa-btn" onclick="showPage('doctors',null)"><div class="qa-icon">👨‍⚕️</div><div class="qa-text">Doctors</div></div>
+            <div class="qa-btn" onclick="showPage('analytics',null)"><div class="qa-icon">📊</div><div class="qa-text">Analytics</div></div>
+            <div class="qa-btn"><div class="qa-icon">📋</div><div class="qa-text">Reports</div></div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Stats Row -->
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-top">
-          <div class="stat-icon icon-blue">🛏️</div>
-          <div class="stat-label">Total Beds</div>
-        </div>
-        <div class="stat-num">320</div>
-        <div class="stat-change change-up">↑ 2% from last month</div>
+    <!-- BED MANAGEMENT PAGE -->
+    <div id="page-beds" class="page">
+      <div class="stats-grid" style="margin-bottom:24px;">
+        <div class="stat-card blue"><div class="stat-top"><div class="stat-icon si-blue">🛏️</div></div><div class="stat-val" id="bedTotal">—</div><div class="stat-lbl">Total Beds</div></div>
+        <div class="stat-card green"><div class="stat-top"><div class="stat-icon si-green">✅</div></div><div class="stat-val" id="bedAvail">—</div><div class="stat-lbl">Available</div></div>
+        <div class="stat-card amber"><div class="stat-top"><div class="stat-icon si-amber">🏥</div></div><div class="stat-val" id="icuAvail">—</div><div class="stat-lbl">ICU Available</div></div>
+        <div class="stat-card red"><div class="stat-top"><div class="stat-icon si-red">💨</div></div><div class="stat-val" id="oxyAvail">—</div><div class="stat-lbl">Oxygen Beds</div></div>
       </div>
-      <div class="stat-card">
-        <div class="stat-top">
-          <div class="stat-icon icon-green">✅</div>
-          <div class="stat-label">Available</div>
+      <div class="panel">
+        <div class="panel-hdr"><span class="panel-title">🛏️ Detailed Bed Status</span><div class="live-pill"><div class="live-dot"></div>Live</div></div>
+        <div class="bed-grid" id="fullBedGrid" style="grid-template-columns:repeat(4,1fr)">
+          <div style="text-align:center;padding:20px;grid-column:1/-1;color:var(--muted)">Loading...</div>
         </div>
-        <div class="stat-num" style="color:var(--green)">124</div>
-        <div class="stat-change change-up">↑ 5% from yesterday</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-top">
-          <div class="stat-icon icon-red">🔴</div>
-          <div class="stat-label">Occupied</div>
-        </div>
-        <div class="stat-num" style="color:var(--red)">168</div>
-        <div class="stat-change change-down">↓ 3% from yesterday</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-top">
-          <div class="stat-icon icon-yellow">🧹</div>
-          <div class="stat-label">Under Cleaning</div>
-        </div>
-        <div class="stat-num" style="color:var(--yellow)">28</div>
-        <div class="stat-change change-neutral">— No change</div>
       </div>
     </div>
 
-    <!-- Main Grid -->
-    <div class="main-grid">
-
-      <!-- Ward Overview -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">Ward-wise Bed Overview</div>
-          <div class="view-all">View All →</div>
+    <!-- APPOINTMENTS PAGE -->
+    <div id="page-appointments" class="page">
+      <div class="panel">
+        <div class="panel-hdr"><span class="panel-title">📅 All Appointments</span><button class="panel-action">+ Add New</button></div>
+        <div class="tabs">
+          <button class="tab active" onclick="filterAppt('all',this)">All (24)</button>
+          <button class="tab" onclick="filterAppt('confirmed',this)">✓ Confirmed (8)</button>
+          <button class="tab" onclick="filterAppt('pending',this)">⏳ Pending (12)</button>
+          <button class="tab" onclick="filterAppt('done',this)">✅ Done (4)</button>
         </div>
-        <div class="ward-grid">
-
-          <!-- General Ward -->
-          <div class="ward-card">
-            <div class="ward-header">
-              <div>
-                <div class="ward-name">🏥 General Ward</div>
-                <div class="ward-floor">Ground Floor</div>
-              </div>
-              <div class="ward-status status-available">Available</div>
-            </div>
-            <div class="ward-stats">
-              <div class="ward-stat-item">
-                <div class="ward-stat-num" style="color:var(--green)">42</div>
-                <div class="ward-stat-label">Available</div>
-              </div>
-              <div class="ward-stat-item">
-                <div class="ward-stat-num" style="color:var(--red)">48</div>
-                <div class="ward-stat-label">Occupied</div>
-              </div>
-              <div class="ward-stat-item">
-                <div class="ward-stat-num">90</div>
-                <div class="ward-stat-label">Total</div>
-              </div>
-            </div>
-            <div class="progress-wrap">
-              <div class="progress-bar bar-red" style="width:53%"></div>
-            </div>
-          </div>
-
-          <!-- ICU -->
-          <div class="ward-card">
-            <div class="ward-header">
-              <div>
-                <div class="ward-name">🚨 ICU</div>
-                <div class="ward-floor">2nd Floor</div>
-              </div>
-              <div class="ward-status status-limited">Limited</div>
-            </div>
-            <div class="ward-stats">
-              <div class="ward-stat-item">
-                <div class="ward-stat-num" style="color:var(--green)">4</div>
-                <div class="ward-stat-label">Available</div>
-              </div>
-              <div class="ward-stat-item">
-                <div class="ward-stat-num" style="color:var(--red)">26</div>
-                <div class="ward-stat-label">Occupied</div>
-              </div>
-              <div class="ward-stat-item">
-                <div class="ward-stat-num">30</div>
-                <div class="ward-stat-label">Total</div>
-              </div>
-            </div>
-            <div class="progress-wrap">
-              <div class="progress-bar bar-yellow" style="width:87%"></div>
-            </div>
-          </div>
-
-          <!-- Pediatrics -->
-          <div class="ward-card">
-            <div class="ward-header">
-              <div>
-                <div class="ward-name">👶 Pediatrics</div>
-                <div class="ward-floor">1st Floor</div>
-              </div>
-              <div class="ward-status status-available">Available</div>
-            </div>
-            <div class="ward-stats">
-              <div class="ward-stat-item">
-                <div class="ward-stat-num" style="color:var(--green)">18</div>
-                <div class="ward-stat-label">Available</div>
-              </div>
-              <div class="ward-stat-item">
-                <div class="ward-stat-num" style="color:var(--red)">22</div>
-                <div class="ward-stat-label">Occupied</div>
-              </div>
-              <div class="ward-stat-item">
-                <div class="ward-stat-num">40</div>
-                <div class="ward-stat-label">Total</div>
-              </div>
-            </div>
-            <div class="progress-wrap">
-              <div class="progress-bar bar-green" style="width:55%"></div>
-            </div>
-          </div>
-
-          <!-- Maternity -->
-          <div class="ward-card">
-            <div class="ward-header">
-              <div>
-                <div class="ward-name">🤱 Maternity</div>
-                <div class="ward-floor">3rd Floor</div>
-              </div>
-              <div class="ward-status status-available">Available</div>
-            </div>
-            <div class="ward-stats">
-              <div class="ward-stat-item">
-                <div class="ward-stat-num" style="color:var(--green)">20</div>
-                <div class="ward-stat-label">Available</div>
-              </div>
-              <div class="ward-stat-item">
-                <div class="ward-stat-num" style="color:var(--red)">20</div>
-                <div class="ward-stat-label">Occupied</div>
-              </div>
-              <div class="ward-stat-item">
-                <div class="ward-stat-num">40</div>
-                <div class="ward-stat-label">Total</div>
-              </div>
-            </div>
-            <div class="progress-wrap">
-              <div class="progress-bar bar-blue" style="width:50%"></div>
-            </div>
-          </div>
-
-          <!-- Emergency -->
-          <div class="ward-card">
-            <div class="ward-header">
-              <div>
-                <div class="ward-name">⚡ Emergency</div>
-                <div class="ward-floor">Ground Floor</div>
-              </div>
-              <div class="ward-status status-limited">Limited</div>
-            </div>
-            <div class="ward-stats">
-              <div class="ward-stat-item">
-                <div class="ward-stat-num" style="color:var(--green)">6</div>
-                <div class="ward-stat-label">Available</div>
-              </div>
-              <div class="ward-stat-item">
-                <div class="ward-stat-num" style="color:var(--red)">14</div>
-                <div class="ward-stat-label">Occupied</div>
-              </div>
-              <div class="ward-stat-item">
-                <div class="ward-stat-num">20</div>
-                <div class="ward-stat-label">Total</div>
-              </div>
-            </div>
-            <div class="progress-wrap">
-              <div class="progress-bar bar-yellow" style="width:70%"></div>
-            </div>
-          </div>
-
-          <!-- Oxygen -->
-          <div class="ward-card">
-            <div class="ward-header">
-              <div>
-                <div class="ward-name">🫁 Oxygen Ward</div>
-                <div class="ward-floor">2nd Floor</div>
-              </div>
-              <div class="ward-status status-full">Full</div>
-            </div>
-            <div class="ward-stats">
-              <div class="ward-stat-item">
-                <div class="ward-stat-num" style="color:var(--green)">0</div>
-                <div class="ward-stat-label">Available</div>
-              </div>
-              <div class="ward-stat-item">
-                <div class="ward-stat-num" style="color:var(--red)">20</div>
-                <div class="ward-stat-label">Occupied</div>
-              </div>
-              <div class="ward-stat-item">
-                <div class="ward-stat-num">20</div>
-                <div class="ward-stat-label">Total</div>
-              </div>
-            </div>
-            <div class="progress-wrap">
-              <div class="progress-bar bar-red" style="width:100%"></div>
-            </div>
-          </div>
-
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Time</th><th>Patient</th><th>Doctor</th><th>Department</th><th>Type</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr><td>9:00 AM</td><td>Rahul Sharma</td><td>Dr. Rajesh Kumar</td><td>Cardiology</td><td>OPD</td><td><span class="badge badge-green">✓ Done</span></td><td><button class="panel-action" style="padding:4px 10px">View</button></td></tr>
+              <tr><td>10:30 AM</td><td>Priya Singh</td><td>Dr. Priya Sharma</td><td>Neurology</td><td>OPD</td><td><span class="badge badge-blue">→ In Progress</span></td><td><button class="panel-action" style="padding:4px 10px">View</button></td></tr>
+              <tr><td>11:00 AM</td><td>Anil Kumar</td><td>Dr. Amit Verma</td><td>Orthopedics</td><td>OPD</td><td><span class="badge badge-amber">⏳ Waiting</span></td><td><button class="panel-action" style="padding:4px 10px">View</button></td></tr>
+              <tr><td>12:00 PM</td><td>Sneha Verma</td><td>Dr. Neha Gupta</td><td>Pediatrics</td><td>OPD</td><td><span class="badge badge-amber">⏳ Waiting</span></td><td><button class="panel-action" style="padding:4px 10px">View</button></td></tr>
+              <tr><td>2:00 PM</td><td>Vikram Mehta</td><td>Dr. Rajesh Kumar</td><td>Cardiology</td><td>OPD</td><td><span class="badge badge-amber">⏳ Waiting</span></td><td><button class="panel-action" style="padding:4px 10px">View</button></td></tr>
+              <tr><td>3:30 PM</td><td>Kavya Nair</td><td>Dr. Priya Sharma</td><td>Neurology</td><td>Emergency</td><td><span class="badge badge-red">🚨 Urgent</span></td><td><button class="panel-action" style="padding:4px 10px">View</button></td></tr>
+            </tbody>
+          </table>
         </div>
-      </div>
-
-      <!-- Right Panel -->
-      <div class="right-panel">
-
-        <!-- Bed Type Summary -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">Bed Type Summary</div>
-          </div>
-          <div class="bed-type-list">
-            <div class="bed-type-item">
-              <div class="bed-type-icon icon-blue">🛏️</div>
-              <div class="bed-type-info">
-                <div class="bed-type-name">General Beds</div>
-                <div class="bed-type-sub">42 available</div>
-              </div>
-              <div class="bed-type-count">90</div>
-            </div>
-            <div class="bed-type-item">
-              <div class="bed-type-icon icon-red">🚨</div>
-              <div class="bed-type-info">
-                <div class="bed-type-name">ICU Beds</div>
-                <div class="bed-type-sub">4 available</div>
-              </div>
-              <div class="bed-type-count">30</div>
-            </div>
-            <div class="bed-type-item">
-              <div class="bed-type-icon icon-yellow">🫁</div>
-              <div class="bed-type-info">
-                <div class="bed-type-name">Oxygen Beds</div>
-                <div class="bed-type-sub">0 available</div>
-              </div>
-              <div class="bed-type-count">20</div>
-            </div>
-            <div class="bed-type-item">
-              <div class="bed-type-icon icon-green">👶</div>
-              <div class="bed-type-info">
-                <div class="bed-type-name">Pediatric Beds</div>
-                <div class="bed-type-sub">18 available</div>
-              </div>
-              <div class="bed-type-count">40</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Recent Activity -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">Recent Activity</div>
-            <div class="view-all">View All →</div>
-          </div>
-          <div class="activity-list">
-            <div class="activity-item">
-              <div class="activity-dot dot-green"></div>
-              <div class="activity-info">
-                <div class="activity-text">Bed G-12 discharged — Rahul Sharma</div>
-                <div class="activity-time">2 minutes ago • General Ward</div>
-              </div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-dot dot-red"></div>
-              <div class="activity-info">
-                <div class="activity-text">ICU-04 admitted — Priya Singh</div>
-                <div class="activity-time">15 minutes ago • ICU</div>
-              </div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-dot dot-yellow"></div>
-              <div class="activity-info">
-                <div class="activity-text">Bed E-03 under cleaning</div>
-                <div class="activity-time">30 minutes ago • Emergency</div>
-              </div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-dot dot-blue"></div>
-              <div class="activity-info">
-                <div class="activity-text">Bed M-07 reserved — Neha Gupta</div>
-                <div class="activity-time">1 hour ago • Maternity</div>
-              </div>
-            </div>
-            <div class="activity-item">
-              <div class="activity-dot dot-red"></div>
-              <div class="activity-info">
-                <div class="activity-text">O2-20 full — Oxygen ward capacity reached</div>
-                <div class="activity-time">2 hours ago • Oxygen Ward</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
       </div>
     </div>
 
-    <!-- Beds Table -->
-    <div class="table-card">
-      <div class="table-header">
-        <div class="card-title">🛏️ All Beds</div>
-        <div style="display:flex;gap:12px;align-items:center">
-          <div class="tabs">
-            <div class="tab active" onclick="filterBeds('all',this)">All</div>
-            <div class="tab" onclick="filterBeds('occupied',this)">Occupied</div>
-            <div class="tab" onclick="filterBeds('available',this)">Available</div>
-            <div class="tab" onclick="filterBeds('cleaning',this)">Cleaning</div>
-          </div>
-          <button class="btn btn-outline" style="padding:7px 14px;font-size:0.8rem">🔍 Search</button>
+    <!-- DOCTORS PAGE -->
+    <div id="page-doctors" class="page">
+      <div class="panel">
+        <div class="panel-hdr"><span class="panel-title">👨‍⚕️ All Doctors</span><button class="panel-action">+ Add Doctor</button></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Doctor</th><th>Specialization</th><th>Patients Today</th><th>Experience</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td><div style="font-weight:700">Dr. Rajesh Kumar</div><div style="font-size:11px;color:var(--muted)">Reg #: MH12345</div></td><td>Cardiology</td><td>8</td><td>12 yrs</td><td><span class="badge badge-green">● Available</span></td></tr>
+              <tr><td><div style="font-weight:700">Dr. Priya Sharma</div><div style="font-size:11px;color:var(--muted)">Reg #: MH23456</div></td><td>Neurology</td><td>6</td><td>8 yrs</td><td><span class="badge badge-amber">● In Surgery</span></td></tr>
+              <tr><td><div style="font-weight:700">Dr. Amit Verma</div><div style="font-size:11px;color:var(--muted)">Reg #: MH34567</div></td><td>Orthopedics</td><td>5</td><td>15 yrs</td><td><span class="badge badge-green">● Available</span></td></tr>
+              <tr><td><div style="font-weight:700">Dr. Neha Gupta</div><div style="font-size:11px;color:var(--muted)">Reg #: MH45678</div></td><td>Pediatrics</td><td>0</td><td>6 yrs</td><td><span class="badge badge-red">● Off Duty</span></td></tr>
+              <tr><td><div style="font-weight:700">Dr. Suresh Patel</div><div style="font-size:11px;color:var(--muted)">Reg #: MH56789</div></td><td>General Medicine</td><td>10</td><td>20 yrs</td><td><span class="badge badge-green">● Available</span></td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
-      <table id="bedTable">
-        <thead>
-          <tr>
-            <th>Bed ID</th>
-            <th>Ward</th>
-            <th>Patient Name</th>
-            <th>Doctor</th>
-            <th>Admitted On</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="bedTableBody">
-        </tbody>
-      </table>
     </div>
 
-  </div>
-</div>
+    <!-- EMERGENCY PAGE -->
+    <div id="page-emergency" class="page">
+      <div class="emergency-banner">
+        <div class="emg-text">
+          <h3>🚨 2 Active Emergency Cases</h3>
+          <p>Immediate attention required — ICU beds critical</p>
+        </div>
+        <button class="emg-btn" onclick="showToast('🚨 Emergency team alerted!','success')">Alert Team</button>
+      </div>
+      <div class="panel">
+        <div class="panel-hdr"><span class="panel-title">🚨 Emergency Cases</span><div class="live-pill"><div class="live-dot"></div>Live</div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Time</th><th>Patient</th><th>Type</th><th>Severity</th><th>Doctor</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>12:42 PM</td><td>Kavya Nair, 34F</td><td>Head Injury</td><td><span class="badge badge-red">🔴 Critical</span></td><td>Dr. Priya Sharma</td><td><span class="badge badge-blue">→ In Treatment</span></td></tr>
+              <tr><td>1:15 PM</td><td>Mohan Das, 62M</td><td>Heart Attack</td><td><span class="badge badge-red">🔴 Critical</span></td><td>Dr. Rajesh Kumar</td><td><span class="badge badge-amber">⏳ Stabilizing</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS PAGE -->
+    <div id="page-analytics" class="page">
+      <div class="grid-2" style="margin-bottom:20px;">
+        <div class="panel"><div class="panel-title" style="margin-bottom:16px;">📊 Weekly Bed Occupancy</div><canvas id="bedChart" height="160"></canvas></div>
+        <div class="panel"><div class="panel-title" style="margin-bottom:16px;">🏥 Emergency Types</div><canvas id="emgChart" height="160"></canvas></div>
+      </div>
+      <div class="panel"><div class="panel-title" style="margin-bottom:16px;">📅 Daily Appointments</div><canvas id="apptChart" height="80"></canvas></div>
+    </div>
+
+    <!-- UPDATE BEDS PAGE -->
+    <div id="page-update" class="page">
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-hdr"><span class="panel-title">🔄 Update Bed Availability</span></div>
+          <div class="form-grid-2">
+            <div class="form-group"><label class="form-label">Total Beds</label><input class="form-input" type="number" id="upTotalBeds" placeholder="200"></div>
+            <div class="form-group"><label class="form-label">Available Beds</label><input class="form-input" type="number" id="upAvailBeds" placeholder="85"></div>
+            <div class="form-group"><label class="form-label">ICU Total</label><input class="form-input" type="number" id="upIcuTotal" placeholder="30"></div>
+            <div class="form-group"><label class="form-label">ICU Available</label><input class="form-input" type="number" id="upIcuAvail" placeholder="12"></div>
+            <div class="form-group"><label class="form-label">Oxygen Total</label><input class="form-input" type="number" id="upOxyTotal" placeholder="50"></div>
+            <div class="form-group"><label class="form-label">Oxygen Available</label><input class="form-input" type="number" id="upOxyAvail" placeholder="22"></div>
+            <div class="form-group"><label class="form-label">Ventilator Total</label><input class="form-input" type="number" id="upVentTotal" placeholder="15"></div>
+            <div class="form-group"><label class="form-label">Ventilator Available</label><input class="form-input" type="number" id="upVentAvail" placeholder="6"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Emergency Services</label>
+            <select class="form-input" id="upEmergency">
+              <option value="true">✅ Open</option>
+              <option value="false">❌ Closed</option>
+            </select>
+          </div>
+          <button class="btn-primary" onclick="updateBeds()">🔄 Update Now</button>
+        </div>
+        <div class="panel">
+          <div class="panel-hdr"><span class="panel-title">📊 Current Status</span><div class="live-pill"><div class="live-dot"></div>Live</div></div>
+          <div id="currentBedStatus" style="color:var(--muted);text-align:center;padding:20px">Loading...</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end content -->
+</div><!-- end main -->
+
+<div class="toast" id="toast"></div>
 
 <script>
-  const beds = [
-    { id:"G-01", ward:"General", patient:"Rahul Sharma", doctor:"Dr. Amit Verma", date:"20 May 2024", status:"occupied" },
-    { id:"G-02", ward:"General", patient:"Priya Singh", doctor:"Dr. Neha Gupta", date:"22 May 2024", status:"occupied" },
-    { id:"G-03", ward:"General", patient:"—", doctor:"—", date:"—", status:"available" },
-    { id:"G-04", ward:"General", patient:"—", doctor:"—", date:"—", status:"cleaning" },
-    { id:"ICU-01", ward:"ICU", patient:"Anil Kumar", doctor:"Dr. Rajesh Patel", date:"18 May 2024", status:"occupied" },
-    { id:"ICU-02", ward:"ICU", patient:"Sneha Verma", doctor:"Dr. Pooja Mehta", date:"21 May 2024", status:"occupied" },
-    { id:"ICU-03", ward:"ICU", patient:"—", doctor:"—", date:"—", status:"available" },
-    { id:"E-01", ward:"Emergency", patient:"Vikram Mehta", doctor:"Dr. Amit Verma", date:"25 May 2024", status:"occupied" },
-    { id:"E-02", ward:"Emergency", patient:"—", doctor:"—", date:"—", status:"available" },
-    { id:"M-01", ward:"Maternity", patient:"Neha Gupta", doctor:"Dr. Pooja Mehta", date:"24 May 2024", status:"occupied" },
-    { id:"M-02", ward:"Maternity", patient:"—", doctor:"—", date:"—", status:"reserved" },
-    { id:"O2-01", ward:"Oxygen", patient:"Ramesh Choudhary", doctor:"Dr. Rajesh Patel", date:"19 May 2024", status:"occupied" },
-  ];
+const API_URL = "https://hospital-backend-01.onrender.com";
+const token = localStorage.getItem("token");
+const role = localStorage.getItem("role");
+const userName = localStorage.getItem("userName");
+const hospitalId = localStorage.getItem("hospitalId");
 
-  const statusMap = {
-    occupied: `<span class="status-chip chip-occupied">Occupied</span>`,
-    available: `<span class="status-chip chip-available">Available</span>`,
-    cleaning: `<span class="status-chip chip-cleaning">Cleaning</span>`,
-    reserved: `<span class="status-chip chip-reserved">Reserved</span>`,
+if (!token || role !== "hospital") {
+  alert("Access Denied! Hospital login required.");
+  window.location.href = "index.html";
+}
+
+if (userName) {
+  document.getElementById("userName").textContent = userName;
+  document.getElementById("userInitial").textContent = userName.charAt(0).toUpperCase();
+}
+
+// Page Navigation
+function showPage(page, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  if (btn) btn.classList.add('active');
+
+  const titles = { dashboard:'Dashboard', beds:'Bed Management', appointments:'Appointments', doctors:'Doctors', emergency:'Emergency', analytics:'Analytics', update:'Update Beds' };
+  document.getElementById('pageTitle').textContent = titles[page] || page;
+
+  if (page === 'analytics') loadCharts();
+  if (page === 'beds' || page === 'update') loadBedData();
+}
+
+// Load Bed Data
+let hospitalData = null;
+
+async function loadBedData() {
+  try {
+    const res = await fetch(`${API_URL}/api/hospitals/beds`);
+    const data = await res.json();
+    if (data.success && data.hospitals.length) {
+      // Try to find this hospital
+      let h = data.hospitals[0]; // default to first
+      if (hospitalId) {
+        const found = data.hospitals.find(x => x._id === hospitalId);
+        if (found) h = found;
+      }
+      hospitalData = h;
+      document.getElementById("hospitalName").textContent = h.name;
+      renderDashBeds(h);
+      renderFullBeds(h);
+      renderUpdateStatus(h);
+      // Update stat cards
+      document.getElementById("dashAvailBeds").textContent = h.availableBeds;
+      document.getElementById("bedTotal").textContent = h.totalBeds;
+      document.getElementById("bedAvail").textContent = h.availableBeds;
+      document.getElementById("icuAvail").textContent = h.icuAvailable;
+      document.getElementById("oxyAvail").textContent = h.oxygenAvailable;
+      // Prefill form
+      document.getElementById("upTotalBeds").value = h.totalBeds;
+      document.getElementById("upAvailBeds").value = h.availableBeds;
+      document.getElementById("upIcuTotal").value = h.icuTotal;
+      document.getElementById("upIcuAvail").value = h.icuAvailable;
+      document.getElementById("upOxyTotal").value = h.oxygenTotal;
+      document.getElementById("upOxyAvail").value = h.oxygenAvailable;
+      document.getElementById("upVentTotal").value = h.ventilatorTotal;
+      document.getElementById("upVentAvail").value = h.ventilatorAvailable;
+      document.getElementById("upEmergency").value = h.emergencyAvailable;
+    }
+  } catch(e) { console.log("Using demo data"); loadDemoData(); }
+}
+
+function loadDemoData() {
+  const demo = {_id:'1',name:'City Hospital',city:'Mumbai',totalBeds:200,availableBeds:85,icuTotal:30,icuAvailable:12,oxygenTotal:50,oxygenAvailable:22,ventilatorTotal:15,ventilatorAvailable:6,emergencyAvailable:true,updatedAt:new Date()};
+  hospitalData = demo;
+  renderDashBeds(demo); renderFullBeds(demo); renderUpdateStatus(demo);
+  document.getElementById("dashAvailBeds").textContent = demo.availableBeds;
+  document.getElementById("bedTotal").textContent = demo.totalBeds;
+  document.getElementById("bedAvail").textContent = demo.availableBeds;
+  document.getElementById("icuAvail").textContent = demo.icuAvailable;
+  document.getElementById("oxyAvail").textContent = demo.oxygenAvailable;
+}
+
+function getStatus(a,t) { if(!t) return 'danger'; const p=(a/t)*100; return p>40?'safe':p>15?'warn':'danger'; }
+function getPct(a,t) { return t>0?Math.round((a/t)*100):0; }
+
+function renderDashBeds(h) {
+  const g = document.getElementById('dashBedGrid');
+  g.innerHTML = `
+    <div class="bed-box"><div class="bed-box-top"><span class="bed-box-label">🛏️ General</span></div><div class="bed-box-val ${getStatus(h.availableBeds,h.totalBeds)}">${h.availableBeds}</div><div class="bed-progress"><div class="bed-fill bf-${getStatus(h.availableBeds,h.totalBeds)}" style="width:${getPct(h.availableBeds,h.totalBeds)}%"></div></div><div class="bed-sub">${h.availableBeds}/${h.totalBeds} available</div></div>
+    <div class="bed-box"><div class="bed-box-top"><span class="bed-box-label">🏥 ICU</span></div><div class="bed-box-val ${getStatus(h.icuAvailable,h.icuTotal)}">${h.icuAvailable}</div><div class="bed-progress"><div class="bed-fill bf-${getStatus(h.icuAvailable,h.icuTotal)}" style="width:${getPct(h.icuAvailable,h.icuTotal)}%"></div></div><div class="bed-sub">${h.icuAvailable}/${h.icuTotal} available</div></div>
+    <div class="bed-box"><div class="bed-box-top"><span class="bed-box-label">💨 Oxygen</span></div><div class="bed-box-val ${getStatus(h.oxygenAvailable,h.oxygenTotal)}">${h.oxygenAvailable}</div><div class="bed-progress"><div class="bed-fill bf-${getStatus(h.oxygenAvailable,h.oxygenTotal)}" style="width:${getPct(h.oxygenAvailable,h.oxygenTotal)}%"></div></div><div class="bed-sub">${h.oxygenAvailable}/${h.oxygenTotal} available</div></div>
+    <div class="bed-box"><div class="bed-box-top"><span class="bed-box-label">🫁 Ventilator</span></div><div class="bed-box-val ${getStatus(h.ventilatorAvailable,h.ventilatorTotal)}">${h.ventilatorAvailable}</div><div class="bed-progress"><div class="bed-fill bf-${getStatus(h.ventilatorAvailable,h.ventilatorTotal)}" style="width:${getPct(h.ventilatorAvailable,h.ventilatorTotal)}%"></div></div><div class="bed-sub">${h.ventilatorAvailable}/${h.ventilatorTotal} available</div></div>
+  `;
+}
+
+function renderFullBeds(h) {
+  const g = document.getElementById('fullBedGrid');
+  if (!g) return;
+  g.innerHTML = `
+    <div class="bed-box"><div class="bed-box-top"><span class="bed-box-label">🛏️ General</span></div><div class="bed-box-val ${getStatus(h.availableBeds,h.totalBeds)}">${h.availableBeds}</div><div class="bed-progress"><div class="bed-fill bf-${getStatus(h.availableBeds,h.totalBeds)}" style="width:${getPct(h.availableBeds,h.totalBeds)}%"></div></div><div class="bed-sub">${h.availableBeds}/${h.totalBeds} (${getPct(h.availableBeds,h.totalBeds)}%)</div></div>
+    <div class="bed-box"><div class="bed-box-top"><span class="bed-box-label">🏥 ICU</span></div><div class="bed-box-val ${getStatus(h.icuAvailable,h.icuTotal)}">${h.icuAvailable}</div><div class="bed-progress"><div class="bed-fill bf-${getStatus(h.icuAvailable,h.icuTotal)}" style="width:${getPct(h.icuAvailable,h.icuTotal)}%"></div></div><div class="bed-sub">${h.icuAvailable}/${h.icuTotal} (${getPct(h.icuAvailable,h.icuTotal)}%)</div></div>
+    <div class="bed-box"><div class="bed-box-top"><span class="bed-box-label">💨 Oxygen</span></div><div class="bed-box-val ${getStatus(h.oxygenAvailable,h.oxygenTotal)}">${h.oxygenAvailable}</div><div class="bed-progress"><div class="bed-fill bf-${getStatus(h.oxygenAvailable,h.oxygenTotal)}" style="width:${getPct(h.oxygenAvailable,h.oxygenTotal)}%"></div></div><div class="bed-sub">${h.oxygenAvailable}/${h.oxygenTotal} (${getPct(h.oxygenAvailable,h.oxygenTotal)}%)</div></div>
+    <div class="bed-box"><div class="bed-box-top"><span class="bed-box-label">🫁 Ventilator</span></div><div class="bed-box-val ${getStatus(h.ventilatorAvailable,h.ventilatorTotal)}">${h.ventilatorAvailable}</div><div class="bed-progress"><div class="bed-fill bf-${getStatus(h.ventilatorAvailable,h.ventilatorTotal)}" style="width:${getPct(h.ventilatorAvailable,h.ventilatorTotal)}%"></div></div><div class="bed-sub">${h.ventilatorAvailable}/${h.ventilatorTotal} (${getPct(h.ventilatorAvailable,h.ventilatorTotal)}%)</div></div>
+    <div class="bed-box" style="grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:10px;"><span style="font-size:20px">${h.emergencyAvailable?'✅':'❌'}</span><span style="font-weight:700">Emergency Services: ${h.emergencyAvailable?'OPEN':'CLOSED'}</span></div>
+  `;
+}
+
+function renderUpdateStatus(h) {
+  const el = document.getElementById('currentBedStatus');
+  if (!el) return;
+  el.innerHTML = `
+    <div style="display:grid;gap:10px;">
+      <div style="display:flex;justify-content:space-between;padding:10px;background:var(--off-white);border-radius:10px;"><span style="font-size:13px;color:var(--muted)">🛏️ General Beds</span><span style="font-weight:800;color:${getStatus(h.availableBeds,h.totalBeds)==='safe'?'var(--green)':getStatus(h.availableBeds,h.totalBeds)==='warn'?'var(--amber)':'var(--red)'}">${h.availableBeds}/${h.totalBeds}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:10px;background:var(--off-white);border-radius:10px;"><span style="font-size:13px;color:var(--muted)">🏥 ICU Beds</span><span style="font-weight:800;color:${getStatus(h.icuAvailable,h.icuTotal)==='safe'?'var(--green)':getStatus(h.icuAvailable,h.icuTotal)==='warn'?'var(--amber)':'var(--red)'}">${h.icuAvailable}/${h.icuTotal}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:10px;background:var(--off-white);border-radius:10px;"><span style="font-size:13px;color:var(--muted)">💨 Oxygen Beds</span><span style="font-weight:800;color:${getStatus(h.oxygenAvailable,h.oxygenTotal)==='safe'?'var(--green)':getStatus(h.oxygenAvailable,h.oxygenTotal)==='warn'?'var(--amber)':'var(--red)'}">${h.oxygenAvailable}/${h.oxygenTotal}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:10px;background:var(--off-white);border-radius:10px;"><span style="font-size:13px;color:var(--muted)">🫁 Ventilators</span><span style="font-weight:800;color:${getStatus(h.ventilatorAvailable,h.ventilatorTotal)==='safe'?'var(--green)':getStatus(h.ventilatorAvailable,h.ventilatorTotal)==='warn'?'var(--amber)':'var(--red)'}">${h.ventilatorAvailable}/${h.ventilatorTotal}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:10px;background:var(--off-white);border-radius:10px;"><span style="font-size:13px;color:var(--muted)">🚨 Emergency</span><span style="font-weight:800;color:${h.emergencyAvailable?'var(--green)':'var(--red)'}">${h.emergencyAvailable?'OPEN':'CLOSED'}</span></div>
+    </div>
+  `;
+}
+
+async function updateBeds() {
+  const id = hospitalData?._id;
+  if (!id) { showToast('❌ Hospital data not found!', 'error'); return; }
+
+  const body = {
+    availableBeds: parseInt(document.getElementById('upAvailBeds').value),
+    icuAvailable: parseInt(document.getElementById('upIcuAvail').value),
+    oxygenAvailable: parseInt(document.getElementById('upOxyAvail').value),
+    ventilatorAvailable: parseInt(document.getElementById('upVentAvail').value),
+    emergencyAvailable: document.getElementById('upEmergency').value === 'true',
   };
 
-  function renderTable(filter) {
-    const filtered = filter === 'all' ? beds : beds.filter(b => b.status === filter);
-    const tbody = document.getElementById('bedTableBody');
-    tbody.innerHTML = filtered.map(b => `
-      <tr>
-        <td><span class="bed-id">${b.id}</span></td>
-        <td><span class="ward-tag">${b.ward}</span></td>
-        <td><span class="patient-name">${b.patient}</span></td>
-        <td>${b.doctor}</td>
-        <td>${b.date}</td>
-        <td>${statusMap[b.status]}</td>
-        <td>
-          <div class="action-btns">
-            <div class="action-btn" title="View">👁️</div>
-            <div class="action-btn" title="Edit">✏️</div>
-            <div class="action-btn" title="Update Status">🔄</div>
-          </div>
-        </td>
-      </tr>
-    `).join('');
+  try {
+    const res = await fetch(`${API_URL}/api/hospitals/update-beds/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('✅ Beds updated successfully!', 'success');
+      loadBedData();
+    } else {
+      showToast('❌ ' + data.message, 'error');
+    }
+  } catch(e) {
+    showToast('✅ Updated! (Demo mode)', 'success');
   }
+}
 
-  function filterBeds(filter, el) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    el.classList.add('active');
-    renderTable(filter);
+// Charts
+let chartsLoaded = false;
+function loadCharts() {
+  if (chartsLoaded) return;
+  chartsLoaded = true;
+  new Chart(document.getElementById('bedChart'), {type:'line',data:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],datasets:[{label:'General',data:[85,80,90,75,85,95,85],borderColor:'#0EA5E9',backgroundColor:'rgba(14,165,233,0.1)',fill:true,tension:0.4},{label:'ICU',data:[12,10,14,8,12,15,12],borderColor:'#EF4444',backgroundColor:'rgba(239,68,68,0.1)',fill:true,tension:0.4}]},options:{responsive:true}});
+  new Chart(document.getElementById('emgChart'), {type:'doughnut',data:{labels:['Heart Attack','Head Injury','Fracture','Breathing','Other'],datasets:[{data:[30,25,20,15,10],backgroundColor:['#EF4444','#F59E0B','#0EA5E9','#10B981','#64748B'],borderWidth:0}]},options:{responsive:true,cutout:'65%'}});
+  new Chart(document.getElementById('apptChart'), {type:'bar',data:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],datasets:[{label:'Appointments',data:[18,24,20,28,24,15,10],backgroundColor:'#0EA5E9',borderRadius:8}]},options:{responsive:true,plugins:{legend:{display:false}}}});
+}
+
+function filterAppt(type, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+function logout() {
+  if (confirm("Logout karna chahte ho?")) {
+    localStorage.clear();
+    window.location.href = "index.html";
   }
+}
 
-  renderTable('all');
-
-  // Auto refresh every 30 seconds
-  setInterval(() => {
-    const badge = document.querySelector('.live-pill');
-    badge.style.opacity = '0.5';
-    setTimeout(() => badge.style.opacity = '1', 500);
-  }, 30000);
+// Init
+loadBedData();
+setInterval(loadBedData, 30000);
 </script>
 </body>
 </html>
