@@ -12,6 +12,7 @@ app.use(cors());
 const authRoutes = require("./routes/authRoutes");
 const appointmentRoutes = require('./routes/appointmentRoutes');
 const hospitalRoutes = require('./routes/hospitalRoutes');
+const emergencyRoutes = require("./routes/emergencyRoutes");
 
 // ✅ Basic route
 app.get("/", (req, res) => {
@@ -25,6 +26,7 @@ app.get('/map', (req, res) => {
 // ✅ Use routes
 app.use("/api/auth", authRoutes);
 app.use('/api/appointments', appointmentRoutes);
+app.use("/api/emergency", emergencyRoutes);
 app.use('/api/hospitals', hospitalRoutes);
 
 // ✅ MongoDB connect
