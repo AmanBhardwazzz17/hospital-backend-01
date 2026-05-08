@@ -21,11 +21,23 @@ const sendSMS = async (phone, message) => {
         },
       }
     );
+
     console.log("✅ SMS sent to:", phone, response.data);
-    return { success: true, data: response.data };
+
+    return {
+      success: true,
+      data: response.data,
+    };
+
   } catch (err) {
+
     console.log("❌ SMS error:", err.message);
-    return { success: false, error: err.message };
+    console.log("❌ Full error:", err.response?.data);
+
+    return {
+      success: false,
+      error: err.message,
+    };
   }
 };
 
@@ -37,6 +49,7 @@ Emergency: ${emergencyType}
 Hospital: ${hospitalName}
 Please be prepared for arrival.
 Helpline: 112 | Ambulance: 108`;
+
   return await sendSMS(phone, message);
 };
 
@@ -48,6 +61,7 @@ Bed Type: ${bedType}
 Available: ${available} beds remaining
 Please update availability immediately.
 HospTrack System`;
+
   return await sendSMS(phone, message);
 };
 
@@ -60,6 +74,7 @@ Date: ${date}
 Time: ${time}
 Please arrive 15 mins early.
 HospTrack System`;
+
   return await sendSMS(phone, message);
 };
 
@@ -69,6 +84,7 @@ const sendOTP = async (phone, otp) => {
 Valid for 10 minutes.
 Do not share this OTP with anyone.
 HospTrack Security Team`;
+
   return await sendSMS(phone, message);
 };
 
@@ -79,6 +95,7 @@ Hello ${name},
 Your account has been created successfully.
 You can now find nearby hospitals, check bed availability & book appointments.
 Stay Safe! - HospTrack Team`;
+
   return await sendSMS(phone, message);
 };
 
