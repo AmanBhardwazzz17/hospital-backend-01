@@ -1,4 +1,5 @@
 const express = require("express");
+console.log("✅ smsRoutes loaded");
 const router = express.Router();
 const { verifyToken, adminOnly } = require("../middleware/authMiddleware");
 const {
