@@ -2,6 +2,31 @@ const express = require("express");
 const router = express.Router();
 const Emergency = require("../models/Emergency");
 const { verifyToken } = require("../middleware/authMiddleware");
+/**
+ * @swagger
+ * /api/emergency/alert:
+ *   post:
+ *     summary: Send emergency alert
+ *     tags: [Emergency]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       201:
+ *         description: Emergency alert sent
+ */
+
+/**
+ * @swagger
+ * /api/emergency/all:
+ *   get:
+ *     summary: Get all emergency cases
+ *     tags: [Emergency]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of emergencies
+ */
 
 // ✅ POST — Emergency alert bhejo
 router.post("/alert", verifyToken, async (req, res) => {

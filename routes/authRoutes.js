@@ -7,6 +7,55 @@ const User = require("../models/User");
 const sendVerificationEmail = require("../utils/sendEmail");
 
 const router = express.Router();
+/**
+ * @swagger
+ * /api/auth/register:
+ *   post:
+ *     summary: Register new patient
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Registered successfully
+ *       409:
+ *         description: Email already registered
+ */
+
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Login user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *       401:
+ *         description: Invalid credentials
+ */
 
 // ✅ reCAPTCHA verify
 async function verifyRecaptcha(token) {

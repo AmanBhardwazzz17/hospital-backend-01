@@ -2,6 +2,48 @@ const express = require("express");
 const router = express.Router();
 const Hospital = require("../models/Hospital");
 const { verifyToken, adminOnly, hospitalOnly } = require("../middleware/authMiddleware");
+/**
+ * @swagger
+ * /api/hospitals/beds:
+ *   get:
+ *     summary: Get all hospitals bed availability
+ *     tags: [Hospitals]
+ *     responses:
+ *       200:
+ *         description: List of hospitals with bed data
+ */
+
+/**
+ * @swagger
+ * /api/hospitals/add:
+ *   post:
+ *     summary: Add new hospital (Admin only)
+ *     tags: [Hospitals]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       201:
+ *         description: Hospital added successfully
+ */
+
+/**
+ * @swagger
+ * /api/hospitals/update-beds/{id}:
+ *   put:
+ *     summary: Update hospital bed availability
+ *     tags: [Hospitals]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Beds updated successfully
+ */
 
 // ✅ GET — Sab hospitals ki bed availability (public)
 router.get("/beds", async (req, res) => {

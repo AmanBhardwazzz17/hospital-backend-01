@@ -4,6 +4,40 @@ const http = require("http");           // ✅ ADD
 const { Server } = require("socket.io"); // ✅ ADD
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
+
+const swaggerOptions = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "🏥 HospTrack API",
+      version: "1.0.0",
+      description: "Hospital Tracking System — Emergency, Beds, Doctors API",
+    },
+    servers: [
+      { url: "https://hospital-backend-01.onrender.com" },
+      { url: "http://localhost:3000" }
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT"
+        }
+      }
+    },
+    security: [{ bearerAuth: [] }]
+  },
+  apis: ["./routes/*.js"],
+};
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customSiteTitle: "HospTrack API Docs",
+  customCss: '.swagger-ui .topbar { background: #C0392B; }',
+}));
 dotenv.config();
 
 const app = express();

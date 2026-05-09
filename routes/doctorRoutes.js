@@ -2,6 +2,48 @@ const express = require("express");
 const router = express.Router();
 const Doctor = require("../models/Doctor");
 const { verifyToken, adminOnly, hospitalOnly } = require("../middleware/authMiddleware");
+/**
+ * @swagger
+ * /api/doctors/all:
+ *   get:
+ *     summary: Get all doctors
+ *     tags: [Doctors]
+ *     responses:
+ *       200:
+ *         description: List of all doctors
+ */
+
+/**
+ * @swagger
+ * /api/doctors/add:
+ *   post:
+ *     summary: Add new doctor
+ *     tags: [Doctors]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       201:
+ *         description: Doctor added successfully
+ */
+
+/**
+ * @swagger
+ * /api/doctors/status/{id}:
+ *   put:
+ *     summary: Update doctor status
+ *     tags: [Doctors]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Status updated
+ */
 
 // ✅ GET — Sab doctors (public)
 router.get("/all", async (req, res) => {
