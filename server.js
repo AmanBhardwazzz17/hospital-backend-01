@@ -1,11 +1,13 @@
 const cors = require('cors');
 const express = require("express");
-const http = require("http");           // ✅ ADD
-const { Server } = require("socket.io"); // ✅ ADD
+const http = require("http");
+const { Server } = require("socket.io");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
+
+dotenv.config();
 
 const swaggerOptions = {
   definition: {
@@ -34,17 +36,18 @@ const swaggerOptions = {
 };
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
+
+const app = express();
+const server = http.createServer(app);
+
+app.use(express.json());
+app.use(cors());
+
+// ✅ Swagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
   customSiteTitle: "HospTrack API Docs",
   customCss: '.swagger-ui .topbar { background: #C0392B; }',
 }));
-dotenv.config();
-
-const app = express();
-const server = http.createServer(app);  // ✅ CHANGE
-
-app.use(express.json());
-app.use(cors());
 
 // ✅ Socket.io setup
 const io = new Server(server, {
@@ -57,13 +60,12 @@ const io = new Server(server, {
 // ✅ Socket.io connection
 io.on('connection', (socket) => {
   console.log('✅ User connected:', socket.id);
-
   socket.on('disconnect', () => {
     console.log('❌ User disconnected:', socket.id);
   });
 });
 
-// ✅ io globally available karo (routes mein use hoga)
+// ✅ io globally available karo
 app.set('io', io);
 
 // ✅ Routes
@@ -103,7 +105,7 @@ mongoose
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.log("❌ MongoDB connection error:", err));
 
-// ✅ server.listen (app.listen nahi!)
+// ✅ server.listen
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
