@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Patient Dashboard – HospTrack</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBjMjJ4elkdu5gtMo8pwxGiKFcBGMuNXBc&libraries=places&callback=initMap" async defer></script>
 <style>
 :root {
   --primary: #C0392B;
@@ -50,7 +51,6 @@ nav {
 }
 .logo { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 800; }
 .logo span.red { color: var(--primary); }
-.logo span.pro { font-size: 11px; background: var(--primary); color: white; padding: 2px 6px; border-radius: 4px; vertical-align: middle; margin-left: 4px; font-family: var(--font); }
 .nav-links { display: flex; gap: 4px; }
 .nav-link { padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer; transition: all 0.2s; border: none; background: none; font-family: var(--font); }
 .nav-link:hover, .nav-link.active { background: var(--primary-light); color: var(--primary); }
@@ -168,7 +168,7 @@ nav {
 .map-header h1 { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
 .map-header p { font-size: 14px; color: var(--muted); }
 .map-layout { display: grid; grid-template-columns: 1fr 380px; gap: 20px; }
-#googleMap { width: 100%; height: 600px; border-radius: 16px; border: 1px solid var(--border); }
+#leafletMap { width: 100%; height: 600px; border-radius: 16px; border: 1px solid var(--border); z-index: 1; }
 .map-sidebar { display: flex; flex-direction: column; gap: 14px; overflow-y: auto; max-height: 600px; }
 .map-hosp-card { background: white; border-radius: 14px; padding: 16px; border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; }
 .map-hosp-card:hover, .map-hosp-card.selected { border-color: var(--primary); box-shadow: 0 4px 16px rgba(192,57,43,0.12); }
@@ -311,14 +311,10 @@ nav {
     <div class="top-bar-item">📞 Emergency: 112</div>
     <div class="top-bar-item">🚑 Ambulance: 108</div>
   </div>
-  <div class="top-bar-right">
-    <span class="top-bar-link" onclick="showPage('map')">🗺️ Nearby Hospitals</span>
-    <span class="top-bar-link" onclick="logout()">Logout</span>
-  </div>
 </div>
 
 <nav>
-  <div class="logo">Hosp<span class="white">Track</span></div>
+  <div class="logo">Hosp<span class="red">Track</span></div>
   <div class="nav-links">
     <button class="nav-link active" onclick="showPage('dashboard',this)">🏠 Dashboard</button>
     <button class="nav-link" onclick="showPage('map',this)">🗺️ Nearby Hospitals</button>
@@ -430,7 +426,7 @@ nav {
       <button class="locate-btn" onclick="searchMapLocation()" style="background:var(--blue)">🔍 Search</button>
     </div>
     <div class="map-layout">
-      <div id="googleMap"></div>
+      <div id="leafletMap"></div>
       <div class="map-sidebar" id="mapSidebar">
         <div style="color:var(--muted);text-align:center;padding:24px">
           <div style="font-size:32px;margin-bottom:8px">📍</div>
@@ -548,7 +544,6 @@ nav {
 
 <script>
 const API_URL = "https://hospital-backend-01.onrender.com";
-const MAPS_KEY = "AIzaSyBjMjJ4elkdu5gtMo8pwxGiKFcBGMuNXBc";
 
 // Auth check
 const token = localStorage.getItem("token");
@@ -574,134 +569,132 @@ function showPage(page, btn) {
   if (btn) btn.classList.add('active');
   if (page === 'beds') loadBeds();
   if (page === 'analytics') loadCharts();
-  if (page === 'map') { if (mapInitialized) locateMe(); }
+  if (page === 'map') initLeafletMap();
 }
 
-// ==================== GOOGLE MAPS ====================
-let map, userMarker, infoWindow;
-let mapInitialized = false;
-let allHospitals = [];
+// ==================== LEAFLET MAP ====================
+let map = null;
+let userMarker = null;
 let mapMarkers = [];
+let allHospitals = [];
 
-function initMap() {
-  mapInitialized = true;
-  map = new google.maps.Map(document.getElementById('googleMap'), {
-    center: { lat: 20.5937, lng: 78.9629 }, // India center
-    zoom: 5,
-    styles: [
-      { featureType: 'poi.business', stylers: [{ visibility: 'off' }] },
-      { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#e9f5fb' }] },
-    ]
-  });
-  infoWindow = new google.maps.InfoWindow();
+function initLeafletMap() {
+  if (map) {
+    setTimeout(() => map.invalidateSize(), 100);
+    return;
+  }
+
+  map = L.map('leafletMap').setView([20.5937, 78.9629], 5);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+
+  setTimeout(() => map.invalidateSize(), 100);
 }
 
 function locateMe() {
+  if (!map) initLeafletMap();
   if (!navigator.geolocation) { showToast('⚠️ Geolocation not supported!', 'error'); return; }
+
   showToast('📍 Getting your location...', '');
   navigator.geolocation.getCurrentPosition(
     (pos) => {
       const { latitude: lat, longitude: lng } = pos.coords;
-      map.setCenter({ lat, lng });
-      map.setZoom(13);
+      map.setView([lat, lng], 14);
 
-      if (userMarker) userMarker.setMap(null);
-      userMarker = new google.maps.Marker({
-        position: { lat, lng }, map,
-        title: 'Your Location',
-        icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          scale: 10, fillColor: '#C0392B', fillOpacity: 1,
-          strokeColor: 'white', strokeWeight: 3
-        }
-      });
+      if (userMarker) map.removeLayer(userMarker);
+      userMarker = L.circleMarker([lat, lng], {
+        radius: 10, fillColor: '#C0392B', color: 'white',
+        weight: 3, fillOpacity: 1
+      }).addTo(map).bindPopup('📍 Your Location').openPopup();
 
       showToast('✅ Location found! Searching nearby hospitals...', 'success');
       searchNearbyHospitals(lat, lng);
     },
     () => {
-      showToast('❌ Location access denied. Please enable location.', 'error');
-      // Default to Delhi
+      showToast('❌ Location access denied. Showing Delhi hospitals.', 'error');
       searchNearbyHospitals(28.6139, 77.2090);
     }
   );
 }
 
-function searchNearbyHospitals(lat, lng) {
-  mapMarkers.forEach(m => m.setMap(null));
+async function searchNearbyHospitals(lat, lng) {
+  // Clear old markers
+  mapMarkers.forEach(m => map.removeLayer(m));
   mapMarkers = [];
 
-  const service = new google.maps.places.PlacesService(map);
-  service.nearbySearch({
-    location: { lat, lng },
-    radius: 10000,
-    type: 'hospital'
-  }, (results, status) => {
-    if (status === google.maps.places.PlacesServiceStatus.OK) {
-      renderMapSidebar(results, lat, lng);
-      results.forEach((place, i) => {
-        const marker = new google.maps.Marker({
-          position: place.geometry.location, map,
-          title: place.name,
-          label: { text: '🏥', fontSize: '20px' },
-          animation: google.maps.Animation.DROP
-        });
+  try {
+    // Use Overpass API to find real nearby hospitals
+    const radius = 10000;
+    const query = `[out:json][timeout:25];(node["amenity"="hospital"](around:${radius},${lat},${lng});way["amenity"="hospital"](around:${radius},${lat},${lng}););out center;`;
+    const res = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
+    const data = await res.json();
 
-        // Match with bed data
-        const bedData = allHospitals.find(h =>
-          h.name.toLowerCase().includes(place.name.toLowerCase().split(' ')[0])
-        );
+    const hospitals = data.elements.map(el => ({
+      name: el.tags?.name || 'Hospital',
+      lat: el.lat || el.center?.lat,
+      lng: el.lon || el.center?.lon,
+      address: el.tags?.['addr:street'] || el.tags?.['addr:city'] || '',
+      phone: el.tags?.phone || el.tags?.['contact:phone'] || '',
+    })).filter(h => h.lat && h.lng).slice(0, 15);
 
-        const content = `
-          <div style="font-family:'DM Sans',sans-serif;padding:8px;max-width:220px;">
-            <div style="font-size:15px;font-weight:800;margin-bottom:4px;">🏥 ${place.name}</div>
-            <div style="font-size:12px;color:#5D6D7E;margin-bottom:8px;">${place.vicinity || ''}</div>
-            ${bedData ? `
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
-                <div style="background:#E9F7EF;border-radius:6px;padding:6px;text-align:center;">
-                  <div style="font-size:16px;font-weight:800;color:#1E8449;">${bedData.availableBeds}</div>
-                  <div style="font-size:10px;color:#5D6D7E;">General</div>
-                </div>
-                <div style="background:#EBF5FB;border-radius:6px;padding:6px;text-align:center;">
-                  <div style="font-size:16px;font-weight:800;color:#1A5276;">${bedData.icuAvailable}</div>
-                  <div style="font-size:10px;color:#5D6D7E;">ICU</div>
-                </div>
+    renderMapSidebar(hospitals, lat, lng);
+
+    hospitals.forEach((h, i) => {
+      const bedData = allHospitals.find(x => x.name.toLowerCase().includes(h.name.toLowerCase().split(' ')[0]));
+
+      const marker = L.marker([h.lat, h.lng], {
+        icon: L.divIcon({
+          html: '<div style="background:#C0392B;color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:16px;border:2px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3)">🏥</div>',
+          iconSize: [32, 32], iconAnchor: [16, 16]
+        })
+      }).addTo(map);
+
+      const popupContent = `
+        <div style="font-family:'DM Sans',sans-serif;padding:8px;min-width:180px;">
+          <div style="font-size:14px;font-weight:800;margin-bottom:4px;">🏥 ${h.name}</div>
+          ${h.address ? `<div style="font-size:11px;color:#5D6D7E;margin-bottom:8px;">${h.address}</div>` : ''}
+          ${bedData ? `
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
+              <div style="background:#E9F7EF;border-radius:6px;padding:6px;text-align:center;">
+                <div style="font-size:16px;font-weight:800;color:#1E8449;">${bedData.availableBeds}</div>
+                <div style="font-size:10px;color:#5D6D7E;">General</div>
               </div>
-            ` : '<div style="font-size:12px;color:#5D6D7E;margin-bottom:8px;">Bed data not available</div>'}
-            <div style="display:flex;gap:6px;">
-              ${place.formatted_phone_number ? `<a href="tel:${place.formatted_phone_number}" style="flex:1;padding:6px;background:#FADBD8;color:#C0392B;border-radius:6px;text-align:center;text-decoration:none;font-size:11px;font-weight:700;">📞 Call</a>` : ''}
-              <button onclick="getDirections(${place.geometry.location.lat()},${place.geometry.location.lng()})" style="flex:1;padding:6px;background:#C0392B;color:white;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">🗺️ Directions</button>
+              <div style="background:#EBF5FB;border-radius:6px;padding:6px;text-align:center;">
+                <div style="font-size:16px;font-weight:800;color:#1A5276;">${bedData.icuAvailable}</div>
+                <div style="font-size:10px;color:#5D6D7E;">ICU</div>
+              </div>
             </div>
-          </div>`;
+          ` : '<div style="font-size:11px;color:#5D6D7E;margin-bottom:8px;">Bed data not available</div>'}
+          <button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lng}','_blank')" style="width:100%;padding:6px;background:#C0392B;color:white;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">🗺️ Get Directions</button>
+        </div>`;
 
-        marker.addListener('click', () => {
-          infoWindow.setContent(content);
-          infoWindow.open(map, marker);
-        });
+      marker.bindPopup(popupContent);
+      mapMarkers.push(marker);
+    });
 
-        mapMarkers.push(marker);
-      });
-    } else {
-      showToast('⚠️ No hospitals found nearby', 'error');
-    }
-  });
+    if (hospitals.length === 0) showToast('⚠️ No hospitals found nearby', 'error');
+
+  } catch (err) {
+    showToast('⚠️ Could not load nearby hospitals', 'error');
+    console.error(err);
+  }
 }
 
-function renderMapSidebar(places, userLat, userLng) {
+function renderMapSidebar(hospitals, userLat, userLng) {
   const sidebar = document.getElementById('mapSidebar');
-  sidebar.innerHTML = `<div style="font-size:13px;font-weight:700;color:var(--muted);padding:4px 0 8px;">Found ${places.length} hospitals nearby</div>`;
+  sidebar.innerHTML = `<div style="font-size:13px;font-weight:700;color:var(--muted);padding:4px 0 8px;">Found ${hospitals.length} hospitals nearby</div>`;
 
-  places.slice(0, 10).forEach((place, i) => {
-    const lat = place.geometry.location.lat();
-    const lng = place.geometry.location.lng();
-    const dist = getDistance(userLat, userLng, lat, lng).toFixed(1);
-    const bedData = allHospitals.find(h => h.name.toLowerCase().includes(place.name.toLowerCase().split(' ')[0]));
+  hospitals.forEach((h, i) => {
+    const dist = getDistance(userLat, userLng, h.lat, h.lng).toFixed(1);
+    const bedData = allHospitals.find(x => x.name.toLowerCase().includes(h.name.toLowerCase().split(' ')[0]));
 
     const card = document.createElement('div');
     card.className = 'map-hosp-card';
     card.innerHTML = `
-      <div class="mhc-name">🏥 ${place.name}</div>
-      <div class="mhc-addr">📍 ${place.vicinity || ''} • ${dist} km away</div>
+      <div class="mhc-name">🏥 ${h.name}</div>
+      <div class="mhc-addr">📍 ${h.address || 'Nearby'} • ${dist} km away</div>
       ${bedData ? `
         <div class="mhc-beds">
           <div class="mhc-bed"><div class="mhc-bed-val ${bedData.availableBeds > 10 ? 'safe' : bedData.availableBeds > 3 ? 'warn' : 'danger'}">${bedData.availableBeds}</div><div class="mhc-bed-lbl">General</div></div>
@@ -711,17 +704,16 @@ function renderMapSidebar(places, userLat, userLng) {
         </div>
       ` : '<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Live bed data not available</div>'}
       <div class="mhc-footer">
-        <button class="mhc-btn" onclick="getDirections(${lat},${lng})">🗺️ Directions</button>
+        <button class="mhc-btn" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lng}','_blank')">🗺️ Directions</button>
         <button class="mhc-btn primary" onclick="focusMarker(${i})">📍 View on Map</button>
       </div>`;
 
-    card.onclick = () => {
+    card.addEventListener('click', () => {
       document.querySelectorAll('.map-hosp-card').forEach(c => c.classList.remove('selected'));
       card.classList.add('selected');
-      map.panTo({ lat, lng });
-      map.setZoom(15);
-      mapMarkers[i]?.dispatchEvent(new Event('click'));
-    };
+      map.setView([h.lat, h.lng], 16);
+      mapMarkers[i]?.openPopup();
+    });
 
     sidebar.appendChild(card);
   });
@@ -729,14 +721,30 @@ function renderMapSidebar(places, userLat, userLng) {
 
 function focusMarker(i) {
   if (mapMarkers[i]) {
-    map.panTo(mapMarkers[i].getPosition());
-    map.setZoom(16);
-    google.maps.event.trigger(mapMarkers[i], 'click');
+    const latlng = mapMarkers[i].getLatLng();
+    map.setView(latlng, 16);
+    mapMarkers[i].openPopup();
   }
 }
 
-function getDirections(lat, lng) {
-  window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, '_blank');
+async function searchMapLocation() {
+  const query = document.getElementById('mapSearchInput').value;
+  if (!query) return;
+  if (!map) initLeafletMap();
+
+  try {
+    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
+    const data = await res.json();
+    if (data.length > 0) {
+      const { lat, lon } = data[0];
+      map.setView([parseFloat(lat), parseFloat(lon)], 13);
+      searchNearbyHospitals(parseFloat(lat), parseFloat(lon));
+    } else {
+      showToast('❌ Location not found', 'error');
+    }
+  } catch {
+    showToast('❌ Search failed', 'error');
+  }
 }
 
 function getDistance(lat1, lng1, lat2, lng2) {
@@ -745,20 +753,6 @@ function getDistance(lat1, lng1, lat2, lng2) {
   const dLng = (lng2 - lng1) * Math.PI / 180;
   const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-}
-
-function searchMapLocation() {
-  const query = document.getElementById('mapSearchInput').value;
-  if (!query) return;
-  const geocoder = new google.maps.Geocoder();
-  geocoder.geocode({ address: query }, (results, status) => {
-    if (status === 'OK') {
-      const loc = results[0].geometry.location;
-      map.setCenter(loc);
-      map.setZoom(13);
-      searchNearbyHospitals(loc.lat(), loc.lng());
-    } else { showToast('❌ Location not found', 'error'); }
-  });
 }
 
 // ==================== BED DATA ====================
@@ -788,7 +782,7 @@ function getAvailBadge(a, t) {
 function renderBeds(hospitals) {
   const grid = document.getElementById('hospitalsGrid');
   if (!hospitals.length) { grid.innerHTML = '<div style="text-align:center;padding:40px;grid-column:1/-1;color:var(--muted)"><div style="font-size:32px">🏥</div>No hospitals found</div>'; return; }
-  grid.innerHTML = hospitals.map((h,i) => {
+  grid.innerHTML = hospitals.map((h) => {
     const gs=getBedStatus(h.availableBeds,h.totalBeds), is=getBedStatus(h.icuAvailable,h.icuTotal), os=getBedStatus(h.oxygenAvailable,h.oxygenTotal), vs=getBedStatus(h.ventilatorAvailable,h.ventilatorTotal);
     const gp=h.totalBeds>0?Math.round((h.availableBeds/h.totalBeds)*100):0, ip=h.icuTotal>0?Math.round((h.icuAvailable/h.icuTotal)*100):0, op=h.oxygenTotal>0?Math.round((h.oxygenAvailable/h.oxygenTotal)*100):0, vp=h.ventilatorTotal>0?Math.round((h.ventilatorAvailable/h.ventilatorTotal)*100):0;
     return `<div class="hosp-card">
@@ -862,7 +856,6 @@ function searchBeds() {
   renderBeds(allHospitals.filter(h=>h.name.toLowerCase().includes(q)||h.city.toLowerCase().includes(q)));
 }
 
-// Emergency
 function quickCall(num) { if(confirm(`Call ${num}?`)) window.location.href=`tel:${num}`; }
 function sendAlert() {
   if(!document.getElementById('emgLocation').value||!document.getElementById('emgType').value||!document.getElementById('emgSeverity').value) { showToast('⚠️ Please fill all fields!','error'); return; }
@@ -877,7 +870,6 @@ function confirmAlert() {
 }
 function closeModal() { document.getElementById('alertModal').classList.remove('show'); }
 
-// Charts
 let chartsLoaded = false;
 function loadCharts() {
   if(chartsLoaded) return;
