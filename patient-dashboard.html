@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <style>
 :root {
   --primary: #C0392B;
@@ -891,6 +892,16 @@ function logout() { if(confirm("Logout?")){ localStorage.clear(); window.locatio
 
 loadBeds();
 setInterval(loadBeds, 30000);
+// ✅ Socket.io real-time  ← ADD FROM HERE
+const socket = io('https://hospital-backend-01.onrender.com');
+
+socket.on('bed-updated', (data) => {
+  showToast(`🔄 ${data.name} — beds updated!`, 'success');
+  loadBeds();
+});
+
+socket.on('hospital-added', () => loadBeds());
+socket.on('hospital-deleted', () => loadBeds());
 </script>
 </body>
 </html>

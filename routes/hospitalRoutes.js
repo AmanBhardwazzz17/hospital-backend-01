@@ -62,6 +62,10 @@ router.post("/add", verifyToken, adminOnly, async (req, res) => {
       latitude, longitude
     });
 
+    // ✅ Real-time — naya hospital sabko dikhao
+    const io = req.app.get('io');
+    io.emit('hospital-added', hospital);
+
     return res.status(201).json({ success: true, message: "Hospital added!", hospital });
   } catch (err) {
     return res.status(500).json({ message: "Server error", error: err.message });
@@ -90,6 +94,19 @@ router.put("/update-beds/:id", verifyToken, async (req, res) => {
 
     if (!hospital) return res.status(404).json({ message: "Hospital not found" });
 
+    // ✅ Real-time — bed update sabko instantly bhejo
+    const io = req.app.get('io');
+    io.emit('bed-updated', {
+      hospitalId: hospital._id,
+      name: hospital.name,
+      availableBeds: hospital.availableBeds,
+      icuAvailable: hospital.icuAvailable,
+      oxygenAvailable: hospital.oxygenAvailable,
+      ventilatorAvailable: hospital.ventilatorAvailable,
+      emergencyAvailable: hospital.emergencyAvailable,
+      updatedAt: hospital.updatedAt
+    });
+
     return res.json({ success: true, message: "Beds updated!", hospital });
   } catch (err) {
     return res.status(500).json({ message: "Server error", error: err.message });
@@ -100,6 +117,11 @@ router.put("/update-beds/:id", verifyToken, async (req, res) => {
 router.delete("/:id", verifyToken, adminOnly, async (req, res) => {
   try {
     await Hospital.findByIdAndDelete(req.params.id);
+
+    // ✅ Real-time — deleted hospital sabke screen se hatao
+    const io = req.app.get('io');
+    io.emit('hospital-deleted', { hospitalId: req.params.id });
+
     return res.json({ success: true, message: "Hospital deleted!" });
   } catch (err) {
     return res.status(500).json({ message: "Server error", error: err.message });
