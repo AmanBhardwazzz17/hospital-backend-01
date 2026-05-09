@@ -49,7 +49,6 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
   letter-spacing: 1.5px; text-transform: uppercase;
   padding: 0 8px; margin-bottom: 6px;
 }
-
 .nav-item {
   display: flex; align-items: center; gap: 10px;
   padding: 10px 12px; border-radius: 10px; cursor: pointer;
@@ -94,7 +93,6 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
   justify-content: space-between; background: var(--sidebar);
   border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50;
 }
-
 .topbar-left h1 { font-size: 20px; font-weight: 800; }
 .topbar-left p { font-size: 12px; color: var(--muted); margin-top: 1px; }
 
@@ -120,7 +118,6 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
   position: absolute; top: 5px; right: 5px; width: 7px; height: 7px;
   background: var(--danger); border-radius: 50%; border: 2px solid white;
 }
-
 .add-btn {
   padding: 9px 18px; border-radius: 10px; border: none;
   background: linear-gradient(135deg, var(--accent), var(--accent2));
@@ -136,18 +133,11 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 
 /* STATS ROW */
 .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
-
 .stat-card {
   background: var(--card); border-radius: 16px; padding: 20px;
   border: 1px solid var(--border); transition: transform 0.2s, box-shadow 0.2s;
-  animation: fadeUp 0.5s ease both;
 }
 .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
-.stat-card:nth-child(1) { animation-delay: 0.1s; }
-.stat-card:nth-child(2) { animation-delay: 0.15s; }
-.stat-card:nth-child(3) { animation-delay: 0.2s; }
-.stat-card:nth-child(4) { animation-delay: 0.25s; }
-
 .stat-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
 .stat-icon-wrap {
   width: 44px; height: 44px; border-radius: 12px;
@@ -157,14 +147,11 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 .stat-icon-wrap.blue { background: #eff6ff; }
 .stat-icon-wrap.yellow { background: #fffbeb; }
 .stat-icon-wrap.red { background: #fef2f2; }
-
 .stat-change {
   font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 20px;
-  display: flex; align-items: center; gap: 3px;
 }
 .stat-change.up { background: #e8f5ee; color: var(--accent); }
 .stat-change.down { background: #fef2f2; color: var(--danger); }
-
 .stat-num { font-size: 30px; font-weight: 800; letter-spacing: -1px; margin-bottom: 3px; }
 .stat-label { font-size: 12.5px; color: var(--muted); }
 .stat-sub { font-size: 11px; color: var(--muted); margin-top: 8px; }
@@ -172,12 +159,10 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
 
 /* MAIN GRID */
 .main-grid { display: grid; grid-template-columns: 1fr 340px; gap: 20px; margin-bottom: 20px; }
-
 .panel {
   background: var(--card); border-radius: 16px; padding: 20px;
-  border: 1px solid var(--border); animation: fadeUp 0.5s ease both;
+  border: 1px solid var(--border);
 }
-
 .panel-head {
   display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;
 }
@@ -186,9 +171,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); min-
   font-size: 12px; color: var(--accent); cursor: pointer; font-weight: 600;
   background: none; border: none; font-family: var(--font);
   padding: 5px 12px; border-radius: 8px; background: var(--accent-light);
-  transition: opacity 0.2s;
 }
-.panel-action:hover { opacity: 0.8; }
 
 /* TABLE */
 table { width: 100%; border-collapse: collapse; }
@@ -229,8 +212,6 @@ tr:hover td { background: #fafbfc; }
 
 /* RIGHT PANEL */
 .right-col { display: flex; flex-direction: column; gap: 16px; }
-
-/* QUICK ACTIONS */
 .quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .quick-card {
   padding: 14px; border-radius: 12px; border: 1px solid var(--border);
@@ -240,7 +221,6 @@ tr:hover td { background: #fafbfc; }
 .quick-card .qc-icon { font-size: 22px; margin-bottom: 6px; }
 .quick-card .qc-text { font-size: 11.5px; font-weight: 600; color: var(--text); }
 
-/* ACTIVITY */
 .activity-list { display: flex; flex-direction: column; gap: 12px; }
 .act-item { display: flex; align-items: flex-start; gap: 10px; }
 .act-icon {
@@ -257,24 +237,115 @@ tr:hover td { background: #fafbfc; }
 .act-desc { font-size: 11.5px; color: var(--muted); }
 .act-time { font-size: 11px; color: var(--muted); white-space: nowrap; margin-top: 2px; }
 
-/* BED OCCUPANCY */
 .occ-item { margin-bottom: 14px; }
 .occ-head { display: flex; justify-content: space-between; margin-bottom: 5px; }
 .occ-name { font-size: 12.5px; font-weight: 500; }
 .occ-val { font-size: 12px; color: var(--muted); }
 .occ-bar { height: 7px; background: var(--border); border-radius: 10px; overflow: hidden; }
-.occ-fill { height: 100%; border-radius: 10px; transition: width 1.2s ease; }
+.occ-fill { height: 100%; border-radius: 10px; }
 
-/* BOTTOM GRID */
 .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
-/* ANIMATIONS */
-@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+/* ======================== ADD HOSPITAL MODAL ======================== */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5); z-index: 999;
+  justify-content: center; align-items: center;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.show { display: flex; }
+.modal-box {
+  background: white; border-radius: 20px; padding: 32px;
+  max-width: 580px; width: 92%; max-height: 90vh;
+  overflow-y: auto; animation: modalIn 0.3s ease;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.15);
+}
+@keyframes modalIn { from{opacity:0;transform:scale(0.9);}to{opacity:1;transform:scale(1);} }
+
+.modal-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border);
+}
+.modal-header h2 { font-size: 20px; font-weight: 800; }
+.modal-header p { font-size: 13px; color: var(--muted); margin-top: 3px; }
+.modal-close {
+  background: var(--bg); border: none; border-radius: 8px;
+  width: 32px; height: 32px; cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s; flex-shrink: 0;
+}
+.modal-close:hover { background: #fef2f2; color: var(--danger); }
+
+.modal-section {
+  background: var(--bg); border-radius: 12px; padding: 16px;
+  margin-bottom: 16px; border: 1px solid var(--border);
+}
+.modal-section-title {
+  font-size: 12px; font-weight: 700; color: var(--accent);
+  text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 6px;
+}
+
+.form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group.full { grid-column: 1/-1; }
+.form-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.form-input {
+  padding: 10px 13px; border: 1.5px solid var(--border);
+  border-radius: 9px; font-size: 13px; font-family: var(--font);
+  outline: none; transition: border 0.2s; background: white;
+  color: var(--text);
+}
+.form-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(26,122,74,0.1); }
+
+.modal-footer { display: flex; gap: 10px; margin-top: 20px; }
+.btn-submit {
+  flex: 1; padding: 13px; border-radius: 10px; border: none;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white; font-size: 14px; font-weight: 700;
+  cursor: pointer; font-family: var(--font);
+  box-shadow: 0 4px 16px rgba(26,122,74,0.3);
+  transition: opacity 0.2s;
+}
+.btn-submit:hover { opacity: 0.9; }
+.btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-cancel {
+  padding: 13px 20px; border-radius: 10px;
+  border: 1.5px solid var(--border); background: white;
+  color: var(--text); font-size: 14px; font-weight: 600;
+  cursor: pointer; font-family: var(--font); transition: all 0.2s;
+}
+.btn-cancel:hover { border-color: var(--danger); color: var(--danger); }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+  background: var(--text); color: white; padding: 14px 20px;
+  border-radius: 12px; font-size: 13px; font-weight: 600;
+  transform: translateY(100px); opacity: 0; transition: all 0.3s;
+  max-width: 320px; display: flex; align-items: center; gap: 8px;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { background: var(--accent); }
+.toast.error { background: var(--danger); }
+
+/* SUCCESS STATE */
+.success-state { text-align: center; padding: 20px 0; }
+.success-icon { font-size: 60px; margin-bottom: 16px; }
+.success-state h3 { font-size: 22px; font-weight: 800; color: var(--accent); margin-bottom: 8px; }
+.success-state p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+.success-details {
+  background: var(--accent-light); border-radius: 12px;
+  padding: 14px 18px; margin: 16px 0; text-align: left;
+}
+.success-details div { font-size: 13px; margin-bottom: 4px; }
+.success-details span { font-weight: 600; color: var(--accent); }
 
 @media (max-width: 1100px) {
   .stats-row { grid-template-columns: repeat(2, 1fr); }
   .main-grid { grid-template-columns: 1fr; }
   .bottom-grid { grid-template-columns: 1fr; }
+  .form-grid-2 { grid-template-columns: 1fr; }
 }
 @media (max-width: 768px) {
   .sidebar { display: none; }
@@ -295,46 +366,23 @@ tr:hover td { background: #fafbfc; }
       <div class="logo-sub">ADMIN PANEL</div>
     </div>
   </div>
-
   <nav>
     <div class="nav-section">
       <div class="nav-label">Menu</div>
-      <a class="nav-item active" href="#">
-        <span class="icon">📊</span> Dashboard
-      </a>
-      <a class="nav-item" href="#">
-        <span class="icon">🏥</span> Hospitals
-        <span class="nav-badge">4</span>
-      </a>
-      <a class="nav-item" href="#">
-        <span class="icon">👥</span> Users
-      </a>
-      <a class="nav-item" href="#">
-        <span class="icon">📅</span> Appointments
-      </a>
+      <a class="nav-item active" href="#"><span class="icon">📊</span> Dashboard</a>
+      <a class="nav-item" href="#"><span class="icon">🏥</span> Hospitals<span class="nav-badge" id="hospCount">—</span></a>
+      <a class="nav-item" href="#"><span class="icon">👥</span> Users</a>
+      <a class="nav-item" href="#"><span class="icon">📅</span> Appointments</a>
     </div>
-
     <div class="nav-section">
       <div class="nav-label">General</div>
-      <a class="nav-item" href="#">
-        <span class="icon">🛏️</span> Bed Tracker
-      </a>
-      <a class="nav-item" href="#">
-        <span class="icon">🚨</span> Emergencies
-        <span class="nav-badge red">3</span>
-      </a>
-      <a class="nav-item" href="#">
-        <span class="icon">📋</span> Reports
-      </a>
-      <a class="nav-item" href="#">
-        <span class="icon">⚙️</span> Settings
-      </a>
-      <a class="nav-item" href="#" onclick="logout()">
-        <span class="icon">🚪</span> Logout
-      </a>
+      <a class="nav-item" href="#"><span class="icon">🛏️</span> Bed Tracker</a>
+      <a class="nav-item" href="#"><span class="icon">🚨</span> Emergencies<span class="nav-badge red">3</span></a>
+      <a class="nav-item" href="#"><span class="icon">📋</span> Reports</a>
+      <a class="nav-item" href="#"><span class="icon">⚙️</span> Settings</a>
+      <a class="nav-item" href="#" onclick="logout()"><span class="icon">🚪</span> Logout</a>
     </div>
   </nav>
-
   <div class="sidebar-footer">
     <div class="admin-card">
       <div class="admin-avatar" id="adminInitial">A</div>
@@ -342,92 +390,65 @@ tr:hover td { background: #fafbfc; }
         <div class="admin-name" id="adminName">Admin</div>
         <div class="admin-role">Super Admin</div>
       </div>
-      <button class="logout-btn" onclick="logout()" title="Logout">🚪</button>
+      <button class="logout-btn" onclick="logout()">🚪</button>
     </div>
   </div>
 </aside>
 
 <!-- MAIN -->
 <main class="main">
-
-  <!-- TOPBAR -->
   <div class="topbar">
     <div class="topbar-left">
       <h1>Dashboard</h1>
       <p id="dateTime">Loading...</p>
     </div>
-
     <div class="search-bar">
       <span>🔍</span>
       <input type="text" placeholder="Search hospitals, users...">
     </div>
-
     <div class="topbar-right">
-      <div class="icon-btn">
-        🔔
-        <div class="notif-dot"></div>
-      </div>
+      <div class="icon-btn">🔔<div class="notif-dot"></div></div>
       <div class="icon-btn">⚙️</div>
-      <button class="add-btn" onclick="addHospital()">
-        + Add Hospital
-      </button>
+      <button class="add-btn" onclick="openAddHospital()">+ Add Hospital</button>
     </div>
   </div>
 
-  <!-- CONTENT -->
   <div class="content">
-
     <!-- STATS -->
     <div class="stats-row">
       <div class="stat-card">
-        <div class="stat-top">
-          <div class="stat-icon-wrap green">🏥</div>
-          <span class="stat-change up">↑ 2.4%</span>
-        </div>
-        <div class="stat-num" id="totalHospitals">4</div>
+        <div class="stat-top"><div class="stat-icon-wrap green">🏥</div><span class="stat-change up">↑ Live</span></div>
+        <div class="stat-num" id="totalHospitals">—</div>
         <div class="stat-label">Total Hospitals</div>
-        <div class="stat-sub"><span>2</span> added this month</div>
+        <div class="stat-sub"><span id="activeHosp">—</span> active</div>
       </div>
-
       <div class="stat-card">
-        <div class="stat-top">
-          <div class="stat-icon-wrap blue">👥</div>
-          <span class="stat-change up">↑ 5.1%</span>
-        </div>
-        <div class="stat-num" id="totalUsers">13</div>
-        <div class="stat-label">Total Users</div>
-        <div class="stat-sub"><span>5</span> new this week</div>
+        <div class="stat-top"><div class="stat-icon-wrap blue">🛏️</div><span class="stat-change up">↑ Live</span></div>
+        <div class="stat-num" id="totalBeds">—</div>
+        <div class="stat-label">Total Beds</div>
+        <div class="stat-sub"><span id="availBeds">—</span> available</div>
       </div>
-
       <div class="stat-card">
-        <div class="stat-top">
-          <div class="stat-icon-wrap yellow">🛏️</div>
-          <span class="stat-change down">↓ 1.2%</span>
-        </div>
-        <div class="stat-num">342</div>
-        <div class="stat-label">Available Beds</div>
-        <div class="stat-sub">Out of <span>580</span> total</div>
+        <div class="stat-top"><div class="stat-icon-wrap yellow">🏥</div><span class="stat-change down">ICU</span></div>
+        <div class="stat-num" id="totalICU">—</div>
+        <div class="stat-label">ICU Beds</div>
+        <div class="stat-sub"><span id="availICU">—</span> available</div>
       </div>
-
       <div class="stat-card">
-        <div class="stat-top">
-          <div class="stat-icon-wrap red">🚨</div>
-          <span class="stat-change down" style="background:#fef2f2;color:var(--danger)">↑ 3</span>
-        </div>
-        <div class="stat-num">3</div>
-        <div class="stat-label">Active Emergencies</div>
-        <div class="stat-sub"><span style="color:var(--danger)">Critical</span> — ICU full</div>
+        <div class="stat-top"><div class="stat-icon-wrap red">🚨</div><span class="stat-change down" style="background:#fef2f2;color:var(--danger)">Critical</span></div>
+        <div class="stat-num" id="criticalHosp">—</div>
+        <div class="stat-label">Critical Hospitals</div>
+        <div class="stat-sub"><span style="color:var(--danger)">Beds &lt; 10%</span></div>
       </div>
     </div>
 
     <!-- MAIN GRID -->
     <div class="main-grid">
-
       <!-- HOSPITALS TABLE -->
       <div class="panel">
         <div class="panel-head">
           <span class="panel-title">🏥 Registered Hospitals</span>
-          <button class="panel-action">View All →</button>
+          <button class="panel-action" onclick="openAddHospital()">+ Add New</button>
         </div>
         <table>
           <thead>
@@ -437,108 +458,20 @@ tr:hover td { background: #fafbfc; }
               <th>Beds</th>
               <th>Occupancy</th>
               <th>Status</th>
-              <th>Action</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>
-                <div class="hosp-info">
-                  <div class="hosp-avatar">🏥</div>
-                  <div>
-                    <div class="hosp-name">City Hospital</div>
-                    <div class="hosp-city">cityhospital@hosptrack.com</div>
-                  </div>
-                </div>
-              </td>
-              <td style="color:var(--muted)">Mumbai</td>
-              <td>120</td>
-              <td>
-                <div style="display:flex;align-items:center;gap:6px;">
-                  <div class="progress-mini"><div class="progress-mini-fill" style="width:78%;background:var(--warning)"></div></div>
-                  <span style="font-size:11px;color:var(--muted)">78%</span>
-                </div>
-              </td>
-              <td><span class="badge active">Active</span></td>
-              <td><button class="tbl-btn">Manage</button></td>
-            </tr>
-            <tr>
-              <td>
-                <div class="hosp-info">
-                  <div class="hosp-avatar">🏨</div>
-                  <div>
-                    <div class="hosp-name">Apollo Medical</div>
-                    <div class="hosp-city">apollo@hosptrack.com</div>
-                  </div>
-                </div>
-              </td>
-              <td style="color:var(--muted)">Delhi</td>
-              <td>85</td>
-              <td>
-                <div style="display:flex;align-items:center;gap:6px;">
-                  <div class="progress-mini"><div class="progress-mini-fill" style="width:45%;background:var(--accent)"></div></div>
-                  <span style="font-size:11px;color:var(--muted)">45%</span>
-                </div>
-              </td>
-              <td><span class="badge active">Active</span></td>
-              <td><button class="tbl-btn">Manage</button></td>
-            </tr>
-            <tr>
-              <td>
-                <div class="hosp-info">
-                  <div class="hosp-avatar">🏪</div>
-                  <div>
-                    <div class="hosp-name">Green Cross</div>
-                    <div class="hosp-city">greencross@hosptrack.com</div>
-                  </div>
-                </div>
-              </td>
-              <td style="color:var(--muted)">Pune</td>
-              <td>60</td>
-              <td>
-                <div style="display:flex;align-items:center;gap:6px;">
-                  <div class="progress-mini"><div class="progress-mini-fill" style="width:30%;background:var(--accent)"></div></div>
-                  <span style="font-size:11px;color:var(--muted)">30%</span>
-                </div>
-              </td>
-              <td><span class="badge inactive">Inactive</span></td>
-              <td><button class="tbl-btn">Manage</button></td>
-            </tr>
-            <tr>
-              <td>
-                <div class="hosp-info">
-                  <div class="hosp-avatar">🏬</div>
-                  <div>
-                    <div class="hosp-name">LifeCare</div>
-                    <div class="hosp-city">lifecare@hosptrack.com</div>
-                  </div>
-                </div>
-              </td>
-              <td style="color:var(--muted)">Bangalore</td>
-              <td>200</td>
-              <td>
-                <div style="display:flex;align-items:center;gap:6px;">
-                  <div class="progress-mini"><div class="progress-mini-fill" style="width:92%;background:var(--danger)"></div></div>
-                  <span style="font-size:11px;color:var(--muted)">92%</span>
-                </div>
-              </td>
-              <td><span class="badge pending">Pending</span></td>
-              <td><button class="tbl-btn">Manage</button></td>
-            </tr>
+          <tbody id="hospTableBody">
+            <tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">Loading...</td></tr>
           </tbody>
         </table>
       </div>
 
       <!-- RIGHT COLUMN -->
       <div class="right-col">
-
-        <!-- QUICK ACTIONS -->
         <div class="panel">
-          <div class="panel-head">
-            <span class="panel-title">⚡ Quick Actions</span>
-          </div>
+          <div class="panel-head"><span class="panel-title">⚡ Quick Actions</span></div>
           <div class="quick-grid">
-            <div class="quick-card" onclick="addHospital()">
+            <div class="quick-card" onclick="openAddHospital()">
               <div class="qc-icon">🏥</div>
               <div class="qc-text">Add Hospital</div>
             </div>
@@ -557,62 +490,31 @@ tr:hover td { background: #fafbfc; }
           </div>
         </div>
 
-        <!-- BED OCCUPANCY -->
         <div class="panel">
           <div class="panel-head">
             <span class="panel-title">🛏️ Bed Occupancy</span>
-            <button class="panel-action">Details →</button>
           </div>
-          <div class="occ-item">
-            <div class="occ-head">
-              <span class="occ-name">City Hospital</span>
-              <span class="occ-val">78%</span>
-            </div>
-            <div class="occ-bar"><div class="occ-fill" style="width:78%;background:var(--warning)"></div></div>
-          </div>
-          <div class="occ-item">
-            <div class="occ-head">
-              <span class="occ-name">Apollo Medical</span>
-              <span class="occ-val">45%</span>
-            </div>
-            <div class="occ-bar"><div class="occ-fill" style="width:45%;background:var(--accent)"></div></div>
-          </div>
-          <div class="occ-item">
-            <div class="occ-head">
-              <span class="occ-name">LifeCare</span>
-              <span class="occ-val">92%</span>
-            </div>
-            <div class="occ-bar"><div class="occ-fill" style="width:92%;background:var(--danger)"></div></div>
-          </div>
-          <div class="occ-item" style="margin-bottom:0">
-            <div class="occ-head">
-              <span class="occ-name">Green Cross</span>
-              <span class="occ-val">30%</span>
-            </div>
-            <div class="occ-bar"><div class="occ-fill" style="width:30%;background:var(--accent)"></div></div>
+          <div id="bedOccupancy">
+            <div style="color:var(--muted);text-align:center;padding:16px;font-size:13px">Loading...</div>
           </div>
         </div>
-
       </div>
     </div>
 
     <!-- BOTTOM GRID -->
     <div class="bottom-grid">
-
-      <!-- RECENT ACTIVITY -->
       <div class="panel">
         <div class="panel-head">
           <span class="panel-title">📋 Recent Activity</span>
-          <button class="panel-action">View All →</button>
         </div>
         <div class="activity-list">
           <div class="act-item">
             <div class="act-icon green">🏥</div>
             <div class="act-body">
-              <div class="act-title">New hospital registered</div>
-              <div class="act-desc">City Hospital — Mumbai added</div>
+              <div class="act-title">Hospital registered</div>
+              <div class="act-desc">City Hospital — Mumbai</div>
             </div>
-            <div class="act-time">2 min ago</div>
+            <div class="act-time">Just now</div>
           </div>
           <div class="act-item">
             <div class="act-icon blue">👤</div>
@@ -641,19 +543,13 @@ tr:hover td { background: #fafbfc; }
         </div>
       </div>
 
-      <!-- USERS TABLE -->
       <div class="panel">
         <div class="panel-head">
           <span class="panel-title">👥 Users Overview</span>
-          <button class="panel-action">Manage →</button>
         </div>
         <table>
           <thead>
-            <tr>
-              <th>Name</th>
-              <th>Role</th>
-              <th>Status</th>
-            </tr>
+            <tr><th>Name</th><th>Role</th><th>Status</th></tr>
           </thead>
           <tbody>
             <tr>
@@ -676,75 +572,349 @@ tr:hover td { background: #fafbfc; }
               <td><span class="badge pending">Hospital</span></td>
               <td><span class="badge active">Active</span></td>
             </tr>
-            <tr>
-              <td>
-                <div style="display:flex;align-items:center;gap:8px;">
-                  <div style="width:30px;height:30px;border-radius:8px;background:#fef2f2;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--danger)">R</div>
-                  <span style="font-weight:600;font-size:13px">Rahul Sharma</span>
-                </div>
-              </td>
-              <td style="color:var(--muted);font-size:12px">Patient</td>
-              <td><span class="badge active">Active</span></td>
-            </tr>
-            <tr>
-              <td>
-                <div style="display:flex;align-items:center;gap:8px;">
-                  <div style="width:30px;height:30px;border-radius:8px;background:#fffbeb;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--warning)">P</div>
-                  <span style="font-weight:600;font-size:13px">Priya Singh</span>
-                </div>
-              </td>
-              <td style="color:var(--muted);font-size:12px">Patient</td>
-              <td><span class="badge inactive">Inactive</span></td>
-            </tr>
           </tbody>
         </table>
       </div>
-
     </div>
-
   </div>
 </main>
 
+<!-- ======================== ADD HOSPITAL MODAL ======================== -->
+<div class="modal-overlay" id="addHospModal">
+  <div class="modal-box">
+
+    <!-- FORM -->
+    <div id="addHospForm">
+      <div class="modal-header">
+        <div>
+          <h2>🏥 Add New Hospital</h2>
+          <p>Hospital + Login account banao — ek click mein!</p>
+        </div>
+        <button class="modal-close" onclick="closeAddHospital()">✕</button>
+      </div>
+
+      <!-- HOSPITAL INFO -->
+      <div class="modal-section">
+        <div class="modal-section-title">🏥 Hospital Information</div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Hospital Name *</label>
+            <input class="form-input" id="h-name" placeholder="e.g. Apollo Medical Center" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">City *</label>
+            <input class="form-input" id="h-city" placeholder="e.g. Mumbai" />
+          </div>
+          <div class="form-group full">
+            <label class="form-label">Address</label>
+            <input class="form-input" id="h-address" placeholder="e.g. Andheri West, Mumbai" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input class="form-input" id="h-phone" placeholder="e.g. 022-12345678" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Emergency Services</label>
+            <select class="form-input" id="h-emergency">
+              <option value="true">✅ Available</option>
+              <option value="false">❌ Not Available</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- BED INFO -->
+      <div class="modal-section">
+        <div class="modal-section-title">🛏️ Bed Information</div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Total General Beds</label>
+            <input class="form-input" id="h-totalBeds" type="number" placeholder="e.g. 200" value="100" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Available Beds</label>
+            <input class="form-input" id="h-availBeds" type="number" placeholder="e.g. 80" value="50" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Total ICU Beds</label>
+            <input class="form-input" id="h-totalICU" type="number" placeholder="e.g. 20" value="20" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Available ICU</label>
+            <input class="form-input" id="h-availICU" type="number" placeholder="e.g. 10" value="10" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Total Oxygen Beds</label>
+            <input class="form-input" id="h-totalOxy" type="number" placeholder="e.g. 30" value="30" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Available Oxygen</label>
+            <input class="form-input" id="h-availOxy" type="number" placeholder="e.g. 20" value="20" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Total Ventilators</label>
+            <input class="form-input" id="h-totalVent" type="number" placeholder="e.g. 10" value="10" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Available Ventilators</label>
+            <input class="form-input" id="h-availVent" type="number" placeholder="e.g. 5" value="5" />
+          </div>
+        </div>
+      </div>
+
+      <!-- LOGIN ACCOUNT -->
+      <div class="modal-section">
+        <div class="modal-section-title">🔐 Hospital Login Account</div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Login Email *</label>
+            <input class="form-input" id="h-email" type="email" placeholder="e.g. apollo@hosptrack.com" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password *</label>
+            <input class="form-input" id="h-password" type="password" placeholder="Min 6 characters" />
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px">
+          ⚠️ Ye credentials hospital staff ko dena hoga login karne ke liye
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeAddHospital()">Cancel</button>
+        <button class="btn-submit" id="submitBtn" onclick="submitAddHospital()">
+          🏥 Add Hospital & Create Account
+        </button>
+      </div>
+    </div>
+
+    <!-- SUCCESS STATE -->
+    <div id="addHospSuccess" style="display:none">
+      <div class="success-state">
+        <div class="success-icon">🎉</div>
+        <h3>Hospital Added Successfully!</h3>
+        <p>Hospital database mein add ho gaya aur login account bhi ban gaya!</p>
+        <div class="success-details" id="successDetails"></div>
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:16px">
+          <button class="btn-submit" onclick="closeAddHospital();loadHospitals();" style="max-width:200px">
+            ✅ Done
+          </button>
+          <button class="btn-cancel" onclick="resetForm()">
+            + Add Another
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
 <script>
-  const API_URL = "https://hospital-backend-01.onrender.com";
-  const token = localStorage.getItem("token");
-  const role = localStorage.getItem("role");
-  const userName = localStorage.getItem("userName");
+const API_URL = "https://hospital-backend-01.onrender.com";
+const token = localStorage.getItem("token");
+const role = localStorage.getItem("role");
+const userName = localStorage.getItem("userName");
 
-  // ✅ Auth Check
-  if (!token || role !== "admin") {
-    alert("Access Denied! Admin login required.");
-    window.location.href = "index.html";
-  }
+// Auth Check
+if (!token || role !== "admin") {
+  alert("Access Denied! Admin login required.");
+  window.location.href = "index.html";
+}
 
-  // ✅ Set admin name
-  if (userName) {
-    document.getElementById("adminName").textContent = userName;
-    document.getElementById("adminInitial").textContent = userName.charAt(0).toUpperCase();
-    document.getElementById("adminNameTable").textContent = userName;
-    document.getElementById("userInitial").textContent = userName.charAt(0).toUpperCase();
-  }
+// Set admin name
+if (userName) {
+  document.getElementById("adminName").textContent = userName;
+  document.getElementById("adminInitial").textContent = userName.charAt(0).toUpperCase();
+  document.getElementById("adminNameTable").textContent = userName;
+  document.getElementById("userInitial").textContent = userName.charAt(0).toUpperCase();
+}
 
-  // ✅ Date Time
-  function updateTime() {
-    const now = new Date();
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    document.getElementById("dateTime").textContent = "Today, " + now.toLocaleDateString('en-IN', options);
-  }
-  updateTime();
+// Date Time
+const now = new Date();
+document.getElementById("dateTime").textContent = "Today, " + now.toLocaleDateString('en-IN', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 
-  // ✅ Logout
-  function logout() {
-    if (confirm("Logout karna chahte ho?")) {
-      localStorage.clear();
-      window.location.href = "index.html";
+// Logout
+function logout() {
+  if (confirm("Logout karna chahte ho?")) { localStorage.clear(); window.location.href = "index.html"; }
+}
+
+// ======================== LOAD HOSPITALS ========================
+async function loadHospitals() {
+  try {
+    const res = await fetch(`${API_URL}/api/hospitals/beds`);
+    const data = await res.json();
+
+    if (data.success) {
+      const hospitals = data.hospitals;
+
+      // Stats update
+      document.getElementById("totalHospitals").textContent = hospitals.length;
+      document.getElementById("hospCount").textContent = hospitals.length;
+      document.getElementById("activeHosp").textContent = hospitals.filter(h => h.availableBeds > 0).length;
+      document.getElementById("totalBeds").textContent = hospitals.reduce((s,h) => s+h.totalBeds, 0);
+      document.getElementById("availBeds").textContent = hospitals.reduce((s,h) => s+h.availableBeds, 0);
+      document.getElementById("totalICU").textContent = hospitals.reduce((s,h) => s+h.icuTotal, 0);
+      document.getElementById("availICU").textContent = hospitals.reduce((s,h) => s+h.icuAvailable, 0);
+      document.getElementById("criticalHosp").textContent = hospitals.filter(h => h.totalBeds > 0 && (h.availableBeds/h.totalBeds) < 0.1).length;
+
+      // Table
+      document.getElementById("hospTableBody").innerHTML = hospitals.length === 0
+        ? `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">No hospitals yet — Add one!</td></tr>`
+        : hospitals.map(h => {
+            const occ = h.totalBeds > 0 ? Math.round(((h.totalBeds - h.availableBeds) / h.totalBeds) * 100) : 0;
+            const color = occ > 80 ? 'var(--danger)' : occ > 60 ? 'var(--warning)' : 'var(--accent)';
+            return `<tr>
+              <td><div class="hosp-info"><div class="hosp-avatar">🏥</div><div><div class="hosp-name">${h.name}</div><div class="hosp-city">${h.address || ''}</div></div></div></td>
+              <td style="color:var(--muted)">${h.city}</td>
+              <td>${h.availableBeds}/${h.totalBeds}</td>
+              <td><div style="display:flex;align-items:center;gap:6px;"><div class="progress-mini"><div class="progress-mini-fill" style="width:${occ}%;background:${color}"></div></div><span style="font-size:11px;color:var(--muted)">${occ}%</span></div></td>
+              <td><span class="badge ${h.availableBeds > 0 ? 'active' : 'inactive'}">${h.availableBeds > 0 ? 'Active' : 'Full'}</span></td>
+            </tr>`;
+          }).join('');
+
+      // Bed Occupancy
+      document.getElementById("bedOccupancy").innerHTML = hospitals.map(h => {
+        const occ = h.totalBeds > 0 ? Math.round(((h.totalBeds - h.availableBeds) / h.totalBeds) * 100) : 0;
+        const color = occ > 80 ? 'var(--danger)' : occ > 60 ? 'var(--warning)' : 'var(--accent)';
+        return `<div class="occ-item">
+          <div class="occ-head"><span class="occ-name">${h.name}</span><span class="occ-val">${occ}%</span></div>
+          <div class="occ-bar"><div class="occ-fill" style="width:${occ}%;background:${color}"></div></div>
+        </div>`;
+      }).join('') || '<div style="color:var(--muted);text-align:center;font-size:13px;padding:10px">No data</div>';
     }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+// ======================== ADD HOSPITAL MODAL ========================
+function openAddHospital() {
+  document.getElementById("addHospModal").classList.add("show");
+}
+
+function closeAddHospital() {
+  document.getElementById("addHospModal").classList.remove("show");
+  resetForm();
+}
+
+function resetForm() {
+  document.getElementById("addHospForm").style.display = "block";
+  document.getElementById("addHospSuccess").style.display = "none";
+  document.getElementById("h-name").value = "";
+  document.getElementById("h-city").value = "";
+  document.getElementById("h-address").value = "";
+  document.getElementById("h-phone").value = "";
+  document.getElementById("h-email").value = "";
+  document.getElementById("h-password").value = "";
+  document.getElementById("submitBtn").disabled = false;
+  document.getElementById("submitBtn").textContent = "🏥 Add Hospital & Create Account";
+}
+
+async function submitAddHospital() {
+  const name = document.getElementById("h-name").value.trim();
+  const city = document.getElementById("h-city").value.trim();
+  const address = document.getElementById("h-address").value.trim();
+  const phone = document.getElementById("h-phone").value.trim();
+  const email = document.getElementById("h-email").value.trim();
+  const password = document.getElementById("h-password").value.trim();
+  const emergency = document.getElementById("h-emergency").value === "true";
+
+  if (!name || !city || !email || !password) {
+    showToast("⚠️ Name, city, email aur password zaroori hai!", "error");
+    return;
+  }
+  if (password.length < 6) {
+    showToast("⚠️ Password kam se kam 6 characters ka hona chahiye!", "error");
+    return;
   }
 
-  function addHospital() {
-    alert("Hospital add karne ka feature abhi ban raha hai! 🏥");
+  const btn = document.getElementById("submitBtn");
+  btn.disabled = true;
+  btn.textContent = "⏳ Adding hospital...";
+
+  try {
+    // Step 1 — Hospital add karo
+    btn.textContent = "⏳ Step 1/3 — Adding hospital...";
+    const hospRes = await fetch(`${API_URL}/api/hospitals/add`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+      body: JSON.stringify({
+        name, city, address, phone,
+        totalBeds: parseInt(document.getElementById("h-totalBeds").value) || 0,
+        availableBeds: parseInt(document.getElementById("h-availBeds").value) || 0,
+        icuTotal: parseInt(document.getElementById("h-totalICU").value) || 0,
+        icuAvailable: parseInt(document.getElementById("h-availICU").value) || 0,
+        oxygenTotal: parseInt(document.getElementById("h-totalOxy").value) || 0,
+        oxygenAvailable: parseInt(document.getElementById("h-availOxy").value) || 0,
+        ventilatorTotal: parseInt(document.getElementById("h-totalVent").value) || 0,
+        ventilatorAvailable: parseInt(document.getElementById("h-availVent").value) || 0,
+        emergencyAvailable: emergency
+      })
+    });
+    const hospData = await hospRes.json();
+    if (!hospRes.ok) throw new Error(hospData.message || "Hospital add failed");
+    const hospitalId = hospData.hospital._id;
+
+    // Step 2 — Hospital user account banao
+    btn.textContent = "⏳ Step 2/3 — Creating login account...";
+    const userRes = await fetch(`${API_URL}/api/auth/create-user`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+      body: JSON.stringify({ name, email, password, role: "hospital" })
+    });
+    const userData = await userRes.json();
+    if (!userRes.ok) throw new Error(userData.message || "User creation failed");
+    const userId = userData.user.id;
+
+    // Step 3 — Link karo
+    btn.textContent = "⏳ Step 3/3 — Linking account...";
+    const linkRes = await fetch(`${API_URL}/api/auth/link-hospital`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+      body: JSON.stringify({ userId, hospitalId })
+    });
+    const linkData = await linkRes.json();
+    if (!linkRes.ok) throw new Error(linkData.message || "Linking failed");
+
+    // Success!
+    document.getElementById("addHospForm").style.display = "none";
+    document.getElementById("addHospSuccess").style.display = "block";
+    document.getElementById("successDetails").innerHTML = `
+      <div>🏥 <span>Hospital:</span> ${name}, ${city}</div>
+      <div>📧 <span>Login Email:</span> ${email}</div>
+      <div>🔐 <span>Password:</span> ${password}</div>
+      <div>🛏️ <span>Beds:</span> ${document.getElementById("h-availBeds").value}/${document.getElementById("h-totalBeds").value} available</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px">⚠️ Ye credentials hospital staff ko share karo</div>
+    `;
+
+    loadHospitals();
+    showToast(`✅ ${name} successfully added!`, "success");
+
+  } catch (err) {
+    showToast(`❌ Error: ${err.message}`, "error");
+    btn.disabled = false;
+    btn.textContent = "🏥 Add Hospital & Create Account";
   }
+}
+
+// Close modal on outside click
+document.getElementById("addHospModal").addEventListener("click", function(e) {
+  if (e.target === this) closeAddHospital();
+});
+
+function showToast(msg, type = "") {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove("show"), 4000);
+}
+
+// Init
+loadHospitals();
+setInterval(loadHospitals, 30000);
 </script>
-
 </body>
 </html>
