@@ -167,6 +167,9 @@ router.post("/login", async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        hospitalId: user.hospitalId || null,
+        hospitalId: user.hospitalId || null,
+        hospitalId: user.hospitalId || null, // ✅ ADD
       },
     });
   } catch (err) {

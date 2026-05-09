@@ -457,6 +457,7 @@ body {
         localStorage.setItem("role", data.user?.role);
         localStorage.setItem("userName", data.user?.name);
         localStorage.setItem("userId", data.user?.id);
+        localStorage.setItem("hospitalId", data.user?.hospitalId || ""); // ✅ ADD
 
         const userName = data.user?.name || email.split('@')[0];
         const role = data.user?.role;

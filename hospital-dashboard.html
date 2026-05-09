@@ -842,7 +842,7 @@ async function saveBeds() {
   };
 
   try {
-    const hospId = hospitalData?._id;
+    const hospId = hospitalData?._id || localStorage.getItem('hospitalId');
     const res = await fetch(`${API_URL}/api/hospitals/update-beds/${hospId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
