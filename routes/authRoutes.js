@@ -101,31 +101,32 @@ router.post("/register", async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const verifyToken = crypto.randomBytes(32).toString("hex");
-    const verifyTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    // ⛔ EMAIL VERIFICATION TEMPORARILY DISABLED (no budget for email service)
+    // const verifyToken = crypto.randomBytes(32).toString("hex");
+    // const verifyTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
     await User.create({
       name,
       email,
       password: hashedPassword,
       role: "patient",
-      isVerified: false,
-      verifyToken,
-      verifyTokenExpiry,
+      isVerified: true, // ✅ Directly verified — email step skip
+      // verifyToken,
+      // verifyTokenExpiry,
     });
 
-     await sendVerificationEmail(email, verifyToken);
+    // await sendVerificationEmail(email, verifyToken); // ⛔ disabled
 
     return res.status(201).json({
       success: true,
-      message: "Registered! Please check your email to verify your account.",
+      message: "Registered successfully! You can login now.",
     });
   } catch (err) {
     return res.status(500).json({ message: "Server error", error: err.message });
   }
 });
 
-// ✅ EMAIL VERIFY
+// ✅ EMAIL VERIFY (route kept as-is, unused for now)
 router.get("/verify/:token", async (req, res) => {
   try {
     const user = await User.findOne({
@@ -190,12 +191,12 @@ router.post("/login", async (req, res) => {
       return res.status(403).json({ message: "Account is deactivated. Contact admin." });
     }
 
-    // ✅ Email verification check
-    if (!user.isVerified) {
-      return res.status(403).json({ 
-        message: "Email verified nahi hai. Apna inbox check karo." 
-      });
-    }
+    // ⛔ Email verification check DISABLED (no budget for email service)
+    // if (!user.isVerified) {
+    //   return res.status(403).json({
+    //     message: "Email verified nahi hai. Apna inbox check karo."
+    //   });
+    // }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
@@ -217,8 +218,6 @@ router.post("/login", async (req, res) => {
         email: user.email,
         role: user.role,
         hospitalId: user.hospitalId || null,
-        hospitalId: user.hospitalId || null,
-        hospitalId: user.hospitalId || null, // ✅ ADD
       },
     });
   } catch (err) {
@@ -278,6 +277,7 @@ router.post("/create-user", async (req, res) => {
     return res.status(500).json({ message: "Server error", error: err.message });
   }
 });
+
 // ✅ Hospital user ko hospitalId link karo
 router.put("/link-hospital", async (req, res) => {
   try {
