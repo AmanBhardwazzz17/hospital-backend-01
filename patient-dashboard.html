@@ -1,3 +1,4 @@
+cat > /mnt/user-data/outputs/patient-dashboard.html << 'HTMLEOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,39 +6,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Patient Dashboard – HospTrack</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <style>
 :root {
-  --primary: #C0392B;
-  --primary-dark: #922B21;
-  --primary-light: #FADBD8;
-  --accent: #1A252F;
-  --white: #FFFFFF;
-  --off-white: #F8F9FA;
-  --light-gray: #EDF0F2;
-  --border: #DDE2E8;
-  --text: #1A252F;
-  --muted: #5D6D7E;
-  --green: #1E8449;
-  --green-bg: #E9F7EF;
-  --amber: #D4A017;
-  --amber-bg: #FEF9E7;
-  --blue: #1A5276;
-  --blue-bg: #EBF5FB;
-  --font: 'DM Sans', sans-serif;
+  --primary: #C0392B; --primary-dark: #922B21; --primary-light: #FADBD8;
+  --accent: #1A252F; --white: #FFFFFF; --off-white: #F8F9FA;
+  --light-gray: #EDF0F2; --border: #DDE2E8; --text: #1A252F; --muted: #5D6D7E;
+  --green: #1E8449; --green-bg: #E9F7EF; --amber: #D4A017; --amber-bg: #FEF9E7;
+  --blue: #1A5276; --blue-bg: #EBF5FB; --font: 'DM Sans', sans-serif;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: var(--font); background: var(--off-white); color: var(--text); }
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 5px; }
 
-.top-bar {
-  background: var(--accent); padding: 8px 32px;
-  display: flex; align-items: center; justify-content: space-between;
+/* PAGE LOADER */
+#pageLoader {
+  position: fixed; inset: 0; background: white;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999; flex-direction: column; gap: 16px;
+  transition: opacity 0.4s;
 }
+.loader-bar-wrap { width: 200px; height: 4px; background: #eee; border-radius: 10px; overflow: hidden; }
+.loader-bar { height: 100%; background: var(--primary); border-radius: 10px; animation: loadAnim 1.2s ease-in-out infinite; }
+@keyframes loadAnim { 0%{width:0%} 50%{width:70%} 100%{width:100%} }
+
+.top-bar { background: var(--accent); padding: 8px 32px; display: flex; align-items: center; justify-content: space-between; }
 .top-bar-left { display: flex; gap: 20px; }
 .top-bar-item { font-size: 12px; color: rgba(255,255,255,0.8); display: flex; align-items: center; gap: 6px; }
 .dot { width: 7px; height: 7px; border-radius: 50%; background: #2ecc71; }
@@ -63,7 +56,6 @@ nav {
 .page { display: none; }
 .page.active { display: block; }
 
-/* DASHBOARD */
 .wrap { max-width: 1300px; margin: 0 auto; padding: 28px 32px; }
 
 .welcome-section {
@@ -90,13 +82,9 @@ nav {
 .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
 .stat-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .stat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-.si-red { background: var(--primary-light); }
-.si-green { background: var(--green-bg); }
-.si-blue { background: var(--blue-bg); }
-.si-amber { background: var(--amber-bg); }
+.si-red{background:var(--primary-light);} .si-green{background:var(--green-bg);} .si-blue{background:var(--blue-bg);} .si-amber{background:var(--amber-bg);}
 .stat-badge { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 20px; }
-.sb-green { background: var(--green-bg); color: var(--green); }
-.sb-amber { background: var(--amber-bg); color: var(--amber); }
+.sb-green{background:var(--green-bg);color:var(--green);} .sb-amber{background:var(--amber-bg);color:var(--amber);}
 .stat-val { font-size: 28px; font-weight: 800; margin-bottom: 3px; }
 .stat-lbl { font-size: 12px; color: var(--muted); }
 
@@ -109,18 +97,14 @@ nav {
 .appt-item { display: flex; align-items: center; gap: 14px; padding: 14px; border-radius: 12px; background: var(--off-white); margin-bottom: 10px; border: 1px solid var(--border); transition: all 0.2s; }
 .appt-item:hover { border-color: var(--primary); background: var(--primary-light); }
 .appt-avatar { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-.aa-red { background: var(--primary-light); }
-.aa-blue { background: var(--blue-bg); }
-.aa-green { background: var(--green-bg); }
+.aa-red{background:var(--primary-light);} .aa-blue{background:var(--blue-bg);} .aa-green{background:var(--green-bg);}
 .appt-info { flex: 1; }
 .appt-doc { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
 .appt-hosp { font-size: 12px; color: var(--muted); }
 .appt-right { text-align: right; }
 .appt-date { font-size: 12px; font-weight: 600; margin-bottom: 5px; }
 .appt-status { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
-.as-confirmed { background: var(--green-bg); color: var(--green); }
-.as-pending { background: var(--amber-bg); color: var(--amber); }
-.as-cancelled { background: var(--primary-light); color: var(--primary); }
+.as-confirmed{background:var(--green-bg);color:var(--green);} .as-pending{background:var(--amber-bg);color:var(--amber);} .as-cancelled{background:var(--primary-light);color:var(--primary);}
 
 .health-card { background: linear-gradient(135deg, #1A252F, #2C3E50); border-radius: 16px; padding: 20px; color: white; margin-bottom: 16px; position: relative; overflow: hidden; }
 .health-card::before { content:''; position:absolute; top:-30px; right:-30px; width:120px; height:120px; background:rgba(192,57,43,0.2); border-radius:50%; }
@@ -163,11 +147,8 @@ nav {
 .qa-icon { font-size: 22px; margin-bottom: 6px; }
 .qa-text { font-size: 12px; font-weight: 600; }
 
-/* MAP PAGE */
+/* MAP */
 .map-wrap { max-width: 1300px; margin: 0 auto; padding: 28px 32px; }
-.map-header { margin-bottom: 20px; }
-.map-header h1 { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
-.map-header p { font-size: 14px; color: var(--muted); }
 .map-layout { display: grid; grid-template-columns: 1fr 380px; gap: 20px; }
 #leafletMap { width: 100%; height: 600px; border-radius: 16px; border: 1px solid var(--border); z-index: 1; }
 .map-sidebar { display: flex; flex-direction: column; gap: 14px; overflow-y: auto; max-height: 600px; }
@@ -178,19 +159,19 @@ nav {
 .mhc-beds { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
 .mhc-bed { background: var(--off-white); border-radius: 8px; padding: 8px; text-align: center; }
 .mhc-bed-val { font-size: 16px; font-weight: 800; }
-.mhc-bed-val.safe { color: var(--green); }
-.mhc-bed-val.warn { color: var(--amber); }
-.mhc-bed-val.danger { color: var(--primary); }
+.mhc-bed-val.safe{color:var(--green);} .mhc-bed-val.warn{color:var(--amber);} .mhc-bed-val.danger{color:var(--primary);}
 .mhc-bed-lbl { font-size: 10px; color: var(--muted); }
 .mhc-footer { display: flex; gap: 8px; }
 .mhc-btn { flex: 1; padding: 7px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--font); border: 1px solid var(--border); background: white; transition: all 0.2s; }
 .mhc-btn:hover { border-color: var(--primary); color: var(--primary); }
 .mhc-btn.primary { background: var(--primary); border: none; color: white; }
-.locate-btn { padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--font); display: flex; align-items: center; gap: 8px; }
+.locate-btn { padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--font); }
+.live-pill { display: inline-flex; align-items: center; gap: 6px; background: var(--green-bg); border: 1px solid rgba(30,132,73,0.2); padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; color: var(--green); margin-bottom: 16px; }
+.live-dot-green { width: 7px; height: 7px; background: var(--green); border-radius: 50%; animation: pulse 1.5s infinite; }
 
 /* EMERGENCY */
 .emg-wrap { max-width: 900px; margin: 0 auto; padding: 28px 32px; }
-.emg-hero { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: 20px; padding: 32px; margin-bottom: 28px; text-align: center; position: relative; overflow: hidden; animation: emg-pulse 2s infinite; }
+.emg-hero { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: 20px; padding: 32px; margin-bottom: 28px; text-align: center; animation: emg-pulse 2s infinite; }
 @keyframes emg-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,0.3);}50%{box-shadow:0 0 0 16px rgba(192,57,43,0);} }
 .emg-hero h1 { font-size: 28px; font-weight: 800; color: white; margin-bottom: 8px; }
 .emg-hero p { color: rgba(255,255,255,0.8); font-size: 14px; }
@@ -211,7 +192,6 @@ nav {
 .form-input, .form-select { padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; font-family: var(--font); outline: none; transition: border 0.2s; }
 .form-input:focus, .form-select:focus { border-color: var(--primary); }
 .btn-send { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer; font-family: var(--font); }
-.btn-send:hover { background: var(--primary-dark); }
 
 /* ANALYTICS */
 .analytics-wrap { max-width: 1300px; margin: 0 auto; padding: 28px 32px; }
@@ -220,28 +200,7 @@ nav {
 .chart-title { font-size: 15px; font-weight: 700; margin-bottom: 16px; }
 .chart-full { background: white; border-radius: 16px; padding: 22px; border: 1px solid var(--border); margin-bottom: 20px; }
 
-/* MODAL */
-.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; justify-content: center; align-items: center; }
-.modal-overlay.show { display: flex; }
-.modal-box { background: white; border-radius: 20px; padding: 32px; max-width: 440px; width: 90%; animation: modalIn 0.3s ease; }
-@keyframes modalIn { from{opacity:0;transform:scale(0.8);}to{opacity:1;transform:scale(1);} }
-.modal-icon { font-size: 48px; text-align: center; margin-bottom: 16px; }
-.modal-title { font-size: 20px; font-weight: 800; text-align: center; margin-bottom: 8px; }
-.modal-desc { font-size: 14px; color: var(--muted); text-align: center; margin-bottom: 24px; line-height: 1.6; }
-.modal-btns { display: flex; gap: 10px; }
-.modal-btn { flex: 1; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: var(--font); border: none; }
-.mb-cancel { background: var(--light-gray); color: var(--text); }
-.mb-confirm { background: var(--primary); color: white; }
-
-.toast { position: fixed; bottom: 24px; right: 24px; z-index: 9999; background: var(--accent); color: white; padding: 14px 20px; border-radius: 12px; font-size: 14px; font-weight: 600; transform: translateY(100px); opacity: 0; transition: all 0.3s; max-width: 320px; }
-.toast.show { transform: translateY(0); opacity: 1; }
-.toast.success { background: var(--green); }
-.toast.error { background: var(--primary); }
-
-.live-pill { display: inline-flex; align-items: center; gap: 6px; background: var(--green-bg); border: 1px solid rgba(30,132,73,0.2); padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; color: var(--green); margin-bottom: 16px; }
-.live-dot-green { width: 7px; height: 7px; background: var(--green); border-radius: 50%; animation: pulse 1.5s infinite; }
-
-/* BED PAGE */
+/* BEDS */
 .beds-wrap { max-width: 1300px; margin: 0 auto; padding: 28px 32px; }
 .summary-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
 .sum-card { background: white; border-radius: 14px; padding: 20px; border: 1px solid var(--border); }
@@ -261,22 +220,16 @@ nav {
 .hc-name { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
 .hc-city { font-size: 12px; color: var(--muted); }
 .avail-badge { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-.ab-high { background: var(--green-bg); color: var(--green); }
-.ab-mid { background: var(--amber-bg); color: var(--amber); }
-.ab-low { background: var(--primary-light); color: var(--primary); }
+.ab-high{background:var(--green-bg);color:var(--green);} .ab-mid{background:var(--amber-bg);color:var(--amber);} .ab-low{background:var(--primary-light);color:var(--primary);}
 .bed-types { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
 .bed-type { background: var(--off-white); border-radius: 10px; padding: 12px; border: 1px solid var(--border); }
 .bt-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .bt-label { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
 .bt-count { font-size: 18px; font-weight: 800; }
-.bt-count.safe { color: var(--green); }
-.bt-count.warn { color: var(--amber); }
-.bt-count.danger { color: var(--primary); }
+.bt-count.safe{color:var(--green);} .bt-count.warn{color:var(--amber);} .bt-count.danger{color:var(--primary);}
 .bed-bar { height: 5px; background: var(--border); border-radius: 10px; overflow: hidden; }
 .bed-fill { height: 100%; border-radius: 10px; transition: width 1s; }
-.bf-safe { background: var(--green); }
-.bf-warn { background: var(--amber); }
-.bf-danger { background: var(--primary); }
+.bf-safe{background:var(--green);} .bf-warn{background:var(--amber);} .bf-danger{background:var(--primary);}
 .bt-sub { font-size: 10px; color: var(--muted); margin-top: 4px; }
 .hc-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 14px; border-top: 1px solid var(--border); }
 .hc-time { font-size: 11px; color: var(--muted); }
@@ -285,26 +238,42 @@ nav {
 .hc-btn:hover { border-color: var(--primary); color: var(--primary); }
 .hc-btn.primary { background: var(--primary); border: none; color: white; }
 
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; justify-content: center; align-items: center; }
+.modal-overlay.show { display: flex; }
+.modal-box { background: white; border-radius: 20px; padding: 32px; max-width: 440px; width: 90%; animation: modalIn 0.3s ease; }
+@keyframes modalIn { from{opacity:0;transform:scale(0.8);}to{opacity:1;transform:scale(1);} }
+.modal-icon { font-size: 48px; text-align: center; margin-bottom: 16px; }
+.modal-title { font-size: 20px; font-weight: 800; text-align: center; margin-bottom: 8px; }
+.modal-desc { font-size: 14px; color: var(--muted); text-align: center; margin-bottom: 24px; line-height: 1.6; }
+.modal-btns { display: flex; gap: 10px; }
+.modal-btn { flex: 1; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: var(--font); border: none; }
+.mb-cancel{background:var(--light-gray);color:var(--text);} .mb-confirm{background:var(--primary);color:white;}
+.toast { position: fixed; bottom: 24px; right: 24px; z-index: 9999; background: var(--accent); color: white; padding: 14px 20px; border-radius: 12px; font-size: 14px; font-weight: 600; transform: translateY(100px); opacity: 0; transition: all 0.3s; max-width: 320px; }
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success{background:var(--green);} .toast.error{background:var(--primary);}
+
 @media(max-width:1024px) {
-  .stats-row,.summary-grid { grid-template-columns: repeat(2,1fr); }
-  .main-grid { grid-template-columns: 1fr; }
-  .bottom-grid { grid-template-columns: 1fr 1fr; }
-  .chart-grid { grid-template-columns: 1fr; }
-  .map-layout { grid-template-columns: 1fr; }
+  .stats-row,.summary-grid{grid-template-columns:repeat(2,1fr);}
+  .main-grid{grid-template-columns:1fr;} .bottom-grid{grid-template-columns:1fr 1fr;}
+  .chart-grid{grid-template-columns:1fr;} .map-layout{grid-template-columns:1fr;}
 }
 @media(max-width:768px) {
-  .wrap,.map-wrap,.emg-wrap,.analytics-wrap,.beds-wrap { padding: 16px; }
-  .stats-row,.summary-grid { grid-template-columns: repeat(2,1fr); }
-  .hospitals-grid { grid-template-columns: 1fr; }
-  .form-grid { grid-template-columns: 1fr; }
-  .quick-emg { grid-template-columns: 1fr 1fr; }
-  .bottom-grid { grid-template-columns: 1fr; }
-  .welcome-stats { display: none; }
-  .top-bar,.nav-links { display: none; }
+  .wrap,.map-wrap,.emg-wrap,.analytics-wrap,.beds-wrap{padding:16px;}
+  .stats-row,.summary-grid{grid-template-columns:repeat(2,1fr);}
+  .hospitals-grid{grid-template-columns:1fr;} .form-grid{grid-template-columns:1fr;}
+  .quick-emg{grid-template-columns:1fr 1fr;} .bottom-grid{grid-template-columns:1fr;}
+  .welcome-stats{display:none;} .top-bar,.nav-links{display:none;}
 }
 </style>
 </head>
 <body>
+
+<!-- PAGE LOADER -->
+<div id="pageLoader">
+  <div style="font-size:48px">🏥</div>
+  <div style="font-size:16px;font-weight:700;color:#1A252F">HospTrack Loading...</div>
+  <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
+</div>
 
 <div class="top-bar">
   <div class="top-bar-left">
@@ -348,14 +317,12 @@ nav {
         <div class="w-stat"><div class="w-stat-val" id="dashHospCount">—</div><div class="w-stat-label">Hospitals</div></div>
       </div>
     </div>
-
     <div class="stats-row">
       <div class="stat-card"><div class="stat-top"><div class="stat-icon si-red">📅</div><span class="stat-badge sb-green">Active</span></div><div class="stat-val">2</div><div class="stat-lbl">Upcoming Appointments</div></div>
       <div class="stat-card"><div class="stat-top"><div class="stat-icon si-blue">👨‍⚕️</div><span class="stat-badge sb-green">+2 New</span></div><div class="stat-val">5</div><div class="stat-lbl">My Doctors</div></div>
       <div class="stat-card"><div class="stat-top"><div class="stat-icon si-amber">💊</div><span class="stat-badge sb-amber">1 Due</span></div><div class="stat-val">4</div><div class="stat-lbl">Active Medicines</div></div>
       <div class="stat-card"><div class="stat-top"><div class="stat-icon si-green">🏥</div><span class="stat-badge sb-green">Nearby</span></div><div class="stat-val" id="dashBedCount">—</div><div class="stat-lbl">Hospitals with Beds</div></div>
     </div>
-
     <div class="main-grid">
       <div class="panel">
         <div class="panel-hdr"><span class="panel-title">📅 My Appointments</span><button class="panel-action">View All →</button></div>
@@ -385,7 +352,6 @@ nav {
         </div>
       </div>
     </div>
-
     <div class="bottom-grid">
       <div class="panel">
         <div class="panel-hdr"><span class="panel-title">🏥 Nearby Hospitals</span><button class="panel-action" onclick="showPage('map')">View Map →</button></div>
@@ -416,10 +382,10 @@ nav {
 <!-- MAP PAGE -->
 <div id="page-map" class="page">
   <div class="map-wrap">
-    <div class="map-header">
+    <div style="margin-bottom:20px;">
       <div class="live-pill"><div class="live-dot-green"></div>Live Location Active</div>
-      <h1>🗺️ Nearby Hospitals Map</h1>
-      <p>Find hospitals near you with real-time bed availability</p>
+      <h1 style="font-size:24px;font-weight:800;margin-bottom:6px;">🗺️ Nearby Hospitals Map</h1>
+      <p style="font-size:14px;color:var(--muted)">Find hospitals near you with real-time bed availability</p>
     </div>
     <div style="display:flex;gap:12px;margin-bottom:16px;align-items:center;flex-wrap:wrap;">
       <button class="locate-btn" onclick="locateMe()">📍 Use My Location</button>
@@ -438,7 +404,7 @@ nav {
   </div>
 </div>
 
-<!-- BED AVAILABILITY -->
+<!-- BEDS -->
 <div id="page-beds" class="page">
   <div class="beds-wrap">
     <div style="margin-bottom:20px;">
@@ -529,12 +495,11 @@ nav {
   </div>
 </div>
 
-<!-- MODAL -->
 <div class="modal-overlay" id="alertModal">
   <div class="modal-box">
     <div class="modal-icon">🚨</div>
     <div class="modal-title">Send Emergency Alert?</div>
-    <div class="modal-desc" id="modalDesc">3 nearest hospitals will be alerted immediately.</div>
+    <div class="modal-desc">3 nearest hospitals will be alerted immediately.</div>
     <div class="modal-btns">
       <button class="modal-btn mb-cancel" onclick="closeModal()">Cancel</button>
       <button class="modal-btn mb-confirm" onclick="confirmAlert()">🚨 Send Alert</button>
@@ -546,7 +511,7 @@ nav {
 <script>
 const API_URL = "https://hospital-backend-01.onrender.com";
 
-// Auth check
+// ✅ Auth check
 const token = localStorage.getItem("token");
 const role = localStorage.getItem("role");
 const userName = localStorage.getItem("userName");
@@ -562,319 +527,210 @@ if (userId) document.getElementById("patientIdCard").textContent = "HOSP-" + use
 const hour = new Date().getHours();
 document.getElementById("greetMsg").textContent = `${hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening'}! 👋`;
 
-// Page navigation
+// ✅ Hide loader fast — dashboard pe koi heavy script nahi
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    const loader = document.getElementById('pageLoader');
+    loader.style.opacity = '0';
+    setTimeout(() => loader.style.display = 'none', 400);
+  }, 600);
+});
+
+// ✅ Lazy load flags
+let leafletLoaded = false;
+let chartsLoaded = false;
+let socketLoaded = false;
+let map = null, userMarker = null, mapMarkers = [], allHospitals = [];
+let bedFilter = 'all';
+
+// ✅ Page navigation — sirf tab load karo jab zaroorat ho
 function showPage(page, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
   if (btn) btn.classList.add('active');
+
   if (page === 'beds') loadBeds();
-  if (page === 'analytics') loadCharts();
-  if (page === 'map') initLeafletMap();
+  if (page === 'analytics') lazyLoadCharts();
+  if (page === 'map') lazyLoadLeaflet();
 }
 
-// ==================== LEAFLET MAP ====================
-let map = null;
-let userMarker = null;
-let mapMarkers = [];
-let allHospitals = [];
-
-function initLeafletMap() {
-  if (map) {
-    setTimeout(() => map.invalidateSize(), 100);
+// ✅ Leaflet lazy load — sirf map tab click pe
+function lazyLoadLeaflet() {
+  if (leafletLoaded) {
+    if (map) setTimeout(() => map.invalidateSize(), 100);
     return;
   }
+  leafletLoaded = true;
 
+  // CSS load
+  const css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+  document.head.appendChild(css);
+
+  // JS load
+  const js = document.createElement('script');
+  js.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  js.onload = () => initLeafletMap();
+  document.head.appendChild(js);
+}
+
+function initLeafletMap() {
+  if (map) { setTimeout(() => map.invalidateSize(), 100); return; }
   map = L.map('leafletMap').setView([20.5937, 78.9629], 5);
-
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors'
   }).addTo(map);
-
   setTimeout(() => map.invalidateSize(), 100);
 }
 
 function locateMe() {
-  if (!map) initLeafletMap();
+  if (!map) { lazyLoadLeaflet(); setTimeout(locateMe, 1500); return; }
   if (!navigator.geolocation) { showToast('⚠️ Geolocation not supported!', 'error'); return; }
-
   showToast('📍 Getting your location...', '');
   navigator.geolocation.getCurrentPosition(
     (pos) => {
       const { latitude: lat, longitude: lng } = pos.coords;
       map.setView([lat, lng], 14);
-
       if (userMarker) map.removeLayer(userMarker);
-      userMarker = L.circleMarker([lat, lng], {
-        radius: 10, fillColor: '#C0392B', color: 'white',
-        weight: 3, fillOpacity: 1
-      }).addTo(map).bindPopup('📍 Your Location').openPopup();
-
+      userMarker = L.circleMarker([lat, lng], { radius: 10, fillColor: '#C0392B', color: 'white', weight: 3, fillOpacity: 1 })
+        .addTo(map).bindPopup('📍 Your Location').openPopup();
       showToast('✅ Location found! Searching nearby hospitals...', 'success');
       searchNearbyHospitals(lat, lng);
     },
-    () => {
-      showToast('❌ Location access denied. Showing Delhi hospitals.', 'error');
-      searchNearbyHospitals(28.6139, 77.2090);
-    }
+    () => { showToast('❌ Location denied. Showing Delhi.', 'error'); searchNearbyHospitals(28.6139, 77.2090); }
   );
 }
 
 async function searchNearbyHospitals(lat, lng) {
-  // Clear old markers
   mapMarkers.forEach(m => map.removeLayer(m));
   mapMarkers = [];
-
   try {
-    // Use Overpass API to find real nearby hospitals
-    const radius = 10000;
-    const query = `[out:json][timeout:25];(node["amenity"="hospital"](around:${radius},${lat},${lng});way["amenity"="hospital"](around:${radius},${lat},${lng}););out center;`;
+    const query = `[out:json][timeout:25];(node["amenity"="hospital"](around:10000,${lat},${lng});way["amenity"="hospital"](around:10000,${lat},${lng}););out center;`;
     const res = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
     const data = await res.json();
-
     const hospitals = data.elements.map(el => ({
-      name: el.tags?.name || 'Hospital',
-      lat: el.lat || el.center?.lat,
-      lng: el.lon || el.center?.lon,
-      address: el.tags?.['addr:street'] || el.tags?.['addr:city'] || '',
-      phone: el.tags?.phone || el.tags?.['contact:phone'] || '',
+      name: el.tags?.name || 'Hospital', lat: el.lat || el.center?.lat, lng: el.lon || el.center?.lon,
+      address: el.tags?.['addr:street'] || el.tags?.['addr:city'] || '', phone: el.tags?.phone || '',
     })).filter(h => h.lat && h.lng).slice(0, 15);
 
     renderMapSidebar(hospitals, lat, lng);
-
     hospitals.forEach((h, i) => {
       const bedData = allHospitals.find(x => x.name.toLowerCase().includes(h.name.toLowerCase().split(' ')[0]));
-
       const marker = L.marker([h.lat, h.lng], {
-        icon: L.divIcon({
-          html: '<div style="background:#C0392B;color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:16px;border:2px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3)">🏥</div>',
-          iconSize: [32, 32], iconAnchor: [16, 16]
-        })
+        icon: L.divIcon({ html: '<div style="background:#C0392B;color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:16px;border:2px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3)">🏥</div>', iconSize: [32, 32], iconAnchor: [16, 16] })
       }).addTo(map);
-
-      const popupContent = `
-        <div style="font-family:'DM Sans',sans-serif;padding:8px;min-width:180px;">
-          <div style="font-size:14px;font-weight:800;margin-bottom:4px;">🏥 ${h.name}</div>
-          ${h.address ? `<div style="font-size:11px;color:#5D6D7E;margin-bottom:8px;">${h.address}</div>` : ''}
-          ${bedData ? `
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
-              <div style="background:#E9F7EF;border-radius:6px;padding:6px;text-align:center;">
-                <div style="font-size:16px;font-weight:800;color:#1E8449;">${bedData.availableBeds}</div>
-                <div style="font-size:10px;color:#5D6D7E;">General</div>
-              </div>
-              <div style="background:#EBF5FB;border-radius:6px;padding:6px;text-align:center;">
-                <div style="font-size:16px;font-weight:800;color:#1A5276;">${bedData.icuAvailable}</div>
-                <div style="font-size:10px;color:#5D6D7E;">ICU</div>
-              </div>
-            </div>
-          ` : '<div style="font-size:11px;color:#5D6D7E;margin-bottom:8px;">Bed data not available</div>'}
-          <button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lng}','_blank')" style="width:100%;padding:6px;background:#C0392B;color:white;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">🗺️ Get Directions</button>
-        </div>`;
-
-      marker.bindPopup(popupContent);
+      marker.bindPopup(`<div style="font-family:'DM Sans',sans-serif;padding:8px;min-width:180px;"><div style="font-size:14px;font-weight:800;margin-bottom:4px;">🏥 ${h.name}</div>${h.address ? `<div style="font-size:11px;color:#5D6D7E;margin-bottom:8px;">${h.address}</div>` : ''}${bedData ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;"><div style="background:#E9F7EF;border-radius:6px;padding:6px;text-align:center;"><div style="font-size:16px;font-weight:800;color:#1E8449;">${bedData.availableBeds}</div><div style="font-size:10px;color:#5D6D7E;">General</div></div><div style="background:#EBF5FB;border-radius:6px;padding:6px;text-align:center;"><div style="font-size:16px;font-weight:800;color:#1A5276;">${bedData.icuAvailable}</div><div style="font-size:10px;color:#5D6D7E;">ICU</div></div></div>` : '<div style="font-size:11px;color:#5D6D7E;margin-bottom:8px;">Bed data not available</div>'}<button onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lng}','_blank')" style="width:100%;padding:6px;background:#C0392B;color:white;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">🗺️ Get Directions</button></div>`);
       mapMarkers.push(marker);
     });
-
-    if (hospitals.length === 0) showToast('⚠️ No hospitals found nearby', 'error');
-
-  } catch (err) {
-    showToast('⚠️ Could not load nearby hospitals', 'error');
-    console.error(err);
-  }
+    if (!hospitals.length) showToast('⚠️ No hospitals found nearby', 'error');
+  } catch { showToast('⚠️ Could not load nearby hospitals', 'error'); }
 }
 
 function renderMapSidebar(hospitals, userLat, userLng) {
   const sidebar = document.getElementById('mapSidebar');
   sidebar.innerHTML = `<div style="font-size:13px;font-weight:700;color:var(--muted);padding:4px 0 8px;">Found ${hospitals.length} hospitals nearby</div>`;
-
   hospitals.forEach((h, i) => {
     const dist = getDistance(userLat, userLng, h.lat, h.lng).toFixed(1);
     const bedData = allHospitals.find(x => x.name.toLowerCase().includes(h.name.toLowerCase().split(' ')[0]));
-
     const card = document.createElement('div');
     card.className = 'map-hosp-card';
-    card.innerHTML = `
-      <div class="mhc-name">🏥 ${h.name}</div>
-      <div class="mhc-addr">📍 ${h.address || 'Nearby'} • ${dist} km away</div>
-      ${bedData ? `
-        <div class="mhc-beds">
-          <div class="mhc-bed"><div class="mhc-bed-val ${bedData.availableBeds > 10 ? 'safe' : bedData.availableBeds > 3 ? 'warn' : 'danger'}">${bedData.availableBeds}</div><div class="mhc-bed-lbl">General</div></div>
-          <div class="mhc-bed"><div class="mhc-bed-val ${bedData.icuAvailable > 5 ? 'safe' : bedData.icuAvailable > 1 ? 'warn' : 'danger'}">${bedData.icuAvailable}</div><div class="mhc-bed-lbl">ICU</div></div>
-          <div class="mhc-bed"><div class="mhc-bed-val ${bedData.oxygenAvailable > 5 ? 'safe' : bedData.oxygenAvailable > 1 ? 'warn' : 'danger'}">${bedData.oxygenAvailable}</div><div class="mhc-bed-lbl">Oxygen</div></div>
-          <div class="mhc-bed"><div class="mhc-bed-val">${bedData.emergencyAvailable ? '✅' : '❌'}</div><div class="mhc-bed-lbl">Emergency</div></div>
-        </div>
-      ` : '<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Live bed data not available</div>'}
-      <div class="mhc-footer">
-        <button class="mhc-btn" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lng}','_blank')">🗺️ Directions</button>
-        <button class="mhc-btn primary" onclick="focusMarker(${i})">📍 View on Map</button>
-      </div>`;
-
-    card.addEventListener('click', () => {
-      document.querySelectorAll('.map-hosp-card').forEach(c => c.classList.remove('selected'));
-      card.classList.add('selected');
-      map.setView([h.lat, h.lng], 16);
-      mapMarkers[i]?.openPopup();
-    });
-
+    card.innerHTML = `<div class="mhc-name">🏥 ${h.name}</div><div class="mhc-addr">📍 ${h.address || 'Nearby'} • ${dist} km away</div>${bedData ? `<div class="mhc-beds"><div class="mhc-bed"><div class="mhc-bed-val ${bedData.availableBeds > 10 ? 'safe' : bedData.availableBeds > 3 ? 'warn' : 'danger'}">${bedData.availableBeds}</div><div class="mhc-bed-lbl">General</div></div><div class="mhc-bed"><div class="mhc-bed-val ${bedData.icuAvailable > 5 ? 'safe' : bedData.icuAvailable > 1 ? 'warn' : 'danger'}">${bedData.icuAvailable}</div><div class="mhc-bed-lbl">ICU</div></div></div>` : '<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Live bed data not available</div>'}<div class="mhc-footer"><button class="mhc-btn" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lng}','_blank')">🗺️ Directions</button><button class="mhc-btn primary" onclick="focusMarker(${i})">📍 View</button></div>`;
+    card.addEventListener('click', () => { document.querySelectorAll('.map-hosp-card').forEach(c => c.classList.remove('selected')); card.classList.add('selected'); map.setView([h.lat, h.lng], 16); mapMarkers[i]?.openPopup(); });
     sidebar.appendChild(card);
   });
 }
 
-function focusMarker(i) {
-  if (mapMarkers[i]) {
-    const latlng = mapMarkers[i].getLatLng();
-    map.setView(latlng, 16);
-    mapMarkers[i].openPopup();
-  }
-}
+function focusMarker(i) { if (mapMarkers[i]) { map.setView(mapMarkers[i].getLatLng(), 16); mapMarkers[i].openPopup(); } }
 
 async function searchMapLocation() {
   const query = document.getElementById('mapSearchInput').value;
   if (!query) return;
-  if (!map) initLeafletMap();
-
+  if (!map) { lazyLoadLeaflet(); setTimeout(() => searchMapLocation(), 1500); return; }
   try {
     const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
     const data = await res.json();
-    if (data.length > 0) {
-      const { lat, lon } = data[0];
-      map.setView([parseFloat(lat), parseFloat(lon)], 13);
-      searchNearbyHospitals(parseFloat(lat), parseFloat(lon));
-    } else {
-      showToast('❌ Location not found', 'error');
-    }
-  } catch {
-    showToast('❌ Search failed', 'error');
-  }
+    if (data.length > 0) { map.setView([parseFloat(data[0].lat), parseFloat(data[0].lon)], 13); searchNearbyHospitals(parseFloat(data[0].lat), parseFloat(data[0].lon)); }
+    else showToast('❌ Location not found', 'error');
+  } catch { showToast('❌ Search failed', 'error'); }
 }
 
 function getDistance(lat1, lng1, lat2, lng2) {
-  const R = 6371;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLng = (lng2 - lng1) * Math.PI / 180;
-  const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  const R = 6371, dLat = (lat2-lat1)*Math.PI/180, dLng = (lng2-lng1)*Math.PI/180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
-// ==================== BED DATA ====================
-let bedFilter = 'all';
-
+// ✅ BED DATA
 function timeAgo(date) {
-  const s = Math.floor((new Date() - new Date(date)) / 1000);
-  if (s < 60) return `${s}s ago`;
-  if (s < 3600) return `${Math.floor(s/60)}m ago`;
-  return `${Math.floor(s/3600)}h ago`;
+  const s = Math.floor((new Date()-new Date(date))/1000);
+  if(s<60) return `${s}s ago`; if(s<3600) return `${Math.floor(s/60)}m ago`; return `${Math.floor(s/3600)}h ago`;
 }
-
-function getBedStatus(a, t) {
-  if (!t) return 'danger';
-  const p = (a/t)*100;
-  return p > 40 ? 'safe' : p > 15 ? 'warn' : 'danger';
-}
-
-function getAvailBadge(a, t) {
-  if (!t) return '<span class="avail-badge ab-low">No Data</span>';
-  const p = (a/t)*100;
-  if (p > 40) return '<span class="avail-badge ab-high">✓ Available</span>';
-  if (p > 15) return '<span class="avail-badge ab-mid">⚠ Limited</span>';
-  return '<span class="avail-badge ab-low">✗ Critical</span>';
-}
+function getBedStatus(a,t) { if(!t) return 'danger'; const p=(a/t)*100; return p>40?'safe':p>15?'warn':'danger'; }
+function getAvailBadge(a,t) { if(!t) return '<span class="avail-badge ab-low">No Data</span>'; const p=(a/t)*100; if(p>40) return '<span class="avail-badge ab-high">✓ Available</span>'; if(p>15) return '<span class="avail-badge ab-mid">⚠ Limited</span>'; return '<span class="avail-badge ab-low">✗ Critical</span>'; }
 
 function renderBeds(hospitals) {
   const grid = document.getElementById('hospitalsGrid');
-  if (!hospitals.length) { grid.innerHTML = '<div style="text-align:center;padding:40px;grid-column:1/-1;color:var(--muted)"><div style="font-size:32px">🏥</div>No hospitals found</div>'; return; }
-  grid.innerHTML = hospitals.map((h) => {
-    const gs=getBedStatus(h.availableBeds,h.totalBeds), is=getBedStatus(h.icuAvailable,h.icuTotal), os=getBedStatus(h.oxygenAvailable,h.oxygenTotal), vs=getBedStatus(h.ventilatorAvailable,h.ventilatorTotal);
-    const gp=h.totalBeds>0?Math.round((h.availableBeds/h.totalBeds)*100):0, ip=h.icuTotal>0?Math.round((h.icuAvailable/h.icuTotal)*100):0, op=h.oxygenTotal>0?Math.round((h.oxygenAvailable/h.oxygenTotal)*100):0, vp=h.ventilatorTotal>0?Math.round((h.ventilatorAvailable/h.ventilatorTotal)*100):0;
-    return `<div class="hosp-card">
-      <div class="hc-top"><div><div class="hc-name">🏥 ${h.name}</div><div class="hc-city">📍 ${h.city}${h.address?' • '+h.address:''}</div></div>
-      <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">${getAvailBadge(h.availableBeds,h.totalBeds)}${h.emergencyAvailable?'<span class="avail-badge ab-high" style="font-size:10px">🚨 Emergency Open</span>':'<span class="avail-badge ab-low" style="font-size:10px">🚨 Closed</span>'}</div></div>
-      <div class="bed-types">
-        <div class="bed-type"><div class="bt-header"><span class="bt-label">🛏️ General</span><span class="bt-count ${gs}">${h.availableBeds}</span></div><div class="bed-bar"><div class="bed-fill bf-${gs}" style="width:${gp}%"></div></div><div class="bt-sub">${h.availableBeds}/${h.totalBeds} (${gp}%)</div></div>
-        <div class="bed-type"><div class="bt-header"><span class="bt-label">🏥 ICU</span><span class="bt-count ${is}">${h.icuAvailable}</span></div><div class="bed-bar"><div class="bed-fill bf-${is}" style="width:${ip}%"></div></div><div class="bt-sub">${h.icuAvailable}/${h.icuTotal} (${ip}%)</div></div>
-        <div class="bed-type"><div class="bt-header"><span class="bt-label">💨 Oxygen</span><span class="bt-count ${os}">${h.oxygenAvailable}</span></div><div class="bed-bar"><div class="bed-fill bf-${os}" style="width:${op}%"></div></div><div class="bt-sub">${h.oxygenAvailable}/${h.oxygenTotal} (${op}%)</div></div>
-        <div class="bed-type"><div class="bt-header"><span class="bt-label">🫁 Ventilator</span><span class="bt-count ${vs}">${h.ventilatorAvailable}</span></div><div class="bed-bar"><div class="bed-fill bf-${vs}" style="width:${vp}%"></div></div><div class="bt-sub">${h.ventilatorAvailable}/${h.ventilatorTotal} (${vp}%)</div></div>
-      </div>
-      <div class="hc-footer"><span class="hc-time">🕐 ${timeAgo(h.updatedAt)}</span><div class="hc-btns">${h.phone?`<button class="hc-btn" onclick="window.location.href='tel:${h.phone}'">📞 Call</button>`:''}<button class="hc-btn primary" onclick="showToast('📅 Booking at ${h.name}...','success')">Book Bed →</button></div></div>
-    </div>`;
+  if(!hospitals.length){grid.innerHTML='<div style="text-align:center;padding:40px;grid-column:1/-1;color:var(--muted)"><div style="font-size:32px">🏥</div>No hospitals found</div>';return;}
+  grid.innerHTML=hospitals.map(h=>{
+    const gs=getBedStatus(h.availableBeds,h.totalBeds),is=getBedStatus(h.icuAvailable,h.icuTotal),os=getBedStatus(h.oxygenAvailable,h.oxygenTotal),vs=getBedStatus(h.ventilatorAvailable,h.ventilatorTotal);
+    const gp=h.totalBeds>0?Math.round((h.availableBeds/h.totalBeds)*100):0,ip=h.icuTotal>0?Math.round((h.icuAvailable/h.icuTotal)*100):0,op=h.oxygenTotal>0?Math.round((h.oxygenAvailable/h.oxygenTotal)*100):0,vp=h.ventilatorTotal>0?Math.round((h.ventilatorAvailable/h.ventilatorTotal)*100):0;
+    return `<div class="hosp-card"><div class="hc-top"><div><div class="hc-name">🏥 ${h.name}</div><div class="hc-city">📍 ${h.city}${h.address?' • '+h.address:''}</div></div><div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">${getAvailBadge(h.availableBeds,h.totalBeds)}${h.emergencyAvailable?'<span class="avail-badge ab-high" style="font-size:10px">🚨 Emergency Open</span>':'<span class="avail-badge ab-low" style="font-size:10px">🚨 Closed</span>'}</div></div><div class="bed-types"><div class="bed-type"><div class="bt-header"><span class="bt-label">🛏️ General</span><span class="bt-count ${gs}">${h.availableBeds}</span></div><div class="bed-bar"><div class="bed-fill bf-${gs}" style="width:${gp}%"></div></div><div class="bt-sub">${h.availableBeds}/${h.totalBeds} (${gp}%)</div></div><div class="bed-type"><div class="bt-header"><span class="bt-label">🏥 ICU</span><span class="bt-count ${is}">${h.icuAvailable}</span></div><div class="bed-bar"><div class="bed-fill bf-${is}" style="width:${ip}%"></div></div><div class="bt-sub">${h.icuAvailable}/${h.icuTotal} (${ip}%)</div></div><div class="bed-type"><div class="bt-header"><span class="bt-label">💨 Oxygen</span><span class="bt-count ${os}">${h.oxygenAvailable}</span></div><div class="bed-bar"><div class="bed-fill bf-${os}" style="width:${op}%"></div></div><div class="bt-sub">${h.oxygenAvailable}/${h.oxygenTotal} (${op}%)</div></div><div class="bed-type"><div class="bt-header"><span class="bt-label">🫁 Ventilator</span><span class="bt-count ${vs}">${h.ventilatorAvailable}</span></div><div class="bed-bar"><div class="bed-fill bf-${vs}" style="width:${vp}%"></div></div><div class="bt-sub">${h.ventilatorAvailable}/${h.ventilatorTotal} (${vp}%)</div></div></div><div class="hc-footer"><span class="hc-time">🕐 ${timeAgo(h.updatedAt)}</span><div class="hc-btns">${h.phone?`<button class="hc-btn" onclick="window.location.href='tel:${h.phone}'">📞 Call</button>`:''}<button class="hc-btn primary" onclick="showToast('📅 Booking at ${h.name}...','success')">Book Bed →</button></div></div></div>`;
   }).join('');
 }
 
 function updateBedSummary(h) {
-  const tb=h.reduce((s,x)=>s+x.totalBeds,0), ab=h.reduce((s,x)=>s+x.availableBeds,0), ti=h.reduce((s,x)=>s+x.icuTotal,0), ai=h.reduce((s,x)=>s+x.icuAvailable,0), to=h.reduce((s,x)=>s+x.oxygenTotal,0), ao=h.reduce((s,x)=>s+x.oxygenAvailable,0);
+  const tb=h.reduce((s,x)=>s+x.totalBeds,0),ab=h.reduce((s,x)=>s+x.availableBeds,0),ti=h.reduce((s,x)=>s+x.icuTotal,0),ai=h.reduce((s,x)=>s+x.icuAvailable,0),to=h.reduce((s,x)=>s+x.oxygenTotal,0),ao=h.reduce((s,x)=>s+x.oxygenAvailable,0);
   document.getElementById('bedTotalHosp').textContent=h.length;
   document.getElementById('bedActiveHosp').textContent=`${h.filter(x=>x.availableBeds>0).length} with beds`;
-  document.getElementById('bedTotalBeds').textContent=tb;
-  document.getElementById('bedAvailBeds').textContent=`${ab} Available`;
-  document.getElementById('bedTotalICU').textContent=ti;
-  document.getElementById('bedAvailICU').textContent=`${ai} Available`;
-  document.getElementById('bedTotalOxy').textContent=to;
-  document.getElementById('bedAvailOxy').textContent=`${ao} Available`;
+  document.getElementById('bedTotalBeds').textContent=tb; document.getElementById('bedAvailBeds').textContent=`${ab} Available`;
+  document.getElementById('bedTotalICU').textContent=ti; document.getElementById('bedAvailICU').textContent=`${ai} Available`;
+  document.getElementById('bedTotalOxy').textContent=to; document.getElementById('bedAvailOxy').textContent=`${ao} Available`;
   document.getElementById('dashBedCount').textContent=h.filter(x=>x.availableBeds>0).length;
   document.getElementById('dashHospCount').textContent=h.length;
-  document.getElementById('dashHospList').innerHTML = h.filter(x=>x.availableBeds>0).slice(0,3).map(x=>`
-    <div class="hosp-item" onclick="showPage('beds')">
-      <div class="hosp-logo">🏥</div>
-      <div class="hosp-info"><div class="hosp-name">${x.name}</div><div class="hosp-detail">📍 ${x.city}</div></div>
-      <div class="hosp-beds"><div class="beds-num">${x.availableBeds}</div><div class="beds-lbl">Beds</div></div>
-    </div>`).join('') || '<div style="color:var(--muted);text-align:center;padding:16px">No hospitals with available beds</div>';
+  document.getElementById('dashHospList').innerHTML=h.filter(x=>x.availableBeds>0).slice(0,3).map(x=>`<div class="hosp-item" onclick="showPage('beds')"><div class="hosp-logo">🏥</div><div class="hosp-info"><div class="hosp-name">${x.name}</div><div class="hosp-detail">📍 ${x.city}</div></div><div class="hosp-beds"><div class="beds-num">${x.availableBeds}</div><div class="beds-lbl">Beds</div></div></div>`).join('')||'<div style="color:var(--muted);text-align:center;padding:16px">No hospitals with available beds</div>';
 }
 
 async function loadBeds() {
   try {
-    const res = await fetch(`${API_URL}/api/hospitals/beds`);
-    const data = await res.json();
-    if (data.success && data.hospitals.length) { allHospitals=data.hospitals; updateBedSummary(data.hospitals); applyBedFilter(bedFilter); }
+    const res=await fetch(`${API_URL}/api/hospitals/beds`);
+    const data=await res.json();
+    if(data.success&&data.hospitals.length){allHospitals=data.hospitals;updateBedSummary(data.hospitals);applyBedFilter(bedFilter);}
     else loadDemoHospitals();
-  } catch { loadDemoHospitals(); }
+  } catch{loadDemoHospitals();}
 }
 
 function loadDemoHospitals() {
-  const demo = [
+  const demo=[
     {_id:'1',name:'City Hospital',city:'Mumbai',address:'Andheri West',totalBeds:200,availableBeds:85,icuTotal:30,icuAvailable:12,oxygenTotal:50,oxygenAvailable:22,ventilatorTotal:15,ventilatorAvailable:6,emergencyAvailable:true,phone:'022-12345678',updatedAt:new Date()},
     {_id:'2',name:'Apollo Medical',city:'Delhi',address:'Saket',totalBeds:350,availableBeds:45,icuTotal:60,icuAvailable:5,oxygenTotal:80,oxygenAvailable:8,ventilatorTotal:25,ventilatorAvailable:2,emergencyAvailable:true,phone:'011-98765432',updatedAt:new Date(Date.now()-300000)},
     {_id:'3',name:'LifeCare Hospital',city:'Bangalore',address:'Koramangala',totalBeds:150,availableBeds:3,icuTotal:20,icuAvailable:0,oxygenTotal:35,oxygenAvailable:1,ventilatorTotal:10,ventilatorAvailable:0,emergencyAvailable:false,phone:'080-11223344',updatedAt:new Date(Date.now()-600000)},
     {_id:'4',name:'Green Cross',city:'Pune',address:'Kothrud',totalBeds:120,availableBeds:67,icuTotal:18,icuAvailable:9,oxygenTotal:30,oxygenAvailable:18,ventilatorTotal:8,ventilatorAvailable:5,emergencyAvailable:true,phone:'020-55667788',updatedAt:new Date(Date.now()-120000)},
   ];
-  allHospitals=demo; updateBedSummary(demo); applyBedFilter(bedFilter);
+  allHospitals=demo;updateBedSummary(demo);applyBedFilter(bedFilter);
 }
 
-function filterBeds(type,btn) {
-  bedFilter=type;
-  document.querySelectorAll('.flt-btn').forEach(b=>b.classList.remove('active'));
-  if(btn) btn.classList.add('active');
-  applyBedFilter(type);
-}
-function applyBedFilter(type) {
-  let f=[...allHospitals];
-  if(type==='available') f=f.filter(h=>h.availableBeds>0);
-  if(type==='icu') f=f.filter(h=>h.icuAvailable>0);
-  if(type==='emergency') f=f.filter(h=>h.emergencyAvailable);
-  renderBeds(f);
-}
-function searchBeds() {
-  const q=document.getElementById('bedSearch').value.toLowerCase();
-  renderBeds(allHospitals.filter(h=>h.name.toLowerCase().includes(q)||h.city.toLowerCase().includes(q)));
+function filterBeds(type,btn){bedFilter=type;document.querySelectorAll('.flt-btn').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');applyBedFilter(type);}
+function applyBedFilter(type){let f=[...allHospitals];if(type==='available')f=f.filter(h=>h.availableBeds>0);if(type==='icu')f=f.filter(h=>h.icuAvailable>0);if(type==='emergency')f=f.filter(h=>h.emergencyAvailable);renderBeds(f);}
+function searchBeds(){const q=document.getElementById('bedSearch').value.toLowerCase();renderBeds(allHospitals.filter(h=>h.name.toLowerCase().includes(q)||h.city.toLowerCase().includes(q)));}
+
+function quickCall(num){if(confirm(`Call ${num}?`))window.location.href=`tel:${num}`;}
+function sendAlert(){if(!document.getElementById('emgLocation').value||!document.getElementById('emgType').value||!document.getElementById('emgSeverity').value){showToast('⚠️ Please fill all fields!','error');return;}document.getElementById('alertModal').classList.add('show');}
+function confirmAlert(){closeModal();showToast('🚨 Emergency alert sent! 3 hospitals notified!','success');document.getElementById('emgLocation').value='';document.getElementById('emgType').value='';document.getElementById('emgSeverity').value='';}
+function closeModal(){document.getElementById('alertModal').classList.remove('show');}
+
+// ✅ Chart.js lazy load
+function lazyLoadCharts() {
+  if (chartsLoaded) return;
+  chartsLoaded = true;
+  const js = document.createElement('script');
+  js.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+  js.onload = () => renderCharts();
+  document.head.appendChild(js);
 }
 
-function quickCall(num) { if(confirm(`Call ${num}?`)) window.location.href=`tel:${num}`; }
-function sendAlert() {
-  if(!document.getElementById('emgLocation').value||!document.getElementById('emgType').value||!document.getElementById('emgSeverity').value) { showToast('⚠️ Please fill all fields!','error'); return; }
-  document.getElementById('alertModal').classList.add('show');
-}
-function confirmAlert() {
-  closeModal();
-  showToast('🚨 Emergency alert sent! 3 hospitals notified. Ambulance dispatched!','success');
-  document.getElementById('emgLocation').value='';
-  document.getElementById('emgType').value='';
-  document.getElementById('emgSeverity').value='';
-}
-function closeModal() { document.getElementById('alertModal').classList.remove('show'); }
-
-let chartsLoaded = false;
-function loadCharts() {
-  if(chartsLoaded) return;
-  chartsLoaded=true;
+function renderCharts() {
   new Chart(document.getElementById('peakHoursChart'),{type:'bar',data:{labels:['12AM','2AM','4AM','6AM','8AM','10AM','12PM','2PM','4PM','6PM','8PM','10PM'],datasets:[{label:'Cases',data:[12,8,5,15,35,42,38,45,52,48,62,38],backgroundColor:(ctx)=>ctx.raw>50?'#C0392B':ctx.raw>35?'#D4A017':'#1E8449',borderRadius:8}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
   new Chart(document.getElementById('bedTrendChart'),{type:'line',data:{labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],datasets:[{label:'Available Beds',data:[120,95,85,110,130,100,145],borderColor:'#1E8449',backgroundColor:'rgba(30,132,73,0.1)',fill:true,tension:0.4},{label:'ICU',data:[20,15,12,18,22,14,26],borderColor:'#C0392B',backgroundColor:'rgba(192,57,43,0.1)',fill:true,tension:0.4}]},options:{responsive:true}});
   new Chart(document.getElementById('emgTypesChart'),{type:'doughnut',data:{labels:['Heart Attack','Accident','Fracture','Breathing','Other'],datasets:[{data:[28,22,18,16,16],backgroundColor:['#C0392B','#1A5276','#1E8449','#D4A017','#5D6D7E'],borderWidth:0}]},options:{responsive:true,cutout:'65%'}});
@@ -882,26 +738,39 @@ function loadCharts() {
   new Chart(document.getElementById('healthChart'),{type:'line',data:{labels:['Jan','Feb','Mar','Apr','May','Jun'],datasets:[{label:'Health Score',data:[72,75,70,78,82,85],borderColor:'#C0392B',backgroundColor:'rgba(192,57,43,0.1)',fill:true,tension:0.4}]},options:{responsive:true,scales:{y:{min:60,max:100}}}});
 }
 
-function showToast(msg,type='') {
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.className=`toast ${type} show`;
-  setTimeout(()=>t.classList.remove('show'),4000);
+// ✅ Socket.IO lazy load — sirf connect karo baad mein
+function lazyLoadSocket() {
+  if (socketLoaded) return;
+  socketLoaded = true;
+  const js = document.createElement('script');
+  js.src = 'https://cdn.socket.io/4.7.2/socket.io.min.js';
+  js.onload = () => {
+    try {
+      const socket = io(API_URL, { timeout: 5000, reconnectionAttempts: 2 });
+      socket.on('bed-updated', (data) => { showToast(`🔄 ${data.name} — beds updated!`,'success'); loadBeds(); });
+      socket.on('hospital-added', ()=>loadBeds());
+      socket.on('hospital-deleted', ()=>loadBeds());
+    } catch(e) { console.log('Socket not available'); }
+  };
+  document.head.appendChild(js);
 }
 
-function logout() { if(confirm("Logout?")){ localStorage.clear(); window.location.href="index.html"; } }
+function showToast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.classList.remove('show'),4000);}
+function logout(){if(confirm("Logout?")){localStorage.clear();window.location.href="index.html";}}
 
+// ✅ Init — sirf bed load karo, baaki lazy
 loadBeds();
 setInterval(loadBeds, 30000);
-// ✅ Socket.io real-time  ← ADD FROM HERE
-const socket = io('https://hospital-backend-01.onrender.com');
 
-socket.on('bed-updated', (data) => {
-  showToast(`🔄 ${data.name} — beds updated!`, 'success');
-  loadBeds();
-});
-
-socket.on('hospital-added', () => loadBeds());
-socket.on('hospital-deleted', () => loadBeds());
+// Socket 3 sec baad load karo — dashboard fast khule
+setTimeout(lazyLoadSocket, 3000);
 </script>
 </body>
 </html>
+HTMLEOF
+echo "done"
+Output
+
+done
+
+
