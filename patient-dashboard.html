@@ -651,6 +651,7 @@ function showPage(page, btn) {
   if (page === 'beds') loadBeds();
   if (page === 'analytics') lazyLoadCharts();
   if (page === 'map') lazyLoadLeaflet();
+  if (page === 'appointments') loadHospitalsForAppt();
 }
 
 // ✅ Leaflet lazy load — sirf map tab click pe
