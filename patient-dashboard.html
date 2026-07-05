@@ -286,10 +286,10 @@ nav {
   <div class="logo">Hosp<span class="red">Track</span></div>
   <div class="nav-links">
     <button class="nav-link active" onclick="showPage('dashboard',this)">🏠 Dashboard</button>
+    <button class="nav-link" onclick="showPage('appointments',this)">📅 Appointments</button>
     <button class="nav-link" onclick="showPage('map',this)">🗺️ Nearby Hospitals</button>
     <button class="nav-link" onclick="showPage('beds',this)">🛏️ Bed Availability</button>
     <button class="nav-link" onclick="showPage('emergency',this)">🚨 Emergency</button>
-    <button class="nav-link" onclick="showPage('appointments',this)">📅 Appointments</button>
     <button class="nav-link" onclick="showPage('analytics',this)">📊 Analytics</button>
   </div>
   <div class="nav-right">
@@ -431,6 +431,160 @@ nav {
   </div>
 </div>
 
+<!-- APPOINTMENTS PAGE -->
+<div id="page-appointments" class="page">
+  <div class="wrap">
+    <div style="margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+      <div>
+        <h1 style="font-size:24px;font-weight:800;margin-bottom:6px;">📅 My Appointments</h1>
+        <p style="font-size:14px;color:var(--muted)">Book, view and manage your appointments</p>
+      </div>
+      <button onclick="showBookingModal()" style="padding:10px 20px;background:var(--primary);color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);">+ Book Appointment</button>
+    </div>
+
+    <!-- STATS -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+      <div style="background:white;border-radius:14px;padding:18px;border:1px solid var(--border);text-align:center;">
+        <div style="font-size:28px;font-weight:800;color:var(--primary);" id="apptTotal">0</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Total</div>
+      </div>
+      <div style="background:white;border-radius:14px;padding:18px;border:1px solid var(--border);text-align:center;">
+        <div style="font-size:28px;font-weight:800;color:var(--amber);" id="apptPending">0</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Pending</div>
+      </div>
+      <div style="background:white;border-radius:14px;padding:18px;border:1px solid var(--border);text-align:center;">
+        <div style="font-size:28px;font-weight:800;color:var(--green);" id="apptConfirmed">0</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Confirmed</div>
+      </div>
+      <div style="background:white;border-radius:14px;padding:18px;border:1px solid var(--border);text-align:center;">
+        <div style="font-size:28px;font-weight:800;color:var(--muted);" id="apptCompleted">0</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Completed</div>
+      </div>
+    </div>
+
+    <!-- FILTER TABS -->
+    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+      <button class="appt-filter-btn active" onclick="filterAppts('all',this)" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);background:white;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);">All</button>
+      <button class="appt-filter-btn" onclick="filterAppts('pending',this)" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);background:white;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);">⏳ Pending</button>
+      <button class="appt-filter-btn" onclick="filterAppts('confirmed',this)" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);background:white;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);">✅ Confirmed</button>
+      <button class="appt-filter-btn" onclick="filterAppts('completed',this)" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);background:white;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);">🏁 Completed</button>
+      <button class="appt-filter-btn" onclick="filterAppts('cancelled',this)" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);background:white;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);">❌ Cancelled</button>
+    </div>
+
+    <!-- APPOINTMENTS LIST -->
+    <div id="apptList">
+      <div style="text-align:center;padding:40px;color:var(--muted);">
+        <div style="font-size:40px;margin-bottom:12px;">📅</div>
+        <div style="font-weight:600;margin-bottom:8px;">Loading appointments...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOOKING MODAL -->
+<div class="modal-overlay" id="bookingModal">
+  <div class="modal-box" style="max-width:580px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <div style="font-size:18px;font-weight:800;">📅 Book Appointment</div>
+      <button onclick="closeBookingModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);">✕</button>
+    </div>
+
+    <!-- STEP INDICATOR -->
+    <div style="display:flex;gap:0;margin-bottom:24px;">
+      <div class="step-item active" id="step1-indicator" style="flex:1;text-align:center;padding:8px;border-bottom:3px solid var(--primary);font-size:12px;font-weight:700;color:var(--primary);">1. Hospital</div>
+      <div class="step-item" id="step2-indicator" style="flex:1;text-align:center;padding:8px;border-bottom:3px solid var(--border);font-size:12px;font-weight:700;color:var(--muted);">2. Doctor</div>
+      <div class="step-item" id="step3-indicator" style="flex:1;text-align:center;padding:8px;border-bottom:3px solid var(--border);font-size:12px;font-weight:700;color:var(--muted);">3. Date & Time</div>
+      <div class="step-item" id="step4-indicator" style="flex:1;text-align:center;padding:8px;border-bottom:3px solid var(--border);font-size:12px;font-weight:700;color:var(--muted);">4. Confirm</div>
+    </div>
+
+    <!-- STEP 1: Hospital -->
+    <div id="booking-step1">
+      <div style="font-size:14px;font-weight:700;margin-bottom:12px;">🏥 Hospital Select Karo</div>
+      <div id="hospitalSelectList" style="max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;">
+        <div style="text-align:center;padding:20px;color:var(--muted);">Loading hospitals...</div>
+      </div>
+    </div>
+
+    <!-- STEP 2: Doctor -->
+    <div id="booking-step2" style="display:none;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+        <button onclick="goToStep(1)" style="background:none;border:none;cursor:pointer;color:var(--primary);font-size:13px;font-weight:600;">← Back</button>
+        <div style="font-size:14px;font-weight:700;">👨‍⚕️ Doctor Select Karo</div>
+      </div>
+      <div style="margin-bottom:12px;">
+        <select id="specialFilter" onchange="loadDoctors()" style="padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:var(--font);outline:none;width:100%;">
+          <option value="">All Specializations</option>
+          <option>Cardiology</option>
+          <option>Neurology</option>
+          <option>Orthopedics</option>
+          <option>Pediatrics</option>
+          <option>General Medicine</option>
+          <option>Gynecology</option>
+          <option>Dermatology</option>
+          <option>ENT</option>
+          <option>Ophthalmology</option>
+        </select>
+      </div>
+      <div id="doctorSelectList" style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;">
+        <div style="text-align:center;padding:20px;color:var(--muted);">Hospital select karo pehle</div>
+      </div>
+    </div>
+
+    <!-- STEP 3: Date & Time -->
+    <div id="booking-step3" style="display:none;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+        <button onclick="goToStep(2)" style="background:none;border:none;cursor:pointer;color:var(--primary);font-size:13px;font-weight:600;">← Back</button>
+        <div style="font-size:14px;font-weight:700;">📆 Date & Time Choose Karo</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div>
+          <label style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Date</label>
+          <input type="date" id="apptDate" onchange="loadSlots()" style="padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:var(--font);outline:none;width:100%;" min="">
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Reason</label>
+          <input type="text" id="apptReason" placeholder="e.g. Fever, Checkup..." style="padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:var(--font);outline:none;width:100%;">
+        </div>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Your Phone (SMS confirmation ke liye)</label>
+        <input type="tel" id="apptPhone" placeholder="10 digit mobile number" style="padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:var(--font);outline:none;width:100%;margin-bottom:16px;">
+      </div>
+      <div style="font-size:13px;font-weight:700;margin-bottom:10px;">Available Slots:</div>
+      <div id="slotsGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+        <div style="grid-column:1/-1;text-align:center;padding:16px;color:var(--muted);">Date choose karo pehle</div>
+      </div>
+    </div>
+
+    <!-- STEP 4: Confirm -->
+    <div id="booking-step4" style="display:none;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;">
+        <button onclick="goToStep(3)" style="background:none;border:none;cursor:pointer;color:var(--primary);font-size:13px;font-weight:600;">← Back</button>
+        <div style="font-size:14px;font-weight:700;">✅ Confirm Karo</div>
+      </div>
+      <div style="background:var(--off-white);border-radius:14px;padding:20px;margin-bottom:20px;border:1px solid var(--border);">
+        <div style="font-size:13px;font-weight:800;margin-bottom:14px;color:var(--primary);">Appointment Summary</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;justify-content:space-between;"><span style="font-size:13px;color:var(--muted);">Hospital</span><span style="font-size:13px;font-weight:700;" id="confirm-hospital">—</span></div>
+          <div style="display:flex;justify-content:space-between;"><span style="font-size:13px;color:var(--muted);">Doctor</span><span style="font-size:13px;font-weight:700;" id="confirm-doctor">—</span></div>
+          <div style="display:flex;justify-content:space-between;"><span style="font-size:13px;color:var(--muted);">Specialization</span><span style="font-size:13px;font-weight:700;" id="confirm-spec">—</span></div>
+          <div style="display:flex;justify-content:space-between;"><span style="font-size:13px;color:var(--muted);">Date</span><span style="font-size:13px;font-weight:700;" id="confirm-date">—</span></div>
+          <div style="display:flex;justify-content:space-between;"><span style="font-size:13px;color:var(--muted);">Time</span><span style="font-size:13px;font-weight:700;" id="confirm-time">—</span></div>
+          <div style="display:flex;justify-content:space-between;"><span style="font-size:13px;color:var(--muted);">Reason</span><span style="font-size:13px;font-weight:700;" id="confirm-reason">—</span></div>
+          <div style="display:flex;justify-content:space-between;"><span style="font-size:13px;color:var(--muted);">Fees</span><span style="font-size:13px;font-weight:700;color:var(--green);" id="confirm-fee">—</span></div>
+        </div>
+      </div>
+      <div style="background:var(--green-bg);border-radius:10px;padding:12px;margin-bottom:20px;font-size:12px;color:var(--green);">
+        📱 SMS confirmation tumhare phone pe bheja jayega
+      </div>
+      <button onclick="confirmBooking()" id="confirmBtn" style="width:100%;padding:14px;background:var(--primary);color:white;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;font-family:var(--font);">
+        ✅ Book Appointment
+      </button>
+    </div>
+
+  </div>
+</div>
+
 <!-- EMERGENCY -->
 <div id="page-emergency" class="page">
   <div class="emg-wrap">
@@ -478,105 +632,7 @@ nav {
     </div>
   </div>
 </div>
-<!-- APPOINTMENTS PAGE -->
-<div id="page-appointments" class="page">
-  <div class="wrap">
 
-    <!-- TABS -->
-    <div style="display:flex;gap:8px;margin-bottom:20px;background:var(--off-white);border-radius:12px;padding:4px;border:1px solid var(--border);">
-      <button id="tab-book" onclick="switchApptTab('book')" style="flex:1;padding:10px;border-radius:8px;border:none;background:white;font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.08);">➕ Book Appointment</button>
-      <button id="tab-list" onclick="switchApptTab('list')" style="flex:1;padding:10px;border-radius:8px;border:none;background:none;font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;color:var(--muted);">📋 My Appointments</button>
-    </div>
-
-    <!-- BOOK TAB -->
-    <div id="appt-book-tab">
-      <div style="background:white;border-radius:16px;padding:24px;border:1px solid var(--border);">
-        <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;">🏥 Book New Appointment</h3>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-
-          <div style="display:flex;flex-direction:column;gap:6px;">
-            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);">Hospital *</label>
-            <select id="appt-hospital" style="padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:var(--font);outline:none;">
-              <option value="">— Hospital select karo —</option>
-            </select>
-          </div>
-
-          <div style="display:flex;flex-direction:column;gap:6px;">
-            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);">Doctor Name</label>
-            <input id="appt-doctor" type="text" placeholder="Dr. Naam (optional)" style="padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:var(--font);outline:none;">
-          </div>
-
-          <div style="display:flex;flex-direction:column;gap:6px;">
-            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);">Department</label>
-            <select id="appt-dept" style="padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:var(--font);outline:none;">
-              <option value="">— Department —</option>
-              <option>Cardiology</option>
-              <option>Neurology</option>
-              <option>Orthopedics</option>
-              <option>Pediatrics</option>
-              <option>General Medicine</option>
-              <option>Gynecology</option>
-              <option>Dermatology</option>
-              <option>ENT</option>
-              <option>Ophthalmology</option>
-              <option>Psychiatry</option>
-              <option>Emergency</option>
-              <option>Other</option>
-            </select>
-          </div>
-
-          <div style="display:flex;flex-direction:column;gap:6px;">
-            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);">Type</label>
-            <select id="appt-type" style="padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:var(--font);outline:none;">
-              <option value="OPD">OPD</option>
-              <option value="Follow-up">Follow-up</option>
-              <option value="Checkup">Checkup</option>
-              <option value="Emergency">Emergency</option>
-            </select>
-          </div>
-
-          <div style="display:flex;flex-direction:column;gap:6px;">
-            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);">Date *</label>
-            <input id="appt-date" type="date" style="padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:var(--font);outline:none;">
-          </div>
-
-          <div style="display:flex;flex-direction:column;gap:6px;">
-            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);">Time *</label>
-            <input id="appt-time" type="time" style="padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:var(--font);outline:none;">
-          </div>
-
-          <div style="display:flex;flex-direction:column;gap:6px;grid-column:1/-1;">
-            <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);">Symptoms / Notes</label>
-            <input id="appt-symptoms" type="text" placeholder="Symptoms ya koi note..." style="padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-family:var(--font);outline:none;">
-          </div>
-
-        </div>
-
-        <button onclick="bookAppointment()" style="margin-top:18px;width:100%;padding:14px;background:var(--primary);color:white;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);">
-          📅 Book Appointment
-        </button>
-      </div>
-    </div>
-
-    <!-- MY APPOINTMENTS TAB -->
-    <div id="appt-list-tab" style="display:none;">
-      <div style="background:white;border-radius:16px;padding:24px;border:1px solid var(--border);">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
-          <h3 style="font-size:16px;font-weight:700;">📋 My Appointments</h3>
-          <button onclick="loadMyAppointments()" style="padding:7px 14px;background:var(--accent-light);color:var(--primary);border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);">🔄 Refresh</button>
-        </div>
-        <div id="appt-list-content">
-          <div style="text-align:center;padding:40px;color:var(--muted);">
-            <div style="font-size:32px;margin-bottom:8px;">📅</div>
-            <div style="font-weight:600;">Loading...</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
 <!-- ANALYTICS -->
 <div id="page-analytics" class="page">
   <div class="analytics-wrap">
@@ -651,7 +707,6 @@ function showPage(page, btn) {
   if (page === 'beds') loadBeds();
   if (page === 'analytics') lazyLoadCharts();
   if (page === 'map') lazyLoadLeaflet();
-  if (page === 'appointments') loadHospitalsForAppt();
 }
 
 // ✅ Leaflet lazy load — sirf map tab click pe
@@ -854,120 +909,344 @@ function lazyLoadSocket() {
   document.head.appendChild(js);
 }
 
-function showToast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.classList.remove('show'),4000);}
-function logout(){if(confirm("Logout?")){localStorage.clear();window.location.href="index.html";}}
-// ======================== APPOINTMENTS ========================
-function switchApptTab(tab) {
-  document.getElementById('appt-book-tab').style.display = tab === 'book' ? 'block' : 'none';
-  document.getElementById('appt-list-tab').style.display = tab === 'list' ? 'block' : 'none';
-  document.getElementById('tab-book').style.background = tab === 'book' ? 'white' : 'none';
-  document.getElementById('tab-book').style.fontWeight = tab === 'book' ? '600' : '500';
-  document.getElementById('tab-list').style.background = tab === 'list' ? 'white' : 'none';
-  document.getElementById('tab-list').style.fontWeight = tab === 'list' ? '600' : '500';
-  if (tab === 'list') loadMyAppointments();
+// ==================== APPOINTMENTS ====================
+let allAppts = [];
+let selectedHospital = null;
+let selectedDoctor = null;
+let selectedSlot = null;
+let currentStep = 1;
+let apptFilter = 'all';
+
+// Showpage mein appointments load karo
+const _origShowPage = showPage;
+showPage = function(page, btn) {
+  _origShowPage(page, btn);
+  if (page === 'appointments') loadMyAppointments();
+};
+
+async function loadMyAppointments() {
+  try {
+    const res = await fetch(`${API_URL}/api/appointments/my`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await res.json();
+    if (data.success) {
+      allAppts = data.appointments;
+      updateApptStats(data.appointments);
+      renderAppts(apptFilter);
+    }
+  } catch {
+    // Demo data
+    allAppts = [
+      { _id:'1', doctor:{name:'Dr. Rajesh Kumar',specialization:'Cardiology'}, hospital:{name:'City Hospital',city:'Mumbai'}, date: new Date(Date.now()+86400000*2), time:'10:30', status:'confirmed', reason:'Chest pain checkup' },
+      { _id:'2', doctor:{name:'Dr. Priya Sharma',specialization:'Neurology'}, hospital:{name:'Apollo Medical',city:'Delhi'}, date: new Date(Date.now()+86400000*5), time:'14:00', status:'pending', reason:'Headache' },
+      { _id:'3', doctor:{name:'Dr. Amit Verma',specialization:'General Medicine'}, hospital:{name:'LifeCare',city:'Bangalore'}, date: new Date(Date.now()-86400000*3), time:'11:00', status:'completed', reason:'Fever' },
+    ];
+    updateApptStats(allAppts);
+    renderAppts(apptFilter);
+  }
 }
 
-function loadHospitalsForAppt() {
-  const sel = document.getElementById('appt-hospital');
-  if (!sel) return;
-  fetch(`${API_URL}/api/hospitals/beds`)
-    .then(r => r.json())
-    .then(data => {
-      if (data.success) {
-        sel.innerHTML = '<option value="">— Hospital select karo —</option>';
-        data.hospitals.forEach(h => {
-          sel.innerHTML += `<option value="${h._id}">${h.name} — ${h.city}</option>`;
-        });
-      }
-    }).catch(() => {});
+function updateApptStats(appts) {
+  document.getElementById('apptTotal').textContent = appts.length;
+  document.getElementById('apptPending').textContent = appts.filter(a=>a.status==='pending').length;
+  document.getElementById('apptConfirmed').textContent = appts.filter(a=>a.status==='confirmed').length;
+  document.getElementById('apptCompleted').textContent = appts.filter(a=>a.status==='completed').length;
 }
 
-async function bookAppointment() {
-  const hospitalId = document.getElementById('appt-hospital').value;
-  const doctorName = document.getElementById('appt-doctor').value.trim();
-  const department = document.getElementById('appt-dept').value;
-  const appointmentType = document.getElementById('appt-type').value;
-  const appointmentDate = document.getElementById('appt-date').value;
-  const appointmentTime = document.getElementById('appt-time').value;
-  const symptoms = document.getElementById('appt-symptoms').value.trim();
+function filterAppts(type, btn) {
+  apptFilter = type;
+  document.querySelectorAll('.appt-filter-btn').forEach(b => {
+    b.style.borderColor = 'var(--border)';
+    b.style.color = 'var(--muted)';
+    b.style.background = 'white';
+  });
+  btn.style.borderColor = 'var(--primary)';
+  btn.style.color = 'var(--primary)';
+  btn.style.background = 'var(--primary-light)';
+  renderAppts(type);
+}
 
-  if (!hospitalId || !appointmentDate || !appointmentTime) {
-    showToast('⚠️ Hospital, date aur time zaroori hai!', 'error');
+function renderAppts(filter) {
+  const list = document.getElementById('apptList');
+  let filtered = filter === 'all' ? allAppts : allAppts.filter(a => a.status === filter);
+
+  if (!filtered.length) {
+    list.innerHTML = `<div style="text-align:center;padding:40px;color:var(--muted);">
+      <div style="font-size:40px;margin-bottom:12px;">📅</div>
+      <div style="font-weight:600;margin-bottom:8px;">${filter === 'all' ? 'Koi appointment nahi' : filter + ' appointments nahi'}</div>
+      <button onclick="showBookingModal()" style="margin-top:12px;padding:10px 20px;background:var(--primary);color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);">+ Book First Appointment</button>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(a => {
+    const date = new Date(a.date).toLocaleDateString('en-IN', {weekday:'short', day:'numeric', month:'short', year:'numeric'});
+    const statusColors = { pending:'var(--amber)', confirmed:'var(--green)', cancelled:'var(--primary)', completed:'var(--muted)' };
+    const statusBg = { pending:'var(--amber-bg)', confirmed:'var(--green-bg)', cancelled:'var(--primary-light)', completed:'var(--light-gray)' };
+    const statusIcon = { pending:'⏳', confirmed:'✅', cancelled:'❌', completed:'🏁' };
+
+    return `<div style="background:white;border-radius:16px;padding:20px;border:1px solid var(--border);margin-bottom:14px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="width:56px;height:56px;border-radius:14px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">👨‍⚕️</div>
+      <div style="flex:1;min-width:200px;">
+        <div style="font-size:15px;font-weight:800;margin-bottom:4px;">${a.doctor?.name || 'Doctor'}</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">🏥 ${a.hospital?.name || 'Hospital'} • ${a.doctor?.specialization || ''}</div>
+        <div style="font-size:12px;color:var(--muted);">📋 ${a.reason || 'General Checkup'}</div>
+      </div>
+      <div style="text-align:center;min-width:100px;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:4px;">📅 ${date}</div>
+        <div style="font-size:13px;color:var(--primary);font-weight:700;">🕐 ${a.time}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+        <span style="padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;background:${statusBg[a.status]};color:${statusColors[a.status]};">${statusIcon[a.status]} ${a.status.charAt(0).toUpperCase()+a.status.slice(1)}</span>
+        ${a.status === 'pending' || a.status === 'confirmed' ? `<button onclick="cancelAppt('${a._id}')" style="padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:white;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--primary);">Cancel</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function cancelAppt(id) {
+  if (!confirm('Appointment cancel karna chahte ho?')) return;
+  try {
+    const res = await fetch(`${API_URL}/api/appointments/cancel/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await res.json();
+    if (data.success) { showToast('✅ Appointment cancelled!', 'success'); loadMyAppointments(); }
+    else showToast('❌ ' + data.message, 'error');
+  } catch { showToast('❌ Cancel failed', 'error'); }
+}
+
+// ==================== BOOKING MODAL ====================
+function showBookingModal() {
+  document.getElementById('bookingModal').classList.add('show');
+  goToStep(1);
+  loadHospitalsForBooking();
+}
+
+function closeBookingModal() {
+  document.getElementById('bookingModal').classList.remove('show');
+  selectedHospital = null; selectedDoctor = null; selectedSlot = null;
+}
+
+function goToStep(step) {
+  currentStep = step;
+  [1,2,3,4].forEach(i => {
+    document.getElementById(`booking-step${i}`).style.display = i === step ? 'block' : 'none';
+    const ind = document.getElementById(`step${i}-indicator`);
+    ind.style.borderBottomColor = i <= step ? 'var(--primary)' : 'var(--border)';
+    ind.style.color = i <= step ? 'var(--primary)' : 'var(--muted)';
+  });
+}
+
+async function loadHospitalsForBooking() {
+  const list = document.getElementById('hospitalSelectList');
+  try {
+    const res = await fetch(`${API_URL}/api/hospitals/beds`);
+    const data = await res.json();
+    const hospitals = data.success ? data.hospitals : getDemoHospitals();
+    list.innerHTML = hospitals.map(h => `
+      <div onclick="selectHospital('${h._id}','${h.name}','${h.city}')" style="padding:14px;border-radius:12px;border:1.5px solid var(--border);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="width:42px;height:42px;border-radius:10px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:18px;">🏥</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:700;">${h.name}</div>
+          <div style="font-size:12px;color:var(--muted);">📍 ${h.city} • ${h.availableBeds} beds available</div>
+        </div>
+        <div style="font-size:18px;color:var(--muted);">→</div>
+      </div>`).join('');
+  } catch {
+    list.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px;">Hospitals load nahi ho sake</div>';
+  }
+}
+
+function getDemoHospitals() {
+  return [
+    {_id:'1',name:'City Hospital',city:'Mumbai',availableBeds:85},
+    {_id:'2',name:'Apollo Medical',city:'Delhi',availableBeds:45},
+    {_id:'4',name:'Green Cross',city:'Pune',availableBeds:67},
+  ];
+}
+
+function selectHospital(id, name, city) {
+  selectedHospital = { id, name, city };
+  goToStep(2);
+  loadDoctors();
+}
+
+async function loadDoctors() {
+  if (!selectedHospital) return;
+  const list = document.getElementById('doctorSelectList');
+  const spec = document.getElementById('specialFilter').value;
+  list.innerHTML = '<div style="color:var(--muted);text-align:center;padding:16px;">Loading doctors...</div>';
+
+  try {
+    let url = `${API_URL}/api/doctors?hospitalId=${selectedHospital.id}`;
+    if (spec) url += `&specialization=${spec}`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    const doctors = data.success && data.doctors.length ? data.doctors : getDemoDoctors(spec);
+    list.innerHTML = doctors.map(d => `
+      <div onclick="selectDoctor('${d._id}','${d.name}','${d.specialization}',${d.fee||500})" style="padding:14px;border-radius:12px;border:1.5px solid var(--border);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="width:48px;height:48px;border-radius:12px;background:var(--blue-bg);display:flex;align-items:center;justify-content:center;font-size:22px;">👨‍⚕️</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:700;">${d.name}</div>
+          <div style="font-size:12px;color:var(--muted);">${d.specialization} • ${d.experience||'5'}+ yrs exp</div>
+          <div style="font-size:12px;color:var(--green);font-weight:600;margin-top:2px;">Fees: ₹${d.fee||500}</div>
+        </div>
+        <div style="font-size:18px;color:var(--muted);">→</div>
+      </div>`).join('');
+  } catch {
+    list.innerHTML = getDemoDoctors(spec).map(d => `
+      <div onclick="selectDoctor('${d._id}','${d.name}','${d.specialization}',${d.fee})" style="padding:14px;border-radius:12px;border:1.5px solid var(--border);cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div style="font-size:14px;font-weight:700;">${d.name}</div>
+        <div style="font-size:12px;color:var(--muted);">${d.specialization} • Fees: ₹${d.fee}</div>
+      </div>`).join('');
+  }
+}
+
+function getDemoDoctors(spec) {
+  const all = [
+    {_id:'d1',name:'Dr. Rajesh Kumar',specialization:'Cardiology',experience:10,fee:800},
+    {_id:'d2',name:'Dr. Priya Sharma',specialization:'Neurology',experience:8,fee:700},
+    {_id:'d3',name:'Dr. Amit Verma',specialization:'General Medicine',experience:6,fee:500},
+    {_id:'d4',name:'Dr. Sunita Patel',specialization:'Gynecology',experience:12,fee:600},
+    {_id:'d5',name:'Dr. Ravi Gupta',specialization:'Orthopedics',experience:9,fee:750},
+  ];
+  return spec ? all.filter(d => d.specialization.toLowerCase().includes(spec.toLowerCase())) : all;
+}
+
+function selectDoctor(id, name, spec, fee) {
+  selectedDoctor = { id, name, spec, fee };
+  // Min date aaj ka
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('apptDate').min = today;
+  goToStep(3);
+}
+
+async function loadSlots() {
+  const date = document.getElementById('apptDate').value;
+  if (!date || !selectedDoctor) return;
+
+  const grid = document.getElementById('slotsGrid');
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:16px;">Loading slots...</div>';
+
+  try {
+    const res = await fetch(`${API_URL}/api/appointments/slots/${selectedDoctor.id}?date=${date}`);
+    const data = await res.json();
+    if (data.success) renderSlots(data.slots);
+    else renderDemoSlots();
+  } catch { renderDemoSlots(); }
+}
+
+function renderDemoSlots() {
+  const slots = [
+    {time:'09:00',available:true},{time:'09:30',available:false},{time:'10:00',available:true},
+    {time:'10:30',available:true},{time:'11:00',available:false},{time:'11:30',available:true},
+    {time:'12:00',available:true},{time:'14:00',available:false},{time:'14:30',available:true},
+    {time:'15:00',available:true},{time:'15:30',available:false},{time:'16:00',available:true},
+  ];
+  renderSlots(slots);
+}
+
+function renderSlots(slots) {
+  const grid = document.getElementById('slotsGrid');
+  grid.innerHTML = slots.map(s => `
+    <button onclick="${s.available ? `selectSlot('${s.time}',this)` : ''}" style="padding:10px 6px;border-radius:10px;border:1.5px solid ${s.available ? 'var(--border)' : 'var(--light-gray)'};background:${s.available ? 'white' : 'var(--light-gray)'};color:${s.available ? 'var(--text)' : 'var(--muted)'};font-size:12px;font-weight:700;cursor:${s.available ? 'pointer' : 'not-allowed'};font-family:var(--font);transition:all 0.2s;" ${!s.available ? 'disabled' : ''}>
+      ${s.time}<br><span style="font-size:10px;font-weight:500;">${s.available ? 'Available' : 'Booked'}</span>
+    </button>`).join('');
+}
+
+function selectSlot(time, btn) {
+  selectedSlot = time;
+  document.querySelectorAll('#slotsGrid button').forEach(b => {
+    if (!b.disabled) { b.style.borderColor='var(--border)'; b.style.background='white'; b.style.color='var(--text)'; }
+  });
+  btn.style.borderColor = 'var(--primary)';
+  btn.style.background = 'var(--primary)';
+  btn.style.color = 'white';
+
+  // Auto go to step 4 after short delay
+  setTimeout(() => {
+    if (selectedSlot) showConfirmStep();
+  }, 300);
+}
+
+function showConfirmStep() {
+  const date = document.getElementById('apptDate').value;
+  const reason = document.getElementById('apptReason').value;
+  const dateFormatted = new Date(date).toLocaleDateString('en-IN', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+
+  document.getElementById('confirm-hospital').textContent = selectedHospital?.name || '—';
+  document.getElementById('confirm-doctor').textContent = selectedDoctor?.name || '—';
+  document.getElementById('confirm-spec').textContent = selectedDoctor?.spec || '—';
+  document.getElementById('confirm-date').textContent = dateFormatted;
+  document.getElementById('confirm-time').textContent = selectedSlot;
+  document.getElementById('confirm-reason').textContent = reason || 'General Checkup';
+  document.getElementById('confirm-fee').textContent = `₹${selectedDoctor?.fee || 500}`;
+
+  goToStep(4);
+}
+
+async function confirmBooking() {
+  const btn = document.getElementById('confirmBtn');
+  btn.textContent = '⏳ Booking...';
+  btn.disabled = true;
+
+  const phone = document.getElementById('apptPhone').value;
+  const date = document.getElementById('apptDate').value;
+  const reason = document.getElementById('apptReason').value;
+
+  if (!selectedSlot || !date) {
+    showToast('⚠️ Date aur time select karo!', 'error');
+    btn.textContent = '✅ Book Appointment'; btn.disabled = false;
     return;
   }
 
   try {
     const res = await fetch(`${API_URL}/api/appointments/book`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify({ hospitalId, doctorName, department, appointmentType, appointmentDate, appointmentTime, symptoms })
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        doctorId: selectedDoctor?.id || 'd1',
+        hospitalId: selectedHospital?.id || '1',
+        date, time: selectedSlot,
+        reason: reason || 'General Checkup',
+        patientPhone: phone
+      })
     });
     const data = await res.json();
-    if (data.success) {
-      showToast('✅ Appointment booked!', 'success');
-      document.getElementById('appt-hospital').value = '';
-      document.getElementById('appt-doctor').value = '';
-      document.getElementById('appt-date').value = '';
-      document.getElementById('appt-time').value = '';
-      document.getElementById('appt-symptoms').value = '';
-      switchApptTab('list');
+
+    if (res.ok) {
+      showToast('🎉 Appointment booked! SMS bheja gaya!', 'success');
+      closeBookingModal();
+      loadMyAppointments();
     } else {
       showToast('❌ ' + data.message, 'error');
     }
-  } catch (err) {
-    showToast('❌ Server error!', 'error');
+  } catch {
+    // Demo mode — success dikhao
+    showToast('🎉 Appointment booked! (Demo mode)', 'success');
+    closeBookingModal();
+    // Demo appointment add karo
+    allAppts.unshift({
+      _id: Date.now().toString(), status: 'pending',
+      doctor: { name: selectedDoctor?.name, specialization: selectedDoctor?.spec },
+      hospital: { name: selectedHospital?.name, city: selectedHospital?.city },
+      date: new Date(date), time: selectedSlot,
+      reason: reason || 'General Checkup'
+    });
+    updateApptStats(allAppts);
+    renderAppts(apptFilter);
   }
+
+  btn.textContent = '✅ Book Appointment'; btn.disabled = false;
 }
 
-async function loadMyAppointments() {
-  const container = document.getElementById('appt-list-content');
-  if (!container) return;
-  container.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);">Loading...</div>';
-  try {
-    const res = await fetch(`${API_URL}/api/appointments/my`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    const data = await res.json();
-    if (!data.success || !data.appointments.length) {
-      container.innerHTML = `<div style="text-align:center;padding:40px;color:var(--muted);"><div style="font-size:40px;margin-bottom:10px;">📅</div><div style="font-weight:600;">Koi appointment nahi hai</div><div style="font-size:12px;margin-top:4px;">Book tab se appointment karo</div></div>`;
-      return;
-    }
-    container.innerHTML = data.appointments.map(a => {
-      const date = new Date(a.appointmentDate).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
-      const sc = a.status==='confirmed'?'#1E8449':a.status==='cancelled'?'#ef4444':a.status==='completed'?'#888':'#D4A017';
-      const sb = a.status==='confirmed'?'#E9F7EF':a.status==='cancelled'?'#FEF2F2':a.status==='completed'?'#F8F9FA':'#FFFBEB';
-      return `<div style="border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;border-left:4px solid ${sc};">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
-          <div><div style="font-weight:700;font-size:14px;">🏥 ${a.hospitalId?.name||'—'}</div><div style="font-size:12px;color:var(--muted);">📍 ${a.hospitalId?.city||''}</div></div>
-          <span style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;background:${sb};color:${sc};">${a.status.toUpperCase()}</span>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
-          <div style="font-size:12px;"><span style="color:var(--muted);">📅</span> <b>${date}</b></div>
-          <div style="font-size:12px;"><span style="color:var(--muted);">🕐</span> <b>${a.appointmentTime}</b></div>
-          <div style="font-size:12px;"><span style="color:var(--muted);">👨‍⚕️</span> <b>${a.doctorName||'Not assigned'}</b></div>
-          <div style="font-size:12px;"><span style="color:var(--muted);">🏥</span> <b>${a.department||'General'}</b></div>
-        </div>
-        ${a.symptoms?`<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">📝 ${a.symptoms}</div>`:''}
-        ${(a.status==='pending'||a.status==='confirmed')?`<button onclick="cancelAppointment('${a._id}')" style="padding:6px 14px;background:#fef2f2;color:#ef4444;border:1px solid #fecaca;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);">❌ Cancel</button>`:''}
-      </div>`;
-    }).join('');
-  } catch(err) {
-    container.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);">Error loading</div>';
-  }
-}
+function showToast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.classList.remove('show'),4000);}
+function logout(){if(confirm("Logout?")){localStorage.clear();window.location.href="index.html";}}
 
-async function cancelAppointment(id) {
-  if (!confirm('Appointment cancel karna chahte ho?')) return;
-  try {
-    const res = await fetch(`${API_URL}/api/appointments/cancel/${id}`, {
-      method: 'PUT',
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    const data = await res.json();
-    if (data.success) { showToast('✅ Cancelled!', 'success'); loadMyAppointments(); }
-    else showToast('❌ ' + data.message, 'error');
-  } catch(err) { showToast('❌ Error!', 'error'); }
-}
 // ✅ Init — sirf bed load karo, baaki lazy
 loadBeds();
 setInterval(loadBeds, 30000);
@@ -977,6 +1256,3 @@ setTimeout(lazyLoadSocket, 3000);
 </script>
 </body>
 </html>
-
-
-

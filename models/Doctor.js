@@ -8,9 +8,10 @@ const doctorSchema = new mongoose.Schema(
       required: true,
     },
     email: {
-      type: String,
-      unique: true,
-    },
+  type: String,
+  unique: true,
+  sparse: true, // ✅ null values allow karega
+  },
     phone: {
       type: String,
     },
@@ -36,9 +37,10 @@ const doctorSchema = new mongoose.Schema(
       ],
     },
     registrationNumber: {
-      type: String,
-      unique: true,
-    },
+  type: String,
+  unique: true,
+  sparse: true, // ✅ ye bhi add karo
+},
     experience: {
       type: Number, // years
       default: 0,

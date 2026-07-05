@@ -15,7 +15,7 @@ const swaggerOptions = {
     info: {
       title: "🏥 HospTrack API",
       version: "1.0.0",
-      description: "Hospital Tracking System — Emergency, Beds, Doctors API",
+      description: "Hospital Tracking System — Emergency, Beds, Doctors, Appointments API",
     },
     servers: [
       { url: "https://hospital-backend-01.onrender.com" },
@@ -43,13 +43,13 @@ const server = http.createServer(app);
 app.use(express.json());
 app.use(cors());
 
-// ✅ Swagger
+// ✅ Swagger Docs
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
   customSiteTitle: "HospTrack API Docs",
   customCss: '.swagger-ui .topbar { background: #C0392B; }',
 }));
 
-// ✅ Socket.io setup
+// ✅ Socket.IO setup
 const io = new Server(server, {
   cors: {
     origin: "*",
@@ -57,18 +57,18 @@ const io = new Server(server, {
   }
 });
 
-// ✅ Socket.io connection
 io.on('connection', (socket) => {
   console.log('✅ User connected:', socket.id);
+
   socket.on('disconnect', () => {
     console.log('❌ User disconnected:', socket.id);
   });
 });
 
-// ✅ io globally available karo
+// ✅ io globally available — routes mein use kar sakte hain
 app.set('io', io);
 
-// ✅ Routes
+// ✅ Routes import
 const authRoutes = require("./routes/authRoutes");
 const appointmentRoutes = require('./routes/appointmentRoutes');
 const hospitalRoutes = require('./routes/hospitalRoutes');
@@ -76,13 +76,13 @@ const emergencyRoutes = require("./routes/emergencyRoutes");
 const smsRoutes = require('./routes/smsRoutes');
 const doctorRoutes = require("./routes/doctorRoutes");
 
-// ✅ Basic route
+// ✅ Basic routes
 app.get("/", (req, res) => {
-  res.send("Hospital Backend API is running ✅");
-});
-
-app.get('/map', (req, res) => {
-  res.sendFile(__dirname + '/map.html');
+  res.send(`
+    <h2>🏥 HospTrack API is running ✅</h2>
+    <p><a href="/api-docs">📖 API Documentation (Swagger)</a></p>
+    <p>Backend: hospital-backend-01.onrender.com</p>
+  `);
 });
 
 // ✅ Use routes
@@ -105,9 +105,10 @@ mongoose
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.log("❌ MongoDB connection error:", err));
 
-// ✅ server.listen
+// ✅ Server start — server.listen (Socket.IO ke liye)
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
-  console.log(`✅ Socket.io ready!`);
+  console.log(`✅ Socket.IO ready!`);
+  console.log(`✅ Swagger docs: http://localhost:${PORT}/api-docs`);
 });

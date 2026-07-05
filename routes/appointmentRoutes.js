@@ -120,6 +120,17 @@ router.post("/book", verifyToken, async (req, res) => {
       );
     }
 
+    // ✅ Socket.IO — real-time notification
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('appointment-booked', {
+        hospitalId,
+        doctorName: doctor?.name,
+        date, time,
+        reason: reason || 'General Checkup'
+      });
+    }
+
     return res.status(201).json({
       success: true,
       message: "Appointment booked! SMS confirmation bheja gaya.",
