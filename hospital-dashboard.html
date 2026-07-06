@@ -1109,18 +1109,10 @@ async function loadHospitalAppointments() {
       updateHApptStats(data.appointments);
       renderHAppts(hApptFilter);
     }
-  } catch {
-    // Demo data
-    allHAppts = [
-      { _id:'1', patientName:'Rahul Sharma', patientPhone:'9999999999', doctorId:{name:'Dr. Rajesh Kumar', specialization:'Cardiology'}, appointmentDate: new Date(Date.now()+86400000), appointmentTime:'10:00', status:'pending', symptoms:'Fever' },
-      { _id:'2', patientName:'Priya Singh', patientPhone:'8888888888', doctorId:{name:'Dr. Priya Sharma', specialization:'Neurology'}, appointmentDate: new Date(Date.now()+86400000*2), appointmentTime:'14:00', status:'confirmed', symptoms:'Headache' },
-      { _id:'3', patientName:'Amit Kumar', patientPhone:'7777777777', doctorId:{name:'Dr. Amit Verma', specialization:'General Medicine'}, appointmentDate: new Date(Date.now()-86400000), appointmentTime:'11:00', status:'completed', symptoms:'Checkup' },
-    ];
-    updateHApptStats(allHAppts);
-    renderHAppts(hApptFilter);
+  } catch(err) {
+    console.error('Appointments load error:', err);
+    showToast('❌ Appointments load nahi hue — server check karo', 'error');
   }
-}
-
 function updateHApptStats(appts) {
   document.getElementById('hApptTotal').textContent = appts.length;
   document.getElementById('hApptPending').textContent = appts.filter(a=>a.status==='pending').length;
@@ -1195,12 +1187,7 @@ async function updateHAppt(id, status) {
       showToast(`✅ Appointment ${status}!`, 'success');
       loadHospitalAppointments();
     } else {
-      // Demo mode
-      const appt = allHAppts.find(a => a._id === id);
-      if (appt) appt.status = status;
-      updateHApptStats(allHAppts);
-      renderHAppts(hApptFilter);
-      showToast(`✅ Appointment ${status}! (Demo)`, 'success');
+      showToast(`❌ Update failed: ${data.message}`, 'error');
     }
   } catch {
     showToast('❌ Update failed', 'error');
