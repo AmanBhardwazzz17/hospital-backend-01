@@ -257,18 +257,6 @@ input:checked + .toggle-slider:before { transform: translateX(24px); }
 </style>
 </head>
 <body>
-<!-- LOADING SCREEN -->
-<div id="loadingScreen" style="position:fixed;inset:0;z-index:9999;background:white;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-  <div style="font-family:'DM Sans',sans-serif;text-align:center;">
-    <div style="font-size:48px;margin-bottom:12px;">🏥</div>
-    <div style="font-size:22px;font-weight:800;color:#1A252F;">HospTrack</div>
-    <div style="font-size:13px;color:#5D6D7E;margin-top:4px;">Hospital Dashboard</div>
-    <div style="margin-top:24px;width:200px;height:4px;background:#EDF0F2;border-radius:10px;overflow:hidden;">
-      <div id="loadBar" style="height:100%;width:0%;background:#1A5276;border-radius:10px;transition:width 0.4s ease;"></div>
-    </div>
-    <div style="font-size:12px;color:#5D6D7E;margin-top:10px;" id="loadText">Loading...</div>
-  </div>
-</div>
 
 <!-- TOP BAR -->
 <div class="top-bar">
@@ -288,6 +276,7 @@ input:checked + .toggle-slider:before { transform: translateX(24px); }
   <div class="nav-links">
     <button class="nav-link active" onclick="showPage('dashboard',this)">🏠 Dashboard</button>
     <button class="nav-link" onclick="showPage('beds',this)">🛏️ Update Beds</button>
+    <button class="nav-link" onclick="showPage('appointments',this)">📅 Appointments</button>
     <button class="nav-link" onclick="showPage('sms',this)">📱 SMS Alerts</button>
     <button class="nav-link" onclick="showPage('history',this)">📋 History</button>
   </div>
@@ -547,6 +536,55 @@ input:checked + .toggle-slider:before { transform: translateX(24px); }
 </div>
 
 <!-- ==================== SMS PAGE ==================== -->
+<!-- APPOINTMENTS PAGE -->
+<div id="page-appointments" class="page">
+  <div class="wrap">
+    <div style="margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+      <div>
+        <h1 style="font-size:24px;font-weight:800;margin-bottom:6px;">📅 Appointments</h1>
+        <p style="font-size:14px;color:var(--muted)">Manage patient appointments — confirm, complete ya cancel karo</p>
+      </div>
+      <button onclick="loadHospitalAppointments()" style="padding:9px 18px;background:var(--primary);color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);">🔄 Refresh</button>
+    </div>
+
+    <!-- STATS -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+      <div style="background:white;border-radius:14px;padding:18px;border:1px solid var(--border);text-align:center;">
+        <div style="font-size:28px;font-weight:800;color:var(--primary);" id="hApptTotal">0</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Total</div>
+      </div>
+      <div style="background:white;border-radius:14px;padding:18px;border:1px solid var(--border);text-align:center;">
+        <div style="font-size:28px;font-weight:800;color:var(--amber);" id="hApptPending">0</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Pending</div>
+      </div>
+      <div style="background:white;border-radius:14px;padding:18px;border:1px solid var(--border);text-align:center;">
+        <div style="font-size:28px;font-weight:800;color:var(--green);" id="hApptConfirmed">0</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Confirmed</div>
+      </div>
+      <div style="background:white;border-radius:14px;padding:18px;border:1px solid var(--border);text-align:center;">
+        <div style="font-size:28px;font-weight:800;color:var(--muted);" id="hApptCompleted">0</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Completed</div>
+      </div>
+    </div>
+
+    <!-- FILTER -->
+    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+      <button class="h-appt-filter active" onclick="filterHAppts('all',this)" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);background:white;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);">All</button>
+      <button class="h-appt-filter" onclick="filterHAppts('pending',this)" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);background:white;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);">⏳ Pending</button>
+      <button class="h-appt-filter" onclick="filterHAppts('confirmed',this)" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);background:white;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);">✅ Confirmed</button>
+      <button class="h-appt-filter" onclick="filterHAppts('completed',this)" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);background:white;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);">🏁 Completed</button>
+    </div>
+
+    <!-- LIST -->
+    <div id="hApptList">
+      <div style="text-align:center;padding:40px;color:var(--muted);">
+        <div style="font-size:40px;margin-bottom:12px;">📅</div>
+        <div>Loading appointments...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="page-sms" class="page">
   <div class="wrap">
     <div style="margin-bottom:24px;">
@@ -659,31 +697,6 @@ input:checked + .toggle-slider:before { transform: translateX(24px); }
 <div class="toast" id="toast"></div>
 
 <script>
-// Loading screen
-const loadBar = document.getElementById('loadBar');
-const loadText = document.getElementById('loadText');
-const loadingScreen = document.getElementById('loadingScreen');
-const steps = [
-  { width: '30%', text: 'Checking authentication...' },
-  { width: '60%', text: 'Loading hospital data...' },
-  { width: '85%', text: 'Connecting to live server...' },
-  { width: '100%', text: 'Ready!' },
-];
-let i = 0;
-const loadInterval = setInterval(() => {
-  if (i < steps.length) {
-    loadBar.style.width = steps[i].width;
-    loadText.textContent = steps[i].text;
-    i++;
-  } else {
-    clearInterval(loadInterval);
-    setTimeout(() => {
-      loadingScreen.style.opacity = '0';
-      loadingScreen.style.transition = 'opacity 0.5s ease';
-      setTimeout(() => loadingScreen.style.display = 'none', 500);
-    }, 300);
-  }
-}, 600);
 const API_URL = "https://hospital-backend-01.onrender.com";
 
 // ✅ Auth check
@@ -879,7 +892,7 @@ async function saveBeds() {
   };
 
   try {
-    const hospId = hospitalData?._id || localStorage.getItem('hospitalId');
+    const hospId = hospitalData?._id;
     const res = await fetch(`${API_URL}/api/hospitals/update-beds/${hospId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -1077,6 +1090,120 @@ function showPage(page, btn) {
   document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
   if (btn) btn.classList.add('active');
+  if (page === 'appointments') loadHospitalAppointments();
+}
+
+// ==================== HOSPITAL APPOINTMENTS ====================
+let allHAppts = [];
+let hApptFilter = 'all';
+
+async function loadHospitalAppointments() {
+  try {
+    const res = await fetch(`${API_URL}/api/appointments/all`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await res.json();
+    if (data.success) {
+      allHAppts = data.appointments;
+      updateHApptStats(data.appointments);
+      renderHAppts(hApptFilter);
+    }
+  } catch {
+    // Demo data
+    allHAppts = [
+      { _id:'1', patientName:'Rahul Sharma', patientPhone:'9999999999', doctorId:{name:'Dr. Rajesh Kumar', specialization:'Cardiology'}, appointmentDate: new Date(Date.now()+86400000), appointmentTime:'10:00', status:'pending', symptoms:'Fever' },
+      { _id:'2', patientName:'Priya Singh', patientPhone:'8888888888', doctorId:{name:'Dr. Priya Sharma', specialization:'Neurology'}, appointmentDate: new Date(Date.now()+86400000*2), appointmentTime:'14:00', status:'confirmed', symptoms:'Headache' },
+      { _id:'3', patientName:'Amit Kumar', patientPhone:'7777777777', doctorId:{name:'Dr. Amit Verma', specialization:'General Medicine'}, appointmentDate: new Date(Date.now()-86400000), appointmentTime:'11:00', status:'completed', symptoms:'Checkup' },
+    ];
+    updateHApptStats(allHAppts);
+    renderHAppts(hApptFilter);
+  }
+}
+
+function updateHApptStats(appts) {
+  document.getElementById('hApptTotal').textContent = appts.length;
+  document.getElementById('hApptPending').textContent = appts.filter(a=>a.status==='pending').length;
+  document.getElementById('hApptConfirmed').textContent = appts.filter(a=>a.status==='confirmed').length;
+  document.getElementById('hApptCompleted').textContent = appts.filter(a=>a.status==='completed').length;
+}
+
+function filterHAppts(type, btn) {
+  hApptFilter = type;
+  document.querySelectorAll('.h-appt-filter').forEach(b => {
+    b.style.borderColor = 'var(--border)';
+    b.style.color = 'var(--muted)';
+    b.style.background = 'white';
+  });
+  btn.style.borderColor = 'var(--primary)';
+  btn.style.color = 'var(--primary)';
+  btn.style.background = 'var(--primary-light)';
+  renderHAppts(type);
+}
+
+function renderHAppts(filter) {
+  const list = document.getElementById('hApptList');
+  const filtered = filter === 'all' ? allHAppts : allHAppts.filter(a => a.status === filter);
+
+  if (!filtered.length) {
+    list.innerHTML = `<div style="text-align:center;padding:40px;color:var(--muted);">
+      <div style="font-size:40px;margin-bottom:12px;">📅</div>
+      <div>Koi appointment nahi</div>
+    </div>`;
+    return;
+  }
+
+  const statusColors = { pending:'var(--amber)', confirmed:'var(--green)', cancelled:'var(--red)', completed:'var(--muted)' };
+  const statusBg = { pending:'var(--amber-bg)', confirmed:'var(--green-bg)', cancelled:'var(--red-bg)', completed:'var(--light-gray)' };
+  const statusIcon = { pending:'⏳', confirmed:'✅', cancelled:'❌', completed:'🏁' };
+
+  list.innerHTML = filtered.map(a => {
+    const date = new Date(a.appointmentDate).toLocaleDateString('en-IN', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+    return `<div style="background:white;border-radius:16px;padding:20px;border:1px solid var(--border);margin-bottom:14px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+      <div style="width:50px;height:50px;border-radius:14px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">👤</div>
+      <div style="flex:1;min-width:180px;">
+        <div style="font-size:15px;font-weight:800;margin-bottom:4px;">${a.patientName}</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:2px;">📞 ${a.patientPhone || 'N/A'}</div>
+        <div style="font-size:12px;color:var(--muted);">👨‍⚕️ ${a.doctorId?.name || 'Any Doctor'} • ${a.doctorId?.specialization || ''}</div>
+        <div style="font-size:12px;color:var(--muted);">📋 ${a.symptoms || 'General Checkup'}</div>
+      </div>
+      <div style="text-align:center;min-width:100px;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:4px;">📅 ${date}</div>
+        <div style="font-size:13px;color:var(--primary);font-weight:700;">🕐 ${a.appointmentTime}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+        <span style="padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;background:${statusBg[a.status]};color:${statusColors[a.status]};">${statusIcon[a.status]} ${a.status.charAt(0).toUpperCase()+a.status.slice(1)}</span>
+        <div style="display:flex;gap:6px;">
+          ${a.status === 'pending' ? `<button onclick="updateHAppt('${a._id}','confirmed')" style="padding:6px 12px;border-radius:8px;border:none;background:var(--green);color:white;font-size:11px;font-weight:700;cursor:pointer;">✅ Confirm</button>` : ''}
+          ${a.status === 'confirmed' ? `<button onclick="updateHAppt('${a._id}','completed')" style="padding:6px 12px;border-radius:8px;border:none;background:var(--blue);color:white;font-size:11px;font-weight:700;cursor:pointer;">🏁 Complete</button>` : ''}
+          ${a.status !== 'cancelled' && a.status !== 'completed' ? `<button onclick="updateHAppt('${a._id}','cancelled')" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:white;color:var(--red);font-size:11px;font-weight:700;cursor:pointer;">❌ Cancel</button>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function updateHAppt(id, status) {
+  try {
+    const res = await fetch(`${API_URL}/api/appointments/update/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ status })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast(`✅ Appointment ${status}!`, 'success');
+      loadHospitalAppointments();
+    } else {
+      // Demo mode
+      const appt = allHAppts.find(a => a._id === id);
+      if (appt) appt.status = status;
+      updateHApptStats(allHAppts);
+      renderHAppts(hApptFilter);
+      showToast(`✅ Appointment ${status}! (Demo)`, 'success');
+    }
+  } catch {
+    showToast('❌ Update failed', 'error');
+  }
 }
 
 // ✅ Helpers
