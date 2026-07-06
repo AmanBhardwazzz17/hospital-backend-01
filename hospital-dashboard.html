@@ -1099,7 +1099,7 @@ let hApptFilter = 'all';
 
 async function loadHospitalAppointments() {
   try {
-   const res = await fetch(`${API_URL}/api/appointments/hospital-appointments`, {
+   const res = await fetch(`${API_URL}/api/appointments/hospital-appointments`, 
      {
       headers: { Authorization: `Bearer ${token}` }
     });
