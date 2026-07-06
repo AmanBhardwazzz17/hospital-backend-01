@@ -981,7 +981,7 @@ function renderAppts(filter) {
   }
 
   list.innerHTML = filtered.map(a => {
-    const date = new Date(a.date).toLocaleDateString('en-IN', {weekday:'short', day:'numeric', month:'short', year:'numeric'});
+    const date = new Date(a.appointmentDate || a.date).toLocaleDateString('en-IN', {weekday:'short', day:'numeric', month:'short', year:'numeric'});
     const statusColors = { pending:'var(--amber)', confirmed:'var(--green)', cancelled:'var(--primary)', completed:'var(--muted)' };
     const statusBg = { pending:'var(--amber-bg)', confirmed:'var(--green-bg)', cancelled:'var(--primary-light)', completed:'var(--light-gray)' };
     const statusIcon = { pending:'⏳', confirmed:'✅', cancelled:'❌', completed:'🏁' };

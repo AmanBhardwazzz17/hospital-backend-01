@@ -184,5 +184,42 @@ router.get("/all", verifyToken, async (req, res) => {
     return res.status(500).json({ message: "Server error", error: err.message });
   }
 });
+// ✅ GET — Hospital ki appointments (hospital staff)
+router.get("/hospital-appointments", verifyToken, async (req, res) => {
+  try {
+    // Hospital ka user find karo
+    const user = await User.findById(req.user.id);
+    if (!user || user.role !== "hospital") {
+      return res.status(403).json({ message: "Hospital access only" });
+    }
 
+    // Us hospital ki appointments fetch karo
+    const Hospital = require("../models/Hospital");
+    const hospital = await Hospital.findOne({ 
+      $or: [
+        { email: user.email },
+        { _id: user.hospitalId }
+      ]
+    });
+
+    let appointments;
+    if (hospital) {
+      appointments = await Appointment.find({ hospitalId: hospital._id })
+        .populate("patientId", "name email phone")
+        .populate("doctorId", "name specialization")
+        .sort({ appointmentDate: 1 });
+    } else {
+      appointments = await Appointment.find()
+        .populate("patientId", "name email phone")
+        .populate("doctorId", "name specialization")
+        .populate("hospitalId", "name city")
+        .sort({ appointmentDate: 1 })
+        .limit(50);
+    }
+
+    return res.json({ success: true, total: appointments.length, appointments });
+  } catch (err) {
+    return res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
 module.exports = router;
