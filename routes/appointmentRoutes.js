@@ -3,16 +3,17 @@ const router = express.Router();
 const Appointment = require("../models/Appointment");
 const Doctor = require("../models/Doctor");
 const Hospital = require("../models/Hospital");
+const User = require("../models/User");
 const { verifyToken } = require("../middleware/authMiddleware");
 const { sendSMS } = require("../utils/sendSMS");
 
 // ✅ GET — Patient ke saare appointments
 router.get("/my", verifyToken, async (req, res) => {
   try {
-    const appointments = await Appointment.find({ patient: req.user.id })
-      .populate("doctor", "name specialization phone")
-      .populate("hospital", "name city address phone")
-      .sort({ date: -1 });
+    const appointments = await Appointment.find({ patientId: req.user.id })
+      .populate("doctorId", "name specialization phone")
+      .populate("hospitalId", "name city address phone")
+      .sort({ appointmentDate: -1 });
 
     return res.json({ success: true, appointments });
   } catch (err) {
@@ -20,114 +21,103 @@ router.get("/my", verifyToken, async (req, res) => {
   }
 });
 
-// ✅ GET — Hospital ke saare appointments (hospital user dekhega)
-router.get("/hospital", verifyToken, async (req, res) => {
-  try {
-    const appointments = await Appointment.find({ hospital: req.body.hospitalId || req.query.hospitalId })
-      .populate("patient", "name email")
-      .populate("doctor", "name specialization")
-      .sort({ date: 1 });
-
-    return res.json({ success: true, appointments });
-  } catch (err) {
-    return res.status(500).json({ message: "Server error", error: err.message });
-  }
-});
-
-// ✅ GET — Ek doctor ke available slots
+// ✅ GET — Available slots
 router.get("/slots/:doctorId", async (req, res) => {
   try {
     const { date } = req.query;
     if (!date) return res.status(400).json({ message: "Date required" });
 
-    // Us din ke already booked slots
     const booked = await Appointment.find({
-      doctor: req.params.doctorId,
-      date: new Date(date),
+      doctorId: req.params.doctorId,
+      appointmentDate: new Date(date),
       status: { $ne: "cancelled" }
-    }).select("time");
+    }).select("appointmentTime");
 
-    const bookedTimes = booked.map(a => a.time);
+    const bookedTimes = booked.map(a => a.appointmentTime);
 
-    // Available slots — 9 AM to 5 PM, 30 min interval
     const allSlots = [
-      "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
-      "12:00", "12:30", "14:00", "14:30", "15:00", "15:30",
-      "16:00", "16:30", "17:00"
+      "09:00","09:30","10:00","10:30","11:00","11:30",
+      "12:00","12:30","14:00","14:30","15:00","15:30",
+      "16:00","16:30","17:00"
     ];
 
-    const availableSlots = allSlots.map(slot => ({
+    const slots = allSlots.map(slot => ({
       time: slot,
       available: !bookedTimes.includes(slot)
     }));
 
-    return res.json({ success: true, date, slots: availableSlots });
+    return res.json({ success: true, date, slots });
   } catch (err) {
     return res.status(500).json({ message: "Server error", error: err.message });
   }
 });
 
-// ✅ POST — New appointment book karo
+// ✅ POST — Appointment book karo
 router.post("/book", verifyToken, async (req, res) => {
   try {
-    const { doctorId, hospitalId, date, time, reason, patientPhone } = req.body;
+    const { doctorId, hospitalId, date, time, reason, patientPhone, department } = req.body;
 
-    if (!doctorId || !hospitalId || !date || !time) {
-      return res.status(400).json({ message: "Doctor, hospital, date, time required" });
+    if (!hospitalId || !date || !time) {
+      return res.status(400).json({ message: "Hospital, date, time required" });
     }
 
-    // Check karo slot available hai
-    const existing = await Appointment.findOne({
-      doctor: doctorId,
-      date: new Date(date),
-      time,
-      status: { $ne: "cancelled" }
-    });
+    // Patient info lo
+    const patient = await User.findById(req.user.id).select("name");
 
-    if (existing) {
-      return res.status(409).json({ message: "Ye slot already booked hai! Doosra time choose karo." });
+    // Slot already booked check
+    if (doctorId) {
+      const existing = await Appointment.findOne({
+        doctorId,
+        appointmentDate: new Date(date),
+        appointmentTime: time,
+        status: { $ne: "cancelled" }
+      });
+      if (existing) return res.status(409).json({ message: "Ye slot already booked hai! Doosra time choose karo." });
     }
+
+    // Doctor details
+    const doctor = doctorId ? await Doctor.findById(doctorId).select("name specialization") : null;
+    const hospital = await Hospital.findById(hospitalId).select("name city phone");
 
     const appointment = await Appointment.create({
-      patient: req.user.id,
-      doctor: doctorId,
-      hospital: hospitalId,
-      date: new Date(date),
-      time,
-      reason: reason || "General Checkup",
+      patientId: req.user.id,
+      patientName: patient?.name || "Patient",
+      patientPhone: patientPhone || "",
+      doctorId: doctorId || null,
+      doctorName: doctor?.name || "To be assigned",
+      hospitalId,
+      appointmentDate: new Date(date),
+      appointmentTime: time,
+      department: department || doctor?.specialization || "General Medicine",
+      symptoms: reason || "General Checkup",
       status: "pending"
     });
 
-    // Doctor aur Hospital details lo SMS ke liye
-    const doctor = await Doctor.findById(doctorId).select("name specialization");
-    const hospital = await Hospital.findById(hospitalId).select("name city phone");
-
-    // ✅ Patient ko SMS bhejo confirmation
+    // ✅ Patient ko SMS
     if (patientPhone) {
       const dateFormatted = new Date(date).toLocaleDateString('en-IN', {
         weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
       });
-
       await sendSMS(patientPhone,
-        `✅ Appointment Confirmed!\nHospTrack\n\nDoctor: ${doctor?.name || 'Doctor'}\nSpecialization: ${doctor?.specialization || ''}\nHospital: ${hospital?.name || 'Hospital'}, ${hospital?.city || ''}\nDate: ${dateFormatted}\nTime: ${time}\n\nPlease arrive 15 mins early.\nHospTrack System`
+        `✅ Appointment Confirmed!\nHospTrack\n\nDoctor: ${doctor?.name || 'To be assigned'}\nHospital: ${hospital?.name}, ${hospital?.city}\nDate: ${dateFormatted}\nTime: ${time}\n\nPlease arrive 15 mins early.\nHospTrack System`
       );
     }
 
-    // ✅ Hospital ko SMS bhejo naye appointment ka
+    // ✅ Hospital ko SMS
     if (hospital?.phone) {
       await sendSMS(hospital.phone,
-        `📅 New Appointment\nHospTrack Alert\n\nNew appointment booked for Dr. ${doctor?.name || 'Doctor'}\nDate: ${date}\nTime: ${time}\nReason: ${reason || 'General Checkup'}\n\nPlease confirm in dashboard.\nHospTrack System`
+        `📅 New Appointment\nPatient: ${patient?.name}\nDoctor: ${doctor?.name || 'Any'}\nDate: ${date}\nTime: ${time}\nReason: ${reason || 'General Checkup'}\nHospTrack System`
       );
     }
 
-    // ✅ Socket.IO — real-time notification
+    // ✅ Socket.IO notification
     const io = req.app.get('io');
     if (io) {
       io.emit('appointment-booked', {
         hospitalId,
+        patientName: patient?.name,
         doctorName: doctor?.name,
-        date, time,
-        reason: reason || 'General Checkup'
+        date, time
       });
     }
 
@@ -137,7 +127,7 @@ router.post("/book", verifyToken, async (req, res) => {
       appointment: {
         id: appointment._id,
         date, time,
-        doctor: doctor?.name,
+        doctor: doctor?.name || "To be assigned",
         hospital: hospital?.name,
         status: "pending"
       }
@@ -147,40 +137,32 @@ router.post("/book", verifyToken, async (req, res) => {
   }
 });
 
-// ✅ PUT — Appointment status update (hospital/admin)
+// ✅ PUT — Status update
 router.put("/update/:id", verifyToken, async (req, res) => {
   try {
-    const { status } = req.body;
-
-    if (!["pending", "confirmed", "cancelled", "completed"].includes(status)) {
+    const { status, notes } = req.body;
+    if (!["pending","confirmed","completed","cancelled"].includes(status)) {
       return res.status(400).json({ message: "Invalid status" });
     }
-
     const appointment = await Appointment.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true }
-    ).populate("patient", "name").populate("doctor", "name").populate("hospital", "name");
-
-    if (!appointment) return res.status(404).json({ message: "Appointment not found" });
-
+      req.params.id, { status, notes }, { new: true }
+    );
+    if (!appointment) return res.status(404).json({ message: "Not found" });
     return res.json({ success: true, message: `Appointment ${status}!`, appointment });
   } catch (err) {
     return res.status(500).json({ message: "Server error", error: err.message });
   }
 });
 
-// ✅ DELETE — Appointment cancel karo
+// ✅ DELETE — Cancel
 router.delete("/cancel/:id", verifyToken, async (req, res) => {
   try {
     const appointment = await Appointment.findOneAndUpdate(
-      { _id: req.params.id, patient: req.user.id },
+      { _id: req.params.id, patientId: req.user.id },
       { status: "cancelled" },
       { new: true }
     );
-
-    if (!appointment) return res.status(404).json({ message: "Appointment not found" });
-
+    if (!appointment) return res.status(404).json({ message: "Not found" });
     return res.json({ success: true, message: "Appointment cancelled!" });
   } catch (err) {
     return res.status(500).json({ message: "Server error", error: err.message });
@@ -191,14 +173,12 @@ router.delete("/cancel/:id", verifyToken, async (req, res) => {
 router.get("/all", verifyToken, async (req, res) => {
   try {
     if (req.user.role !== "admin") return res.status(403).json({ message: "Admin only" });
-
     const appointments = await Appointment.find()
-      .populate("patient", "name email")
-      .populate("doctor", "name specialization")
-      .populate("hospital", "name city")
+      .populate("patientId", "name email")
+      .populate("doctorId", "name specialization")
+      .populate("hospitalId", "name city")
       .sort({ createdAt: -1 })
       .limit(50);
-
     return res.json({ success: true, total: appointments.length, appointments });
   } catch (err) {
     return res.status(500).json({ message: "Server error", error: err.message });
