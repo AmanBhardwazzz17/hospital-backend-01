@@ -1113,6 +1113,8 @@ async function loadHospitalAppointments() {
     console.error('Appointments load error:', err);
     showToast('❌ Appointments load nahi hue — server check karo', 'error');
   }
+}
+
 function updateHApptStats(appts) {
   document.getElementById('hApptTotal').textContent = appts.length;
   document.getElementById('hApptPending').textContent = appts.filter(a=>a.status==='pending').length;
