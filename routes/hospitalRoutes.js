@@ -153,33 +153,31 @@ router.put("/reject/:id", verifyToken, adminOnly, async (req, res) => {
 router.post("/add", verifyToken, adminOnly, async (req, res) => {
   try {
     const {
-      name, address, city, phone,
-      totalBeds, availableBeds,
-      icuTotal, icuAvailable,
-      oxygenTotal, oxygenAvailable,
-      ventilatorTotal, ventilatorAvailable,
-      emergencyAvailable, latitude, longitude
-    } = req.body;
+  name, address, city, phone, email, password,
+  totalBeds, availableBeds, icuTotal, icuAvailable,
+  oxygenTotal, oxygenAvailable, ventilatorTotal, ventilatorAvailable,
+  emergencyAvailable, latitude, longitude,
+  adminName, state, pinCode, hospitalType, registrationNumber, departments, notes
+} = req.body;
 
-    if (!name || !address || !city) {
-      return res.status(400).json({ message: "Name, address, city required" });
-    }
-
+if (!name || !address || !city) {
+  return res.status(400).json({ message: "Name, address, city required" });
+}
     const hospital = await Hospital.create({
-      name, address, city, phone,
-      totalBeds: totalBeds || 0,
-      availableBeds: availableBeds || 0,
-      icuTotal: icuTotal || 0,
-      icuAvailable: icuAvailable || 0,
-      oxygenTotal: oxygenTotal || 0,
-      oxygenAvailable: oxygenAvailable || 0,
-      ventilatorTotal: ventilatorTotal || 0,
-      ventilatorAvailable: ventilatorAvailable || 0,
-      emergencyAvailable: emergencyAvailable !== false,
-      latitude, longitude,
-      approvalStatus: "approved",
-      approvedAt: new Date()
-    });
+  name, address, city, phone, email,
+  totalBeds: totalBeds || 0,
+  availableBeds: availableBeds || totalBeds || 0,
+  icuTotal: icuTotal || 0,
+  icuAvailable: icuAvailable || icuTotal || 0,
+  oxygenTotal: oxygenTotal || 0,
+  oxygenAvailable: oxygenAvailable || oxygenTotal || 0,
+  ventilatorTotal: ventilatorTotal || 0,
+  ventilatorAvailable: ventilatorAvailable || ventilatorTotal || 0,
+  emergencyAvailable: emergencyAvailable !== false,
+  latitude, longitude,
+  approvalStatus: "pending",
+  appliedAt: new Date(),
+});
 
     const io = req.app.get('io');
     if (io) io.emit('hospital-added', hospital);
