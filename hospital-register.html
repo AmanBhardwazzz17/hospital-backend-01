@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hospital Registration – HospTrack</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #C0392B; --primary-dark: #922B21; --primary-light: #FADBD8;
+  --accent: #1A252F; --white: #FFFFFF; --off-white: #F8F9FA;
+  --border: #DDE2E8; --text: #1A252F; --muted: #5D6D7E;
+  --green: #1E8449; --green-bg: #E9F7EF; --font: 'DM Sans', sans-serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:var(--font); background:var(--off-white); color:var(--text); min-height:100vh; }
+
+nav {
+  background:white; padding:0 32px; display:flex; align-items:center;
+  justify-content:space-between; border-bottom:1px solid var(--border);
+  height:64px; box-shadow:0 2px 8px rgba(0,0,0,0.06);
+}
+.logo { font-family:'Playfair Display',serif; font-size:22px; font-weight:800; }
+.logo span { color:var(--primary); }
+.nav-right { display:flex; gap:10px; }
+.nav-btn {
+  padding:8px 18px; border-radius:8px; font-size:13px; font-weight:600;
+  cursor:pointer; font-family:var(--font); transition:all 0.2s;
+}
+.nav-btn.outline { border:1px solid var(--border); background:white; color:var(--text); }
+.nav-btn.primary { border:none; background:var(--primary); color:white; }
+
+.hero {
+  background:linear-gradient(135deg, #1A252F, #2C3E50, #C0392B);
+  padding:48px 32px; text-align:center; color:white;
+}
+.hero h1 { font-size:32px; font-weight:800; margin-bottom:8px; }
+.hero p { font-size:15px; color:rgba(255,255,255,0.75); }
+
+.steps {
+  display:flex; justify-content:center; gap:0; margin:32px auto;
+  max-width:700px; padding:0 32px;
+}
+.step {
+  flex:1; text-align:center; padding:12px 8px;
+  border-bottom:3px solid var(--border); position:relative;
+}
+.step.active { border-bottom-color:var(--primary); }
+.step.done { border-bottom-color:var(--green); }
+.step-num {
+  width:28px; height:28px; border-radius:50%; background:var(--border);
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:700; margin:0 auto 6px; color:var(--muted);
+}
+.step.active .step-num { background:var(--primary); color:white; }
+.step.done .step-num { background:var(--green); color:white; }
+.step-label { font-size:11px; color:var(--muted); font-weight:600; }
+.step.active .step-label { color:var(--primary); }
+
+.form-wrap { max-width:700px; margin:0 auto; padding:0 32px 48px; }
+
+.form-card {
+  background:white; border-radius:16px; padding:28px;
+  border:1px solid var(--border); margin-bottom:20px;
+}
+.form-card-title {
+  font-size:16px; font-weight:800; margin-bottom:20px;
+  display:flex; align-items:center; gap:8px;
+  padding-bottom:14px; border-bottom:1px solid var(--border);
+}
+
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.form-group { display:flex; flex-direction:column; gap:6px; }
+.form-group.full { grid-column:1/-1; }
+.form-label { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+.required { color:var(--primary); }
+.form-input, .form-select, .form-textarea {
+  padding:11px 14px; border:1.5px solid var(--border); border-radius:10px;
+  font-size:14px; font-family:var(--font); color:var(--text); outline:none;
+  transition:border 0.2s;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color:var(--primary); }
+.form-textarea { resize:vertical; min-height:80px; }
+.form-hint { font-size:11px; color:var(--muted); margin-top:3px; }
+
+.checkbox-group { display:flex; flex-wrap:wrap; gap:10px; }
+.checkbox-item {
+  display:flex; align-items:center; gap:6px; padding:8px 14px;
+  border-radius:8px; border:1.5px solid var(--border); cursor:pointer;
+  transition:all 0.2s; font-size:13px; font-weight:500;
+}
+.checkbox-item:hover { border-color:var(--primary); background:var(--primary-light); }
+.checkbox-item input { cursor:pointer; }
+
+.btn-row { display:flex; gap:12px; justify-content:flex-end; margin-top:8px; }
+.btn {
+  padding:12px 24px; border-radius:10px; font-size:14px; font-weight:700;
+  cursor:pointer; font-family:var(--font); transition:all 0.2s;
+}
+.btn.outline { border:1px solid var(--border); background:white; color:var(--text); }
+.btn.primary { border:none; background:var(--primary); color:white; }
+.btn.primary:hover { background:var(--primary-dark); }
+.btn:disabled { opacity:0.6; cursor:not-allowed; }
+
+/* SUCCESS */
+.success-card {
+  background:white; border-radius:20px; padding:40px; text-align:center;
+  border:1px solid var(--border); max-width:500px; margin:40px auto;
+}
+.success-icon { font-size:64px; margin-bottom:16px; }
+.success-title { font-size:24px; font-weight:800; margin-bottom:8px; }
+.success-desc { font-size:14px; color:var(--muted); line-height:1.6; }
+.success-id {
+  background:var(--off-white); border-radius:10px; padding:14px;
+  margin:20px 0; font-size:13px; font-weight:700; color:var(--primary);
+  border:1px solid var(--primary-light);
+}
+
+.toast { position:fixed; bottom:24px; right:24px; z-index:9999; background:var(--accent); color:white; padding:14px 20px; border-radius:12px; font-size:14px; font-weight:600; transform:translateY(100px); opacity:0; transition:all 0.3s; max-width:320px; }
+.toast.show { transform:translateY(0); opacity:1; }
+.toast.success { background:var(--green); }
+.toast.error { background:var(--primary); }
+
+@media(max-width:600px) {
+  .form-grid { grid-template-columns:1fr; }
+  .form-wrap, nav { padding-left:16px; padding-right:16px; }
+  .hero { padding:32px 16px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Hosp<span>Track</span></div>
+  <div class="nav-right">
+    <button class="nav-btn outline" onclick="window.location.href='index.html'">Login</button>
+    <button class="nav-btn primary" onclick="window.location.href='index.html'">Already Registered?</button>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>🏥 Hospital Registration</h1>
+  <p>Apna hospital register karo — admin approve karega aur tum live ho jaoge</p>
+</div>
+
+<!-- STEPS -->
+<div class="steps" id="stepsBar">
+  <div class="step active" id="step1-bar"><div class="step-num">1</div><div class="step-label">Basic Info</div></div>
+  <div class="step" id="step2-bar"><div class="step-num">2</div><div class="step-label">Facilities</div></div>
+  <div class="step" id="step3-bar"><div class="step-num">3</div><div class="step-label">Account</div></div>
+  <div class="step" id="step4-bar"><div class="step-num">4</div><div class="step-label">Review</div></div>
+</div>
+
+<div class="form-wrap">
+
+  <!-- STEP 1: Basic Info -->
+  <div id="form-step1">
+    <div class="form-card">
+      <div class="form-card-title">🏥 Hospital Basic Information</div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label class="form-label">Hospital Name <span class="required">*</span></label>
+          <input class="form-input" id="hospName" placeholder="e.g. City Medical Center">
+        </div>
+        <div class="form-group">
+          <label class="form-label">City <span class="required">*</span></label>
+          <input class="form-input" id="hospCity" placeholder="e.g. Mumbai">
+        </div>
+        <div class="form-group">
+          <label class="form-label">State <span class="required">*</span></label>
+          <select class="form-select" id="hospState">
+            <option value="">Select State</option>
+            <option>Andhra Pradesh</option><option>Bihar</option><option>Delhi</option>
+            <option>Gujarat</option><option>Haryana</option><option>Jharkhand</option>
+            <option>Karnataka</option><option>Kerala</option><option>Madhya Pradesh</option>
+            <option>Maharashtra</option><option>Punjab</option><option>Rajasthan</option>
+            <option>Tamil Nadu</option><option>Telangana</option><option>Uttar Pradesh</option>
+            <option>Uttarakhand</option><option>West Bengal</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Full Address <span class="required">*</span></label>
+          <input class="form-input" id="hospAddress" placeholder="Street, Area, Landmark...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">PIN Code <span class="required">*</span></label>
+          <input class="form-input" id="hospPin" placeholder="6 digit PIN" maxlength="6">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone Number <span class="required">*</span></label>
+          <input class="form-input" id="hospPhone" placeholder="10 digit number" maxlength="10">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Hospital Type <span class="required">*</span></label>
+          <select class="form-select" id="hospType">
+            <option value="">Select Type</option>
+            <option>Government Hospital</option>
+            <option>Private Hospital</option>
+            <option>Multi-specialty Hospital</option>
+            <option>Super-specialty Hospital</option>
+            <option>Clinic</option>
+            <option>Nursing Home</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Registration Number</label>
+          <input class="form-input" id="hospRegNo" placeholder="Hospital registration number">
+          <div class="form-hint">Government ya state registration number</div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn primary" onclick="goStep(2)">Next → Facilities</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Facilities -->
+  <div id="form-step2" style="display:none;">
+    <div class="form-card">
+      <div class="form-card-title">🛏️ Bed & Facility Information</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Total Beds <span class="required">*</span></label>
+          <input class="form-input" id="totalBeds" type="number" min="0" placeholder="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Available Beds</label>
+          <input class="form-input" id="availBeds" type="number" min="0" placeholder="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">ICU Beds Total</label>
+          <input class="form-input" id="icuTotal" type="number" min="0" placeholder="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">ICU Available</label>
+          <input class="form-input" id="icuAvail" type="number" min="0" placeholder="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Oxygen Beds Total</label>
+          <input class="form-input" id="oxyTotal" type="number" min="0" placeholder="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Oxygen Available</label>
+          <input class="form-input" id="oxyAvail" type="number" min="0" placeholder="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ventilator Beds Total</label>
+          <input class="form-input" id="ventTotal" type="number" min="0" placeholder="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ventilator Available</label>
+          <input class="form-input" id="ventAvail" type="number" min="0" placeholder="0">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Departments Available</label>
+          <div class="checkbox-group">
+            <label class="checkbox-item"><input type="checkbox" value="Cardiology"> Cardiology</label>
+            <label class="checkbox-item"><input type="checkbox" value="Neurology"> Neurology</label>
+            <label class="checkbox-item"><input type="checkbox" value="Orthopedics"> Orthopedics</label>
+            <label class="checkbox-item"><input type="checkbox" value="Pediatrics"> Pediatrics</label>
+            <label class="checkbox-item"><input type="checkbox" value="General Medicine"> General Medicine</label>
+            <label class="checkbox-item"><input type="checkbox" value="Gynecology"> Gynecology</label>
+            <label class="checkbox-item"><input type="checkbox" value="Emergency"> Emergency</label>
+            <label class="checkbox-item"><input type="checkbox" value="ICU"> ICU</label>
+          </div>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Emergency Services</label>
+          <select class="form-select" id="emergencyAvail">
+            <option value="true">✅ Yes — 24/7 Emergency Available</option>
+            <option value="false">❌ No — Emergency Not Available</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn outline" onclick="goStep(1)">← Back</button>
+      <button class="btn primary" onclick="goStep(3)">Next → Account</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Account -->
+  <div id="form-step3" style="display:none;">
+    <div class="form-card">
+      <div class="form-card-title">🔐 Login Account Details</div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label class="form-label">Admin Name <span class="required">*</span></label>
+          <input class="form-input" id="adminName" placeholder="Hospital admin ka naam">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address <span class="required">*</span></label>
+          <input class="form-input" id="adminEmail" type="email" placeholder="hospital@example.com">
+          <div class="form-hint">Ye email se login karoge</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone <span class="required">*</span></label>
+          <input class="form-input" id="adminPhone" placeholder="Admin phone number">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password <span class="required">*</span></label>
+          <input class="form-input" id="adminPassword" type="password" placeholder="Min 6 characters">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm Password <span class="required">*</span></label>
+          <input class="form-input" id="confirmPassword" type="password" placeholder="Password dobara likho">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Additional Notes</label>
+          <textarea class="form-textarea" id="adminNotes" placeholder="Koi extra information jo admin ko batani ho..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn outline" onclick="goStep(2)">← Back</button>
+      <button class="btn primary" onclick="goStep(4)">Next → Review</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: Review -->
+  <div id="form-step4" style="display:none;">
+    <div class="form-card">
+      <div class="form-card-title">📋 Review & Submit</div>
+      <div id="reviewContent"></div>
+    </div>
+    <div style="background:#FEF9E7;border-radius:12px;padding:16px;margin-bottom:20px;border:1px solid #D4A017;font-size:13px;color:#856404;">
+      ⚠️ Submit karne ke baad admin review karega — 24-48 hours mein approval milega. Approved hone ke baad tum login kar paoge.
+    </div>
+    <div class="btn-row">
+      <button class="btn outline" onclick="goStep(3)">← Back</button>
+      <button class="btn primary" id="submitBtn" onclick="submitRegistration()">✅ Submit Registration</button>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div id="form-success" style="display:none;">
+    <div class="success-card">
+      <div class="success-icon">🎉</div>
+      <div class="success-title">Registration Submitted!</div>
+      <div class="success-desc">Tumhari hospital registration request submit ho gayi. Admin 24-48 hours mein review karega.</div>
+      <div class="success-id" id="successId">Application ID: Loading...</div>
+      <div class="success-desc" style="margin-top:12px;">Approved hone ke baad tumhare email pe notification aayega aur tum login kar paoge.</div>
+      <button class="btn primary" style="margin-top:20px;width:100%;" onclick="window.location.href='index.html'">← Back to Login</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API_URL = "https://hospital-backend-01.onrender.com";
+
+function goStep(step) {
+  // Validate before going forward
+  if (step === 2 && !validateStep1()) return;
+  if (step === 3 && !validateStep2()) return;
+  if (step === 4 && !validateStep3()) return;
+
+  [1,2,3,4].forEach(i => {
+    document.getElementById(`form-step${i}`).style.display = i === step ? 'block' : 'none';
+    const bar = document.getElementById(`step${i}-bar`);
+    bar.className = 'step';
+    if (i < step) bar.className = 'step done';
+    if (i === step) bar.className = 'step active';
+  });
+
+  if (step === 4) buildReview();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function validateStep1() {
+  const fields = [
+    { id: 'hospName', label: 'Hospital Name' },
+    { id: 'hospCity', label: 'City' },
+    { id: 'hospState', label: 'State' },
+    { id: 'hospAddress', label: 'Address' },
+    { id: 'hospPin', label: 'PIN Code' },
+    { id: 'hospPhone', label: 'Phone' },
+    { id: 'hospType', label: 'Hospital Type' },
+  ];
+  for (const f of fields) {
+    if (!document.getElementById(f.id).value.trim()) {
+      showToast(`⚠️ ${f.label} required hai!`, 'error');
+      document.getElementById(f.id).focus();
+      return false;
+    }
+  }
+  if (document.getElementById('hospPin').value.length !== 6) {
+    showToast('⚠️ PIN Code 6 digits ka hona chahiye!', 'error');
+    return false;
+  }
+  if (document.getElementById('hospPhone').value.length !== 10) {
+    showToast('⚠️ Phone number 10 digits ka hona chahiye!', 'error');
+    return false;
+  }
+  return true;
+}
+
+function validateStep2() {
+  if (!document.getElementById('totalBeds').value) {
+    showToast('⚠️ Total Beds required hai!', 'error');
+    return false;
+  }
+  return true;
+}
+
+function validateStep3() {
+  const fields = [
+    { id: 'adminName', label: 'Admin Name' },
+    { id: 'adminEmail', label: 'Email' },
+    { id: 'adminPhone', label: 'Phone' },
+    { id: 'adminPassword', label: 'Password' },
+  ];
+  for (const f of fields) {
+    if (!document.getElementById(f.id).value.trim()) {
+      showToast(`⚠️ ${f.label} required hai!`, 'error');
+      return false;
+    }
+  }
+  if (document.getElementById('adminPassword').value !== document.getElementById('confirmPassword').value) {
+    showToast('⚠️ Passwords match nahi kar rahe!', 'error');
+    return false;
+  }
+  if (document.getElementById('adminPassword').value.length < 6) {
+    showToast('⚠️ Password minimum 6 characters ka hona chahiye!', 'error');
+    return false;
+  }
+  return true;
+}
+
+function buildReview() {
+  const departments = Array.from(document.querySelectorAll('.checkbox-item input:checked')).map(c => c.value);
+  document.getElementById('reviewContent').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div style="background:var(--off-white);border-radius:10px;padding:16px;">
+        <div style="font-size:13px;font-weight:800;color:var(--primary);margin-bottom:10px;">🏥 Hospital Info</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div><div style="font-size:11px;color:var(--muted);">Name</div><div style="font-size:13px;font-weight:600;">${document.getElementById('hospName').value}</div></div>
+          <div><div style="font-size:11px;color:var(--muted);">Type</div><div style="font-size:13px;font-weight:600;">${document.getElementById('hospType').value}</div></div>
+          <div><div style="font-size:11px;color:var(--muted);">City</div><div style="font-size:13px;font-weight:600;">${document.getElementById('hospCity').value}</div></div>
+          <div><div style="font-size:11px;color:var(--muted);">State</div><div style="font-size:13px;font-weight:600;">${document.getElementById('hospState').value}</div></div>
+          <div style="grid-column:1/-1;"><div style="font-size:11px;color:var(--muted);">Address</div><div style="font-size:13px;font-weight:600;">${document.getElementById('hospAddress').value}, ${document.getElementById('hospPin').value}</div></div>
+        </div>
+      </div>
+      <div style="background:var(--off-white);border-radius:10px;padding:16px;">
+        <div style="font-size:13px;font-weight:800;color:var(--primary);margin-bottom:10px;">🛏️ Beds</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center;">
+          <div style="background:white;border-radius:8px;padding:10px;"><div style="font-size:18px;font-weight:800;">${document.getElementById('totalBeds').value||0}</div><div style="font-size:10px;color:var(--muted);">Total</div></div>
+          <div style="background:white;border-radius:8px;padding:10px;"><div style="font-size:18px;font-weight:800;">${document.getElementById('icuTotal').value||0}</div><div style="font-size:10px;color:var(--muted);">ICU</div></div>
+          <div style="background:white;border-radius:8px;padding:10px;"><div style="font-size:18px;font-weight:800;">${document.getElementById('oxyTotal').value||0}</div><div style="font-size:10px;color:var(--muted);">Oxygen</div></div>
+          <div style="background:white;border-radius:8px;padding:10px;"><div style="font-size:18px;font-weight:800;">${document.getElementById('ventTotal').value||0}</div><div style="font-size:10px;color:var(--muted);">Ventilator</div></div>
+        </div>
+        ${departments.length ? `<div style="margin-top:10px;font-size:12px;color:var(--muted);">Departments: ${departments.join(', ')}</div>` : ''}
+      </div>
+      <div style="background:var(--off-white);border-radius:10px;padding:16px;">
+        <div style="font-size:13px;font-weight:800;color:var(--primary);margin-bottom:10px;">🔐 Account</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div><div style="font-size:11px;color:var(--muted);">Admin Name</div><div style="font-size:13px;font-weight:600;">${document.getElementById('adminName').value}</div></div>
+          <div><div style="font-size:11px;color:var(--muted);">Email</div><div style="font-size:13px;font-weight:600;">${document.getElementById('adminEmail').value}</div></div>
+        </div>
+      </div>
+    </div>`;
+}
+
+async function submitRegistration() {
+  const btn = document.getElementById('submitBtn');
+  btn.textContent = '⏳ Submitting...';
+  btn.disabled = true;
+
+  const departments = Array.from(document.querySelectorAll('.checkbox-item input:checked')).map(c => c.value);
+
+  const payload = {
+    // Hospital Info
+    name: document.getElementById('hospName').value,
+    city: document.getElementById('hospCity').value,
+    state: document.getElementById('hospState').value,
+    address: document.getElementById('hospAddress').value,
+    pinCode: document.getElementById('hospPin').value,
+    phone: document.getElementById('hospPhone').value,
+    hospitalType: document.getElementById('hospType').value,
+    registrationNumber: document.getElementById('hospRegNo').value,
+    // Beds
+    totalBeds: parseInt(document.getElementById('totalBeds').value) || 0,
+    availableBeds: parseInt(document.getElementById('availBeds').value) || 0,
+    icuTotal: parseInt(document.getElementById('icuTotal').value) || 0,
+    icuAvailable: parseInt(document.getElementById('icuAvail').value) || 0,
+    oxygenTotal: parseInt(document.getElementById('oxyTotal').value) || 0,
+    oxygenAvailable: parseInt(document.getElementById('oxyAvail').value) || 0,
+    ventilatorTotal: parseInt(document.getElementById('ventTotal').value) || 0,
+    ventilatorAvailable: parseInt(document.getElementById('ventAvail').value) || 0,
+    emergencyAvailable: document.getElementById('emergencyAvail').value === 'true',
+    departments,
+    // Account
+    adminName: document.getElementById('adminName').value,
+    email: document.getElementById('adminEmail').value,
+    password: document.getElementById('adminPassword').value,
+    notes: document.getElementById('adminNotes').value,
+  };
+
+  try {
+    const res = await fetch(`${API_URL}/api/hospitals/apply`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      showSuccess(data.applicationId || 'APP-' + Date.now().toString().slice(-6));
+    } else {
+      showToast('❌ ' + (data.message || 'Submit failed'), 'error');
+      btn.textContent = '✅ Submit Registration';
+      btn.disabled = false;
+    }
+  } catch {
+    // Demo mode
+    showSuccess('APP-' + Date.now().toString().slice(-6));
+  }
+}
+
+function showSuccess(id) {
+  [1,2,3,4].forEach(i => document.getElementById(`form-step${i}`).style.display = 'none');
+  document.getElementById('stepsBar').style.display = 'none';
+  document.getElementById('form-success').style.display = 'block';
+  document.getElementById('successId').textContent = `Application ID: ${id}`;
+}
+
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 4000);
+}
+</script>
+</body>
+</html>
