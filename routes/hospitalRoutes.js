@@ -59,15 +59,15 @@ router.get("/:id", async (req, res) => {
 router.post("/apply", async (req, res) => {
   try {
     const {
-      name, address, city, phone, email, website, description,
-      totalBeds, icuTotal, oxygenTotal, ventilatorTotal,
+      name, address, city, phone, email,
+      totalBeds, availableBeds, icuTotal, icuAvailable, oxygenTotal, oxygenAvailable, ventilatorTotal, ventilatorAvailable, emergencyAvailable,
       latitude, longitude,
       // Hospital user account
-      contactPersonName, contactEmail, contactPassword
+      adminName, state, pinCode, hospitalType, registrationNumber, departments, notes
     } = req.body;
 
-    if (!name || !address || !city || !contactEmail || !contactPassword) {
-      return res.status(400).json({ message: "Name, address, city, contact email & password required" });
+    if (!name || !address || !city) {
+      return res.status(400).json({ message: "Name, address, city required" });
     }
 
     // Check duplicate hospital
@@ -78,7 +78,7 @@ router.post("/apply", async (req, res) => {
 
     // Hospital document create karo
     const hospital = await Hospital.create({
-      name, address, city, phone, email, website, description,
+      name, address, city, phone, email,
       totalBeds: totalBeds || 0,
       availableBeds: totalBeds || 0,
       icuTotal: icuTotal || 0,
