@@ -1,54 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const Hospital = require("../models/Hospital");
-const { verifyToken, adminOnly, hospitalOnly } = require("../middleware/authMiddleware");
-/**
- * @swagger
- * /api/hospitals/beds:
- *   get:
- *     summary: Get all hospitals bed availability
- *     tags: [Hospitals]
- *     responses:
- *       200:
- *         description: List of hospitals with bed data
- */
+const User = require("../models/User");
+const { verifyToken, adminOnly } = require("../middleware/authMiddleware");
 
-/**
- * @swagger
- * /api/hospitals/add:
- *   post:
- *     summary: Add new hospital (Admin only)
- *     tags: [Hospitals]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       201:
- *         description: Hospital added successfully
- */
-
-/**
- * @swagger
- * /api/hospitals/update-beds/{id}:
- *   put:
- *     summary: Update hospital bed availability
- *     tags: [Hospitals]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Beds updated successfully
- */
-
-// ✅ GET — Sab hospitals ki bed availability (public)
+// ✅ GET — Sab hospitals ki bed availability (public, sirf approved)
 router.get("/beds", async (req, res) => {
   try {
-    const hospitals = await Hospital.find({ isActive: true })
+    const hospitals = await Hospital.find({ isActive: true, approvalStatus: "approved" })
       .select("name city address phone totalBeds availableBeds icuTotal icuAvailable oxygenTotal oxygenAvailable ventilatorTotal ventilatorAvailable emergencyAvailable updatedAt")
       .sort({ availableBeds: -1 });
 
@@ -58,6 +17,28 @@ router.get("/beds", async (req, res) => {
       hospitals,
       lastUpdated: new Date()
     });
+  } catch (err) {
+    return res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+// ✅ GET — Pending hospitals (Admin only)
+router.get("/pending", verifyToken, adminOnly, async (req, res) => {
+  try {
+    const hospitals = await Hospital.find({ approvalStatus: "pending" })
+      .sort({ appliedAt: -1 });
+    return res.json({ success: true, total: hospitals.length, hospitals });
+  } catch (err) {
+    return res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+// ✅ GET — All hospitals (Admin only)
+router.get("/all", verifyToken, adminOnly, async (req, res) => {
+  try {
+    const hospitals = await Hospital.find()
+      .sort({ createdAt: -1 });
+    return res.json({ success: true, total: hospitals.length, hospitals });
   } catch (err) {
     return res.status(500).json({ message: "Server error", error: err.message });
   }
@@ -74,7 +55,101 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// ✅ POST — Admin new hospital add kare
+// ✅ POST — Public hospital registration apply (from hospital-register.html)
+router.post("/apply", async (req, res) => {
+  try {
+    const {
+      name, address, city, phone, email, website, description,
+      totalBeds, icuTotal, oxygenTotal, ventilatorTotal,
+      latitude, longitude,
+      // Hospital user account
+      contactPersonName, contactEmail, contactPassword
+    } = req.body;
+
+    if (!name || !address || !city || !contactEmail || !contactPassword) {
+      return res.status(400).json({ message: "Name, address, city, contact email & password required" });
+    }
+
+    // Check duplicate hospital
+    const existing = await Hospital.findOne({ name, city });
+    if (existing) {
+      return res.status(409).json({ message: "Ye hospital already registered hai" });
+    }
+
+    // Hospital document create karo
+    const hospital = await Hospital.create({
+      name, address, city, phone, email, website, description,
+      totalBeds: totalBeds || 0,
+      availableBeds: totalBeds || 0,
+      icuTotal: icuTotal || 0,
+      icuAvailable: icuTotal || 0,
+      oxygenTotal: oxygenTotal || 0,
+      oxygenAvailable: oxygenTotal || 0,
+      ventilatorTotal: ventilatorTotal || 0,
+      ventilatorAvailable: ventilatorTotal || 0,
+      latitude, longitude,
+      approvalStatus: "pending",
+      appliedAt: new Date(),
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "Application submitted! Admin approval ka wait karo.",
+      hospitalId: hospital._id
+    });
+  } catch (err) {
+    return res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+// ✅ PUT — Admin hospital approve kare
+router.put("/approve/:id", verifyToken, adminOnly, async (req, res) => {
+  try {
+    const hospital = await Hospital.findByIdAndUpdate(
+      req.params.id,
+      {
+        approvalStatus: "approved",
+        isActive: true,
+        approvedAt: new Date()
+      },
+      { new: true }
+    );
+
+    if (!hospital) return res.status(404).json({ message: "Hospital not found" });
+
+    // Socket.IO se sabko notify karo
+    const io = req.app.get('io');
+    if (io) io.emit('hospital-approved', hospital);
+
+    return res.json({ success: true, message: "Hospital approved!", hospital });
+  } catch (err) {
+    return res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+// ✅ PUT — Admin hospital reject kare
+router.put("/reject/:id", verifyToken, adminOnly, async (req, res) => {
+  try {
+    const { reason } = req.body;
+    const hospital = await Hospital.findByIdAndUpdate(
+      req.params.id,
+      {
+        approvalStatus: "rejected",
+        isActive: false,
+        rejectionReason: reason || "Admin ne reject kiya"
+      },
+      { new: true }
+    );
+
+    if (!hospital) return res.status(404).json({ message: "Hospital not found" });
+
+    return res.json({ success: true, message: "Hospital rejected!", hospital });
+  } catch (err) {
+    return res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+// ✅ POST — Admin new hospital add kare (direct, auto approved)
 router.post("/add", verifyToken, adminOnly, async (req, res) => {
   try {
     const {
@@ -101,12 +176,13 @@ router.post("/add", verifyToken, adminOnly, async (req, res) => {
       ventilatorTotal: ventilatorTotal || 0,
       ventilatorAvailable: ventilatorAvailable || 0,
       emergencyAvailable: emergencyAvailable !== false,
-      latitude, longitude
+      latitude, longitude,
+      approvalStatus: "approved",
+      approvedAt: new Date()
     });
 
-    // ✅ Real-time — naya hospital sabko dikhao
     const io = req.app.get('io');
-    io.emit('hospital-added', hospital);
+    if (io) io.emit('hospital-added', hospital);
 
     return res.status(201).json({ success: true, message: "Hospital added!", hospital });
   } catch (err) {
@@ -136,9 +212,8 @@ router.put("/update-beds/:id", verifyToken, async (req, res) => {
 
     if (!hospital) return res.status(404).json({ message: "Hospital not found" });
 
-    // ✅ Real-time — bed update sabko instantly bhejo
     const io = req.app.get('io');
-    io.emit('bed-updated', {
+    if (io) io.emit('bed-updated', {
       hospitalId: hospital._id,
       name: hospital.name,
       availableBeds: hospital.availableBeds,
@@ -159,11 +234,8 @@ router.put("/update-beds/:id", verifyToken, async (req, res) => {
 router.delete("/:id", verifyToken, adminOnly, async (req, res) => {
   try {
     await Hospital.findByIdAndDelete(req.params.id);
-
-    // ✅ Real-time — deleted hospital sabke screen se hatao
     const io = req.app.get('io');
-    io.emit('hospital-deleted', { hospitalId: req.params.id });
-
+    if (io) io.emit('hospital-deleted', { hospitalId: req.params.id });
     return res.json({ success: true, message: "Hospital deleted!" });
   } catch (err) {
     return res.status(500).json({ message: "Server error", error: err.message });
