@@ -105,23 +105,58 @@ router.post("/apply", async (req, res) => {
 // ✅ PUT — Admin hospital approve kare
 router.put("/approve/:id", verifyToken, adminOnly, async (req, res) => {
   try {
+    const bcrypt = require("bcryptjs");
+
+    // Hospital find karo
+    const hospitalDoc = await Hospital.findById(req.params.id);
+    if (!hospitalDoc) return res.status(404).json({ message: "Hospital not found" });
+
+    // Email generate karo
+    const email = hospitalDoc.email ||
+      `${hospitalDoc.name.toLowerCase().replace(/\s+/g, ".")}@hosptrack.com`;
+
+    // Hospital user account banao agar nahi hai
+    let hospitalUser = await User.findOne({ email });
+    if (!hospitalUser) {
+      const tempPassword = "Hospital@123";
+      const hashedPassword = await bcrypt.hash(tempPassword, 10);
+      hospitalUser = await User.create({
+        name: hospitalDoc.name,
+        email,
+        password: hashedPassword,
+        role: "hospital",
+        isVerified: true,
+        isActive: true,
+        hospitalId: hospitalDoc._id
+      });
+    }
+
+    // Hospital approve karo
     const hospital = await Hospital.findByIdAndUpdate(
       req.params.id,
       {
         approvalStatus: "approved",
         isActive: true,
-        approvedAt: new Date()
+        approvedAt: new Date(),
+        managedBy: hospitalUser._id
       },
       { new: true }
     );
 
-    if (!hospital) return res.status(404).json({ message: "Hospital not found" });
-
-    // Socket.IO se sabko notify karo
+    // Socket.IO notify
     const io = req.app.get('io');
     if (io) io.emit('hospital-approved', hospital);
 
-    return res.json({ success: true, message: "Hospital approved!", hospital });
+    return res.json({
+      success: true,
+      message: "Hospital approved!",
+      hospital,
+      loginCredentials: {
+        email,
+        password: "Hospital@123",
+        note: "Hospital in se login kar sakta hai"
+      }
+    });
   } catch (err) {
     return res.status(500).json({ message: "Server error", error: err.message });
   }
