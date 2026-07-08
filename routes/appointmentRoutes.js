@@ -121,9 +121,17 @@ router.post("/book", verifyToken, async (req, res) => {
       });
     }
 
-    return res.status(201).json({
-      success: true,
-      message: "Appointment booked! SMS confirmation bheja gaya.",
+    // ✅ Email notification
+    const { sendAppointmentEmail } = require("../utils/sendEmail");
+    await sendAppointmentEmail(
+      patient?.name || "Patient",
+      doctor?.name || "To be assigned",
+      date,
+      time,
+      hospital?.name || "Hospital"
+    );
+
+    return res.json({ success: true,
       appointment: {
         id: appointment._id,
         date, time,
