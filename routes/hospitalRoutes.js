@@ -147,9 +147,9 @@ const hashedPassword = await bcrypt.hash(tempPassword, 10);
     const io = req.app.get('io');
     if (io) io.emit('hospital-approved', hospital);
 
-    return res.json({
-      success: true,
-      message: "Hospital approved!",
+   // Email bhejo
+const { sendHospitalApprovalEmail } = require("../utils/sendEmail");
+await sendHospitalApprovalEmail(hospitalDoc.name, email, "Hospital@123");
       hospital,
       loginCredentials: {
         email,
