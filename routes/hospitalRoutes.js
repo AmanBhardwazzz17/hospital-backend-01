@@ -118,8 +118,8 @@ router.put("/approve/:id", verifyToken, adminOnly, async (req, res) => {
     // Hospital user account banao agar nahi hai
     let hospitalUser = await User.findOne({ email });
     if (!hospitalUser) {
-      const tempPassword = "Hospital@123";
-      const hashedPassword = await bcrypt.hash(tempPassword, 10);
+     const tempPassword = hospitalDoc.contactPassword || "Hospital@123";
+const hashedPassword = await bcrypt.hash(tempPassword, 10);
       hospitalUser = await User.create({
         name: hospitalDoc.name,
         email,
@@ -200,6 +200,7 @@ if (!name || !address || !city) {
 }
     const hospital = await Hospital.create({
   name, address, city, phone, email,
+  contactPassword: password,
   totalBeds: totalBeds || 0,
   availableBeds: availableBeds || totalBeds || 0,
   icuTotal: icuTotal || 0,

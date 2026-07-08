@@ -27,6 +27,7 @@ const hospitalSchema = new mongoose.Schema({
   approvedAt: { type: Date },
   latitude: { type: Number },
   longitude: { type: Number },
+  contactPassword: { type: String },
   managedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
