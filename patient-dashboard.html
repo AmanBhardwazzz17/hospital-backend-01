@@ -999,7 +999,8 @@ function renderAppts(filter) {
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
         <span style="padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;background:${statusBg[a.status]};color:${statusColors[a.status]};">${statusIcon[a.status]} ${a.status.charAt(0).toUpperCase()+a.status.slice(1)}</span>
-        ${a.status === 'pending' || a.status === 'confirmed' ? `<button onclick="cancelAppt('${a._id}')" style="padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:white;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--primary);">Cancel</button>` : ''}
+        ${a.status === 'pending' || a.status === 'confirmed' ? `<button onclick='showQRCode(${JSON.stringify(a).replace(/'/g, "&#39;")})' style="padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:white;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--primary);">📱 QR Code</button>` : ''}
+${a.status === 'pending' || a.status === 'confirmed' ? `<button onclick="cancelAppt('${a._id}')" style="padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:white;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--primary);">Cancel</button>` : ''}
       </div>
     </div>`;
   }).join('');
@@ -1289,6 +1290,27 @@ function toggleDarkMode() {
     document.getElementById('darkModeToggle').textContent = '☀️';
   }
 })();
+function showQRCode(appt) {
+  const date = new Date(appt.appointmentDate || appt.date).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
+  const qrData = encodeURIComponent(
+    `HospTrack Appointment\nID: ${appt._id}\nPatient: ${appt.patientName || 'Patient'}\nDoctor: ${appt.doctorName || appt.doctor?.name || 'N/A'}\nDate: ${date}\nTime: ${appt.appointmentTime || appt.time || 'N/A'}`
+  );
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${qrData}`;
+
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;';
+  overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+  overlay.innerHTML = `
+    <div style="background:white;border-radius:20px;padding:30px;text-align:center;max-width:320px;width:90%;">
+      <div style="font-size:16px;font-weight:800;margin-bottom:4px;">📱 Appointment QR Code</div>
+      <div style="font-size:12px;color:#888;margin-bottom:16px;">Reception pe ye QR scan karwao</div>
+      <img src="${qrUrl}" style="width:220px;height:220px;border-radius:12px;border:1px solid #eee;" />
+      <div style="font-size:12px;color:#888;margin-top:14px;">Doctor: ${appt.doctorName || appt.doctor?.name || 'N/A'} • ${date} • ${appt.appointmentTime || appt.time || 'N/A'}</div>
+      <button onclick="this.closest('div').parentElement.remove()" style="margin-top:18px;padding:10px 24px;background:#C0392B;color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;">Close</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
 </script>
 </body>
 </html>
