@@ -26,7 +26,6 @@ router.get("/slots/:doctorId", async (req, res) => {
   try {
     const { date } = req.query;
     if (!date) return res.status(400).json({ message: "Date required" });
-
     const booked = await Appointment.find({
       doctorId: req.params.doctorId,
       appointmentDate: new Date(date),
@@ -49,6 +48,31 @@ router.get("/slots/:doctorId", async (req, res) => {
     return res.json({ success: true, date, slots });
   } catch (err) {
     return res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+// ✅ GET — Public appointment verify (for QR scan)
+router.get("/verify/:id", async (req, res) => {
+  try {
+    const appt = await Appointment.findById(req.params.id).populate("doctorId", "name specialization");
+    if (!appt) return res.status(404).json({ success: false, message: "Appointment not found" });
+    return res.json({ success: true, appointment: appt });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// ✅ PUT — Public check-in (for QR scan at reception)
+router.put("/checkin/:id", async (req, res) => {
+  try {
+    const appt = await Appointment.findByIdAndUpdate(
+      req.params.id,
+      { status: "confirmed", checkedInAt: new Date() },
+      { new: true }
+    );
+    if (!appt) return res.status(404).json({ success: false, message: "Appointment not found" });
+    return res.json({ success: true, message: "Checked in!", appointment: appt });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 });
 
