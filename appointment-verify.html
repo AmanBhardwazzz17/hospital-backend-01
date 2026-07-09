@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Appointment Verify - HospTrack</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Arial, sans-serif; }
+  body {
+    min-height:100vh; display:flex; justify-content:center; align-items:center;
+    background:linear-gradient(135deg, #e8f5e9, #e3f2fd); padding:20px;
+  }
+  .card {
+    background:white; border-radius:24px; padding:36px 30px; max-width:420px; width:100%;
+    box-shadow:0 10px 40px rgba(0,0,0,0.08); text-align:center;
+  }
+  .logo { font-size:22px; font-weight:800; color:#1A252F; margin-bottom:4px; }
+  .logo span { color:#C0392B; }
+  .subtitle { font-size:12px; color:#888; margin-bottom:24px; }
+  .icon-circle {
+    width:70px; height:70px; border-radius:50%; background:#fef2f2; display:flex;
+    align-items:center; justify-content:center; font-size:32px; margin:0 auto 16px;
+  }
+  .status-badge {
+    display:inline-block; padding:6px 16px; border-radius:20px; font-size:12px;
+    font-weight:700; margin-bottom:20px;
+  }
+  .detail-row {
+    display:flex; justify-content:space-between; align-items:center; padding:12px 0;
+    border-bottom:1px solid #f0f0f0; text-align:left;
+  }
+  .detail-row:last-child { border-bottom:none; }
+  .detail-label { font-size:12px; color:#888; font-weight:600; }
+  .detail-value { font-size:14px; color:#1A252F; font-weight:700; text-align:right; }
+  .action-btn {
+    width:100%; margin-top:24px; padding:14px; border:none; border-radius:12px;
+    font-size:15px; font-weight:700; cursor:pointer; transition:transform 0.15s;
+  }
+  .action-btn:active { transform:scale(0.98); }
+  .btn-checkin { background:#1a7a4a; color:white; }
+  .btn-checkin:disabled { background:#ccc; cursor:not-allowed; }
+  .btn-checked { background:#e8f5ee; color:#1a7a4a; cursor:default; }
+  .loading, .error-box {
+    text-align:center; padding:40px 20px; color:#888;
+  }
+  .error-box .icon { font-size:48px; margin-bottom:12px; }
+  .spinner {
+    width:36px; height:36px; border:4px solid #eee; border-top-color:#C0392B;
+    border-radius:50%; margin:0 auto 16px; animation:spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .toast {
+    position:fixed; top:20px; left:50%; transform:translateX(-50%);
+    background:#1A252F; color:white; padding:12px 24px; border-radius:10px;
+    font-size:13px; font-weight:600; z-index:999; opacity:0; transition:opacity 0.3s;
+    pointer-events:none;
+  }
+  .toast.show { opacity:1; }
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<div class="card" id="card">
+  <div class="logo">Hosp<span>Track</span></div>
+  <div class="subtitle">Appointment Verification</div>
+  <div class="loading" id="loadingState">
+    <div class="spinner"></div>
+    <div>Appointment details load ho rahi hai...</div>
+  </div>
+</div>
+
+<script>
+const API_URL = "https://hospital-backend-01.onrender.com";
+
+function getApptId() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('id');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function renderError(message) {
+  document.getElementById('card').innerHTML = `
+    <div class="logo">Hosp<span>Track</span></div>
+    <div class="subtitle">Appointment Verification</div>
+    <div class="error-box">
+      <div class="icon">❌</div>
+      <div style="font-weight:700;color:#1A252F;margin-bottom:6px;">Appointment Not Found</div>
+      <div style="font-size:13px;">${message}</div>
+    </div>
+  `;
+}
+
+function renderAppointment(appt) {
+  const date = new Date(appt.appointmentDate).toLocaleDateString('en-IN', {
+    weekday:'long', day:'numeric', month:'long', year:'numeric'
+  });
+
+  const statusMap = {
+    pending: { bg:'#fff7ed', color:'#ea580c', icon:'⏳', label:'Pending' },
+    confirmed: { bg:'#e8f5ee', color:'#1a7a4a', icon:'✅', label:'Confirmed' },
+    cancelled: { bg:'#fef2f2', color:'#C0392B', icon:'❌', label:'Cancelled' },
+    completed: { bg:'#f3f4f6', color:'#6b7280', icon:'🏁', label:'Completed' }
+  };
+  const s = statusMap[appt.status] || statusMap.pending;
+  const canCheckIn = appt.status === 'pending' || appt.status === 'confirmed';
+
+  document.getElementById('card').innerHTML = `
+    <div class="logo">Hosp<span>Track</span></div>
+    <div class="subtitle">Appointment Verification</div>
+    <div class="icon-circle">👨‍⚕️</div>
+    <div class="status-badge" style="background:${s.bg};color:${s.color};">${s.icon} ${s.label}</div>
+
+    <div class="detail-row">
+      <div class="detail-label">Patient</div>
+      <div class="detail-value">${appt.patientName || 'N/A'}</div>
+    </div>
+    <div class="detail-row">
+      <div class="detail-label">Doctor</div>
+      <div class="detail-value">${appt.doctorId?.name || appt.doctorName || 'To be assigned'}</div>
+    </div>
+    <div class="detail-row">
+      <div class="detail-label">Specialization</div>
+      <div class="detail-value">${appt.doctorId?.specialization || appt.department || 'General'}</div>
+    </div>
+    <div class="detail-row">
+      <div class="detail-label">Date</div>
+      <div class="detail-value">${date}</div>
+    </div>
+    <div class="detail-row">
+      <div class="detail-label">Time</div>
+      <div class="detail-value">${appt.appointmentTime || 'N/A'}</div>
+    </div>
+    <div class="detail-row">
+      <div class="detail-label">Reason</div>
+      <div class="detail-value">${appt.symptoms || appt.reason || 'General Checkup'}</div>
+    </div>
+
+    ${appt.status === 'confirmed' && appt.checkedInAt
+      ? `<button class="action-btn btn-checked" disabled>✅ Already Checked In</button>`
+      : canCheckIn
+        ? `<button class="action-btn btn-checkin" onclick="doCheckIn('${appt._id}')" id="checkinBtn">✅ Check In Patient</button>`
+        : `<div style="margin-top:20px;font-size:12px;color:#999;">This appointment is ${s.label.toLowerCase()}.</div>`
+    }
+  `;
+}
+
+async function loadAppointment() {
+  const id = getApptId();
+  if (!id) {
+    renderError("Appointment ID missing from link.");
+    return;
+  }
+  try {
+    const res = await fetch(`${API_URL}/api/appointments/verify/${id}`);
+    const data = await res.json();
+    if (data.success) {
+      renderAppointment(data.appointment);
+    } else {
+      renderError(data.message || "Appointment nahi mili.");
+    }
+  } catch (err) {
+    renderError("Server se connect nahi ho paya. Thodi der baad try karo.");
+  }
+}
+
+async function doCheckIn(id) {
+  const btn = document.getElementById('checkinBtn');
+  if (btn) { btn.textContent = '⏳ Checking in...'; btn.disabled = true; }
+  try {
+    const res = await fetch(`${API_URL}/api/appointments/checkin/${id}`, { method: 'PUT' });
+    const data = await res.json();
+    if (data.success) {
+      showToast('✅ Patient checked in successfully!');
+      loadAppointment();
+    } else {
+      showToast('❌ ' + (data.message || 'Check-in failed'));
+      if (btn) { btn.textContent = '✅ Check In Patient'; btn.disabled = false; }
+    }
+  } catch (err) {
+    showToast('❌ Server error');
+    if (btn) { btn.textContent = '✅ Check In Patient'; btn.disabled = false; }
+  }
+}
+
+loadAppointment();
+</script>
+</body>
+</html>
