@@ -1292,11 +1292,8 @@ function toggleDarkMode() {
 })();
 function showQRCode(appt) {
   const date = new Date(appt.appointmentDate || appt.date).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
-  const qrData = encodeURIComponent(
-    `HospTrack Appointment\nID: ${appt._id}\nPatient: ${appt.patientName || 'Patient'}\nDoctor: ${appt.doctorName || appt.doctor?.name || 'N/A'}\nDate: ${date}\nTime: ${appt.appointmentTime || appt.time || 'N/A'}`
-  );
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${qrData}`;
-
+  const verifyLink = `https://amanbhardwazzz17.github.io/hospital-backend-01/appointment-verify.html?id=${appt._id}`;
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(verifyLink)}`;
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;';
   overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
