@@ -75,6 +75,7 @@ const hospitalRoutes = require('./routes/hospitalRoutes');
 const emergencyRoutes = require("./routes/emergencyRoutes");
 const smsRoutes = require('./routes/smsRoutes');
 const doctorRoutes = require("./routes/doctorRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
 
 // ✅ Basic routes
 app.get("/", (req, res) => {
@@ -92,6 +93,7 @@ app.use("/api/emergency", emergencyRoutes);
 app.use('/api/hospitals', hospitalRoutes);
 app.use("/api/doctors", doctorRoutes);
 app.use('/api/sms', smsRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 // ✅ MongoDB connect
 const MONGO_URI = process.env.MONGO_URI;
