@@ -1272,7 +1272,8 @@ setInterval(loadBeds, 30000);
 // Socket 3 sec baad load karo — dashboard fast khule
 setTimeout(lazyLoadSocket, 3000);
 </script>
-// ⭐ Rate Hospital
+<!-- ⭐ Rate Hospital -->
+<script>
 let currentRatingAppt = null;
 let selectedRating = 0;
 
@@ -1331,6 +1332,7 @@ async function submitReview() {
     showToast('❌ Server error', 'error');
   }
 }
+</script>
 <!-- 🌙 Dark Mode Toggle -->
 <button id="darkModeToggle" onclick="toggleDarkMode()" style="
   position:fixed; bottom:24px; right:24px; z-index:9999;
