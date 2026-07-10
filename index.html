@@ -315,18 +315,35 @@ body {
   const provider = new GoogleAuthProvider();
 
   window.loginWithGoogle = async () => {
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      const token = await user.getIdToken();
-      localStorage.setItem("token", token);
-      localStorage.setItem("userName", user.displayName);
-      localStorage.setItem("role", "patient"); // Google login = patient by default
-      showSuccessModal(user.displayName, "patient");
-    } catch (error) {
-      alert("Google Login Failed ❌ " + error.message);
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+
+    // Backend ko email/name bhejo, apna JWT wapas lo
+    const API_URL = "https://hospital-backend-01.onrender.com";
+    const res = await fetch(`${API_URL}/api/auth/google-login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: user.email,
+        name: user.displayName
+      })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("userName", data.user.name);
+      localStorage.setItem("role", data.user.role);
+      localStorage.setItem("userId", data.user.id);
+      showSuccessModal(data.user.name, data.user.role);
+    } else {
+      alert("Google Login Failed ❌ " + (data.message || "Unknown error"));
     }
-  };
+  } catch (error) {
+    alert("Google Login Failed ❌ " + error.message);
+  }
+};
 </script>
 
 <script>
