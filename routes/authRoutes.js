@@ -303,5 +303,51 @@ router.put("/link-hospital", async (req, res) => {
     return res.status(500).json({ message: "Server error", error: err.message });
   }
 });
+// ✅ POST — Google Login (Firebase se aane wale users ke liye backend JWT banao)
+router.post("/google-login", async (req, res) => {
+  try {
+    const { email, name } = req.body;
+    if (!email || !name) {
+      return res.status(400).json({ message: "Email aur name required" });
+    }
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      // Naya user banao — random password (Google users ye use nahi karenge)
+      const randomPassword = crypto.randomBytes(16).toString("hex");
+      const hashedPassword = await bcrypt.hash(randomPassword, 10);
+      user = await User.create({
+        name,
+        email,
+        password: hashedPassword,
+        role: "patient",
+        isVerified: true,
+        isActive: true
+      });
+    }
+
+    // Backend ka apna JWT banao
+    const token = jwt.sign(
+      { id: user._id, email: user.email, role: user.role },
+      process.env.JWT_SECRET || "default_secret",
+      { expiresIn: "7d" }
+    );
+
+    return res.json({
+      success: true,
+      message: "Google login successful",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
+    });
+  } catch (err) {
+    return res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
 
 module.exports = router;
