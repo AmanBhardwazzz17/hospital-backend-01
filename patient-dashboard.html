@@ -660,6 +660,22 @@ nav {
     </div>
   </div>
 </div>
+<!-- ⭐ Rate Hospital Modal -->
+<div class="modal-overlay" id="rateModal">
+  <div class="modal-box" style="max-width:400px;">
+    <div class="modal-icon">⭐</div>
+    <div class="modal-title">Rate Your Visit</div>
+    <div class="modal-desc" id="rateHospitalName">How was your experience?</div>
+    <div id="starRating" style="font-size:36px;margin:16px 0;letter-spacing:6px;cursor:pointer;">
+      <span onclick="setRating(1)" data-star="1">☆</span><span onclick="setRating(2)" data-star="2">☆</span><span onclick="setRating(3)" data-star="3">☆</span><span onclick="setRating(4)" data-star="4">☆</span><span onclick="setRating(5)" data-star="5">☆</span>
+    </div>
+    <textarea id="reviewComment" placeholder="Apna experience likho (optional)..." style="width:100%;min-height:80px;padding:12px;border:1px solid var(--border);border-radius:10px;font-family:var(--font);font-size:13px;resize:vertical;margin-bottom:16px;"></textarea>
+    <div class="modal-btns">
+      <button class="modal-btn mb-cancel" onclick="closeRateModal()">Cancel</button>
+      <button class="modal-btn mb-confirm" onclick="submitReview()">✅ Submit Review</button>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1001,6 +1017,7 @@ function renderAppts(filter) {
         <span style="padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;background:${statusBg[a.status]};color:${statusColors[a.status]};">${statusIcon[a.status]} ${a.status.charAt(0).toUpperCase()+a.status.slice(1)}</span>
         ${a.status === 'pending' || a.status === 'confirmed' ? `<button onclick='showQRCode(${JSON.stringify(a).replace(/'/g, "&#39;")})' style="padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:white;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--primary);">📱 QR Code</button>` : ''}
 ${a.status === 'pending' || a.status === 'confirmed' ? `<button onclick="cancelAppt('${a._id}')" style="padding:5px 12px;border-radius:8px;border:1px solid var(--border);background:white;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--primary);">Cancel</button>` : ''}
+${a.status === 'completed' ? `<button onclick='openRateModal(${JSON.stringify(a).replace(/'/g, "&#39;")})' style="padding:5px 12px;border-radius:8px;border:1px solid #f59e0b;background:#fffbeb;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);color:#d97706;">⭐ Rate Hospital</button>` : ''}
       </div>
     </div>`;
   }).join('');
@@ -1255,6 +1272,65 @@ setInterval(loadBeds, 30000);
 // Socket 3 sec baad load karo — dashboard fast khule
 setTimeout(lazyLoadSocket, 3000);
 </script>
+// ⭐ Rate Hospital
+let currentRatingAppt = null;
+let selectedRating = 0;
+
+function openRateModal(appt) {
+  currentRatingAppt = appt;
+  selectedRating = 0;
+  document.getElementById('reviewComment').value = '';
+  document.getElementById('rateHospitalName').textContent = `${appt.hospitalId?.name || appt.hospital?.name || 'Hospital'} - kaisa experience raha?`;
+  updateStars();
+  document.getElementById('rateModal').classList.add('show');
+}
+
+function closeRateModal() {
+  document.getElementById('rateModal').classList.remove('show');
+}
+
+function setRating(n) {
+  selectedRating = n;
+  updateStars();
+}
+
+function updateStars() {
+  document.querySelectorAll('#starRating span').forEach(el => {
+    const val = parseInt(el.dataset.star);
+    el.textContent = val <= selectedRating ? '★' : '☆';
+    el.style.color = val <= selectedRating ? '#f59e0b' : '#ccc';
+  });
+}
+
+async function submitReview() {
+  if (!selectedRating) {
+    showToast('⚠️ Kam se kam 1 star select karo!', 'error');
+    return;
+  }
+  const comment = document.getElementById('reviewComment').value;
+  try {
+    const res = await fetch(`${API_URL}/api/reviews/add`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        hospitalId: currentRatingAppt.hospitalId?._id || currentRatingAppt.hospitalId,
+        appointmentId: currentRatingAppt._id,
+        rating: selectedRating,
+        comment,
+        patientName: userName
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('✅ Review submit ho gaya! Thank you 🎉', 'success');
+      closeRateModal();
+    } else {
+      showToast('❌ ' + (data.message || 'Review submit nahi hua'), 'error');
+    }
+  } catch (err) {
+    showToast('❌ Server error', 'error');
+  }
+}
 <!-- 🌙 Dark Mode Toggle -->
 <button id="darkModeToggle" onclick="toggleDarkMode()" style="
   position:fixed; bottom:24px; right:24px; z-index:9999;
