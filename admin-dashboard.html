@@ -1149,5 +1149,32 @@ function toggleDarkMode() {
   }
 })();
 </script>
+<!-- 🌐 Google Translate Widget -->
+<div id="google_translate_element" style="
+  position:fixed; bottom:24px; right:88px; z-index:9999;
+  background:#1A252F; padding:6px 10px; border-radius:12px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.25);
+"></div>
+<style>
+  #google_translate_element .goog-te-gadget { font-family:inherit !important; color:white !important; font-size:0 !important; }
+  #google_translate_element .goog-te-gadget-simple {
+    background:transparent !important; border:none !important; padding:0 !important;
+  }
+  #google_translate_element .goog-te-gadget-simple span { color:white !important; font-size:13px !important; }
+  #google_translate_element img { display:none !important; }
+  .goog-te-banner-frame { display:none !important; }
+  body { top:0 !important; }
+  .goog-tooltip, .goog-tooltip:hover { display:none !important; }
+  .goog-text-highlight { background:none !important; box-shadow:none !important; }
+</style>
+<script>
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement(
+      { pageLanguage: 'en', includedLanguages: 'en,hi', autoDisplay: false },
+      'google_translate_element'
+    );
+  }
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script>
 </body>
 </html>
