@@ -47,9 +47,3 @@ IIT Patna — Capstone-I Project 2026
 - **Hospital:** cityhospital@hosptrack.com / Hospital@123
 
 ## 📁 Project Structure
-hospital-backend-01/
-├── middleware/     # Auth middleware
-├── models/         # MongoDB schemas
-├── routes/         # API endpoints
-├── utils/          # Email & SMS helpers
-└── *.html          # Frontend dashboards
