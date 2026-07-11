@@ -5,8 +5,10 @@ const axios = require("axios");
 const crypto = require("crypto");
 const User = require("../models/User");
 const sendVerificationEmail = require("../utils/sendEmail");
-
+const { verifyToken } = require("../middleware/authMiddleware");
 const router = express.Router();
+
+
 /**
  * @swagger
  * /api/auth/register:
