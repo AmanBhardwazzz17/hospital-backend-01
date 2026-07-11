@@ -692,8 +692,9 @@ nav {
   </div>
   <div style="display:flex;flex-direction:column;gap:16px;">
     <div>
-      <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">Photo URL</label>
-      <input type="text" id="profilePhoto" placeholder="https://example.com/photo.jpg" oninput="previewPhoto()" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;font-family:var(--font);font-size:14px;">
+      <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">Profile Photo</label>
+<input type="file" id="profilePhotoFile" accept="image/*" onchange="handlePhotoFile(event)" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;font-family:var(--font);font-size:13px;">
+<input type="hidden" id="profilePhoto">
     </div>
     <div>
       <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">Full Name</label>
@@ -1070,7 +1071,32 @@ async function loadProfile() {
     showToast('❌ Profile load nahi hua', 'error');
   }
 }
+// ✅ Photo file select karke resize + base64 convert karo
+function handlePhotoFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
 
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const MAX = 300;
+      let w = img.width, h = img.height;
+      if (w > h) { if (w > MAX) { h *= MAX / w; w = MAX; } }
+      else { if (h > MAX) { w *= MAX / h; h = MAX; } }
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+      document.getElementById('profilePhoto').value = compressedBase64;
+      previewPhoto();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
 function previewPhoto() {
   const url = document.getElementById('profilePhoto').value;
   const img = document.getElementById('profilePhotoPreview');
