@@ -8,7 +8,7 @@ hospital beds during emergencies.
 - **Backend:** https://hospital-backend-01.onrender.com
 
 ## 👨‍💻 Built By
-**Aman Kumar** | Roll: ua2503cdh782 | Group: 57  
+**Aman Kumar** | Roll: ua2503cdh782 |  
 IIT Patna — Capstone-I Project 2026
 
 ## ✨ Features
