@@ -793,6 +793,27 @@ if (userName) {
 }
 if (userId) document.getElementById("patientIdCard").textContent = "HOSP-" + userId.slice(-6).toUpperCase();
 
+// ✅ Page load pe hi profile photo top avatar mein set karo
+function applyTopAvatar(photoUrl, name) {
+  const avatar = document.getElementById('userAvatar');
+  if (photoUrl) {
+    avatar.innerHTML = `<img src="${photoUrl}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" onerror="this.parentElement.textContent='${(name||'P').charAt(0).toUpperCase()}'">`;
+  } else {
+    avatar.textContent = (name || 'P').charAt(0).toUpperCase();
+  }
+}
+(async function loadTopAvatarPhoto() {
+  try {
+    const res = await fetch(`${API_URL}/api/auth/profile`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await res.json();
+    if (data.success && data.user.profilePhoto) {
+      applyTopAvatar(data.user.profilePhoto, data.user.name);
+    }
+  } catch (err) { /* silent fail, letter avatar rahega */ }
+})();
+
 const hour = new Date().getHours();
 document.getElementById("greetMsg").textContent = `${hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening'}! 👋`;
 
@@ -1082,9 +1103,9 @@ async function saveProfile() {
     });
     const data = await res.json();
     if (data.success) {
-      showToast('✅ Profile updated!', 'success');
+     showToast('✅ Profile updated!', 'success');
       localStorage.setItem('userName', data.user.name);
-      document.getElementById('userAvatar').textContent = data.user.name.charAt(0).toUpperCase();
+      applyTopAvatar(data.user.profilePhoto, data.user.name);
       document.getElementById('patientNameWelcome').textContent = data.user.name;
     } else {
       showToast('❌ ' + (data.message || 'Update failed'), 'error');
