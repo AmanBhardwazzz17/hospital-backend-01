@@ -279,6 +279,7 @@ input:checked + .toggle-slider:before { transform: translateX(24px); }
     <button class="nav-link" onclick="showPage('appointments',this)">📅 Appointments</button>
     <button class="nav-link" onclick="showPage('sms',this)">📱 SMS Alerts</button>
     <button class="nav-link" onclick="showPage('history',this)">📋 History</button>
+    <button class="nav-link" onclick="showPage('blood',this)">🩸 Blood Bank</button>
   </div>
   <div class="nav-right">
     <div class="hosp-avatar" id="hospAvatar">H</div>
@@ -534,6 +535,56 @@ input:checked + .toggle-slider:before { transform: translateX(24px); }
 
   </div>
 </div>
+<!-- ========== BLOOD BANK PAGE ========== -->
+<div id="page-blood" class="page">
+  <div class="wrap">
+    <div style="margin-bottom:24px;">
+      <h1 style="font-size:24px;font-weight:800;margin-bottom:6px;">🩸 Blood Bank Stock</h1>
+      <p style="font-size:14px;color:var(--muted);">Update blood unit availability — visible to patients searching for blood</p>
+    </div>
+    <div class="panel" style="margin-bottom:20px;">
+      <div class="panel-hdr">
+        <span class="panel-title">🩸 Blood Group Stock (Units)</span>
+        <span style="font-size:12px;color:var(--muted);" id="bloodLastUpdated">Never updated</span>
+      </div>
+      <div class="bed-update-grid">
+        <div class="bed-update-card">
+          <div class="buc-header"><div class="buc-title"><div class="buc-icon bi-red">🩸</div>A+</div></div>
+          <div class="buc-inputs"><div class="buc-field"><label>Units Available</label><input type="number" id="blood_A+" min="0" placeholder="0"></div></div>
+        </div>
+        <div class="bed-update-card">
+          <div class="buc-header"><div class="buc-title"><div class="buc-icon bi-red">🩸</div>A-</div></div>
+          <div class="buc-inputs"><div class="buc-field"><label>Units Available</label><input type="number" id="blood_A-" min="0" placeholder="0"></div></div>
+        </div>
+        <div class="bed-update-card">
+          <div class="buc-header"><div class="buc-title"><div class="buc-icon bi-red">🩸</div>B+</div></div>
+          <div class="buc-inputs"><div class="buc-field"><label>Units Available</label><input type="number" id="blood_B+" min="0" placeholder="0"></div></div>
+        </div>
+        <div class="bed-update-card">
+          <div class="buc-header"><div class="buc-title"><div class="buc-icon bi-red">🩸</div>B-</div></div>
+          <div class="buc-inputs"><div class="buc-field"><label>Units Available</label><input type="number" id="blood_B-" min="0" placeholder="0"></div></div>
+        </div>
+        <div class="bed-update-card">
+          <div class="buc-header"><div class="buc-title"><div class="buc-icon bi-red">🩸</div>O+</div></div>
+          <div class="buc-inputs"><div class="buc-field"><label>Units Available</label><input type="number" id="blood_O+" min="0" placeholder="0"></div></div>
+        </div>
+        <div class="bed-update-card">
+          <div class="buc-header"><div class="buc-title"><div class="buc-icon bi-red">🩸</div>O-</div></div>
+          <div class="buc-inputs"><div class="buc-field"><label>Units Available</label><input type="number" id="blood_O-" min="0" placeholder="0"></div></div>
+        </div>
+        <div class="bed-update-card">
+          <div class="buc-header"><div class="buc-title"><div class="buc-icon bi-red">🩸</div>AB+</div></div>
+          <div class="buc-inputs"><div class="buc-field"><label>Units Available</label><input type="number" id="blood_AB+" min="0" placeholder="0"></div></div>
+        </div>
+        <div class="bed-update-card">
+          <div class="buc-header"><div class="buc-title"><div class="buc-icon bi-red">🩸</div>AB-</div></div>
+          <div class="buc-inputs"><div class="buc-field"><label>Units Available</label><input type="number" id="blood_AB-" min="0" placeholder="0"></div></div>
+        </div>
+      </div>
+      <button class="save-btn" onclick="saveBloodBank()" style="margin-top:20px;padding:14px 28px;background:linear-gradient(135deg, var(--primary), #2980b9);color:white;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;width:100%;">💾 Save Blood Bank Stock</button>
+    </div>
+  </div>
+</div>
 
 <!-- ==================== SMS PAGE ==================== -->
 <!-- APPOINTMENTS PAGE -->
@@ -764,6 +815,7 @@ function loadDemoData() {
 }
 
 function updateDashboard(h) {
+  loadBloodBankForm(h);
   // Stats
   document.getElementById("dashGeneral").textContent = h.availableBeds;
   document.getElementById("dashICU").textContent = h.icuAvailable;
@@ -931,7 +983,56 @@ async function saveBeds() {
     btn.style.opacity = "1";
   }
 }
+// ✅ Blood Bank — Load current stock
+function loadBloodBankForm(h) {
+  const groups = ["A+","A-","B+","B-","O+","O-","AB+","AB-"];
+  groups.forEach(g => {
+    const el = document.getElementById(`blood_${g}`);
+    if (el && h.bloodBank) el.value = h.bloodBank[g] || 0;
+  });
+}
 
+// ✅ Blood Bank — Save stock to API
+async function saveBloodBank() {
+  const btn = event.target;
+  btn.textContent = "💾 Saving...";
+  btn.style.opacity = "0.75";
+
+  const groups = ["A+","A-","B+","B-","O+","O-","AB+","AB-"];
+  const bloodBank = {};
+  groups.forEach(g => {
+    bloodBank[g] = parseInt(document.getElementById(`blood_${g}`).value) || 0;
+  });
+
+  try {
+    const hospId = hospitalData?._id;
+    const res = await fetch(`${API_URL}/api/blood/update/${hospId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ bloodBank })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      btn.textContent = "✅ Saved Successfully!";
+      btn.style.background = "var(--green)";
+      document.getElementById('bloodLastUpdated').textContent = "Updated just now";
+      showToast("✅ Blood bank stock updated!", "success");
+
+      setTimeout(() => {
+        btn.textContent = "💾 Save Blood Bank Stock";
+        btn.style.background = "linear-gradient(135deg, var(--primary), #2980b9)";
+        btn.style.opacity = "1";
+      }, 2000);
+    } else {
+      throw new Error(data.message);
+    }
+  } catch (err) {
+    showToast("❌ Blood bank update failed", "error");
+    btn.textContent = "💾 Save Blood Bank Stock";
+    btn.style.opacity = "1";
+  }
+}
 // ✅ Emergency toggle
 async function updateEmergencyStatus() {
   const isAvailable = document.getElementById('emergencyToggle').checked;
