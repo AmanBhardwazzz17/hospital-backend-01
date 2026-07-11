@@ -296,7 +296,7 @@ nav {
   </div>
   <div class="nav-right">
     <button class="btn-sos" onclick="showPage('emergency')">🆘 SOS</button>
-    <div class="user-avatar" id="userAvatar">P</div>
+   <div class="user-avatar" id="userAvatar" onclick="showPage('profile')" style="cursor:pointer;" title="My Profile">P</div>
   </div>
 </nav>
 
@@ -677,7 +677,69 @@ nav {
     </div>
   </div>
 </div>
+<!-- PROFILE PAGE -->
+<div id="page-profile" class="page">
+  <div class="analytics-wrap">
+    <div style="margin-bottom:24px;">
+      <h1 style="font-size:24px;font-weight:800;margin-bottom:6px;">👤 My Profile</h1>
+      <p style="font-size:14px;color:var(--muted)">Apni details update karo</p>
+    </div>
 
+    <div class="panel" style="max-width:520px;">
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">Full Name</label>
+          <input type="text" id="profileName" placeholder="Your name" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;font-family:var(--font);font-size:14px;">
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">Email</label>
+          <input type="email" id="profileEmail" disabled style="width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;font-family:var(--font);font-size:14px;background:#f5f5f5;color:#888;">
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">Phone</label>
+          <input type="text" id="profilePhone" placeholder="10 digit number" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;font-family:var(--font);font-size:14px;">
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">Address</label>
+          <input type="text" id="profileAddress" placeholder="Your address" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;font-family:var(--font);font-size:14px;">
+        </div>
+        <div style="display:flex;gap:12px;">
+          <div style="flex:1;">
+            <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">Age</label>
+            <input type="number" id="profileAge" placeholder="Age" min="0" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;font-family:var(--font);font-size:14px;">
+          </div>
+          <div style="flex:1;">
+            <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">Gender</label>
+            <select id="profileGender" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;font-family:var(--font);font-size:14px;">
+              <option value="">Select</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">Blood Group</label>
+          <select id="profileBloodGroup" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;font-family:var(--font);font-size:14px;">
+            <option value="">Select</option>
+            <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+            <option>O+</option><option>O-</option><option>AB+</option><option>AB-</option>
+          </select>
+        </div>
+        <button onclick="saveProfile()" style="padding:14px;background:linear-gradient(135deg, var(--primary), #2980b9);color:white;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;">💾 Save Profile</button>
+      </div>
+    </div>
+
+    <div class="panel" style="max-width:520px;margin-top:20px;">
+      <div class="panel-title" style="margin-bottom:16px;">🔒 Change Password</div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <input type="password" id="oldPassword" placeholder="Current password" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;font-family:var(--font);font-size:14px;">
+        <input type="password" id="newPassword" placeholder="New password (min 6 chars)" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;font-family:var(--font);font-size:14px;">
+        <button onclick="changePassword()" style="padding:14px;background:#1A252F;color:white;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;">🔒 Change Password</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="modal-overlay" id="alertModal">
   <div class="modal-box">
     <div class="modal-icon">🚨</div>
@@ -752,6 +814,7 @@ function showPage(page, btn) {
   if (page === 'beds') loadBeds();
   if (page === 'analytics') lazyLoadCharts();
   if (page === 'map') lazyLoadLeaflet();
+  if (page === 'profile') loadProfile();
 }
 
 // ✅ Leaflet lazy load — sirf map tab click pe
@@ -954,6 +1017,86 @@ async function searchBlood(group, btn) {
   }
 }
 function quickCall(num){if(confirm(`Call ${num}?`))window.location.href=`tel:${num}`;}
+// ✅ Profile Page
+async function loadProfile() {
+  try {
+    const res = await fetch(`${API_URL}/api/auth/profile`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await res.json();
+    if (data.success) {
+      const u = data.user;
+      document.getElementById('profileName').value = u.name || '';
+      document.getElementById('profileEmail').value = u.email || '';
+      document.getElementById('profilePhone').value = u.phone || '';
+      document.getElementById('profileAddress').value = u.address || '';
+      document.getElementById('profileAge').value = u.age || '';
+      document.getElementById('profileGender').value = u.gender || '';
+      document.getElementById('profileBloodGroup').value = u.bloodGroup || '';
+    }
+  } catch (err) {
+    showToast('❌ Profile load nahi hua', 'error');
+  }
+}
+
+async function saveProfile() {
+  const body = {
+    name: document.getElementById('profileName').value,
+    phone: document.getElementById('profilePhone').value,
+    address: document.getElementById('profileAddress').value,
+    age: parseInt(document.getElementById('profileAge').value) || null,
+    gender: document.getElementById('profileGender').value,
+    bloodGroup: document.getElementById('profileBloodGroup').value,
+  };
+  try {
+    const res = await fetch(`${API_URL}/api/auth/profile`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('✅ Profile updated!', 'success');
+      localStorage.setItem('userName', data.user.name);
+      document.getElementById('userAvatar').textContent = data.user.name.charAt(0).toUpperCase();
+      document.getElementById('patientNameWelcome').textContent = data.user.name;
+    } else {
+      showToast('❌ ' + (data.message || 'Update failed'), 'error');
+    }
+  } catch (err) {
+    showToast('❌ Server error', 'error');
+  }
+}
+
+async function changePassword() {
+  const oldPassword = document.getElementById('oldPassword').value;
+  const newPassword = document.getElementById('newPassword').value;
+  if (!oldPassword || !newPassword) {
+    showToast('⚠️ Dono fields bharo', 'error');
+    return;
+  }
+  if (newPassword.length < 6) {
+    showToast('⚠️ New password kam se kam 6 characters ka ho', 'error');
+    return;
+  }
+  try {
+    const res = await fetch(`${API_URL}/api/auth/change-password`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ oldPassword, newPassword })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('✅ Password change ho gaya!', 'success');
+      document.getElementById('oldPassword').value = '';
+      document.getElementById('newPassword').value = '';
+    } else {
+      showToast('❌ ' + (data.message || 'Change failed'), 'error');
+    }
+  } catch (err) {
+    showToast('❌ Server error', 'error');
+  }
+}
 function sendAlert(){if(!document.getElementById('emgLocation').value||!document.getElementById('emgType').value||!document.getElementById('emgSeverity').value){showToast('⚠️ Please fill all fields!','error');return;}document.getElementById('alertModal').classList.add('show');}
 function confirmAlert(){closeModal();showToast('🚨 Emergency alert sent! 3 hospitals notified!','success');document.getElementById('emgLocation').value='';document.getElementById('emgType').value='';document.getElementById('emgSeverity').value='';}
 function closeModal(){document.getElementById('alertModal').classList.remove('show');}
