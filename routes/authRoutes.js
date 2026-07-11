@@ -349,5 +349,60 @@ router.post("/google-login", async (req, res) => {
     return res.status(500).json({ message: "Server error", error: err.message });
   }
 });
+// ✅ GET — Apni profile dekho
+router.get("/profile", verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    return res.json({ success: true, user });
+  } catch (err) {
+    return res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+// ✅ PUT — Profile update karo
+router.put("/profile", verifyToken, async (req, res) => {
+  try {
+    const { name, phone, address, age, gender, bloodGroup, profilePhoto } = req.body;
+
+    const updated = await User.findByIdAndUpdate(
+      req.user.id,
+      { name, phone, address, age, gender, bloodGroup, profilePhoto },
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    if (!updated) return res.status(404).json({ message: "User not found" });
+
+    return res.json({ success: true, message: "Profile updated!", user: updated });
+  } catch (err) {
+    return res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+// ✅ PUT — Password change karo
+router.put("/change-password", verifyToken, async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ message: "Old aur new password required" });
+    }
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: "New password kam se kam 6 characters ka ho" });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) return res.status(401).json({ message: "Purana password galat hai" });
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    return res.json({ success: true, message: "Password successfully changed" });
+  } catch (err) {
+    return res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
 
 module.exports = router;

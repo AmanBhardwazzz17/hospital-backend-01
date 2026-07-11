@@ -40,9 +40,16 @@ const userSchema = new mongoose.Schema(
     verifyToken: {
       type: String,
     },
-    verifyTokenExpiry: {
+   verifyTokenExpiry: {
       type: Date,
     },
+    // ✅ Profile Info
+    phone: { type: String, default: "" },
+    address: { type: String, default: "" },
+    age: { type: Number, default: null },
+    gender: { type: String, enum: ["male", "female", "other", ""], default: "" },
+    bloodGroup: { type: String, default: "" },
+    profilePhoto: { type: String, default: "" },
   },
   { timestamps: true }
 );
