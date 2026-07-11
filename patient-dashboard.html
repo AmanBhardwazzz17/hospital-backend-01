@@ -686,9 +686,17 @@ nav {
     </div>
 
     <div class="panel" style="max-width:520px;">
-      <div style="display:flex;flex-direction:column;gap:16px;">
-        <div>
-          <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">Full Name</label>
+  <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:8px;">
+    <img id="profilePhotoPreview" src="" style="width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid var(--primary-light);display:none;margin-bottom:12px;">
+    <div id="profilePhotoFallback" style="width:90px;height:90px;border-radius:50%;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;margin-bottom:12px;">P</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:16px;">
+    <div>
+      <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">Photo URL</label>
+      <input type="text" id="profilePhoto" placeholder="https://example.com/photo.jpg" oninput="previewPhoto()" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;font-family:var(--font);font-size:14px;">
+    </div>
+    <div>
+      <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:6px;">Full Name</label>
           <input type="text" id="profileName" placeholder="Your name" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;font-family:var(--font);font-size:14px;">
         </div>
         <div>
@@ -1033,12 +1041,29 @@ async function loadProfile() {
       document.getElementById('profileAge').value = u.age || '';
       document.getElementById('profileGender').value = u.gender || '';
       document.getElementById('profileBloodGroup').value = u.bloodGroup || '';
+      document.getElementById('profilePhoto').value = u.profilePhoto || '';
+      document.getElementById('profilePhotoFallback').textContent = (u.name || 'P').charAt(0).toUpperCase();
+      previewPhoto();
     }
   } catch (err) {
     showToast('❌ Profile load nahi hua', 'error');
   }
 }
 
+function previewPhoto() {
+  const url = document.getElementById('profilePhoto').value;
+  const img = document.getElementById('profilePhotoPreview');
+  const fallback = document.getElementById('profilePhotoFallback');
+  if (url) {
+    img.src = url;
+    img.style.display = 'block';
+    img.onerror = () => { img.style.display = 'none'; fallback.style.display = 'flex'; };
+    img.onload = () => { fallback.style.display = 'none'; };
+  } else {
+    img.style.display = 'none';
+    fallback.style.display = 'flex';
+  }
+}
 async function saveProfile() {
   const body = {
     name: document.getElementById('profileName').value,
@@ -1047,6 +1072,7 @@ async function saveProfile() {
     age: parseInt(document.getElementById('profileAge').value) || null,
     gender: document.getElementById('profileGender').value,
     bloodGroup: document.getElementById('profileBloodGroup').value,
+    profilePhoto: document.getElementById('profilePhoto').value,
   };
   try {
     const res = await fetch(`${API_URL}/api/auth/profile`, {
