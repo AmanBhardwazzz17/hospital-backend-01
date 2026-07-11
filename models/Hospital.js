@@ -16,6 +16,17 @@ const hospitalSchema = new mongoose.Schema({
   ventilatorAvailable: { type: Number, default: 0 },
   emergencyAvailable: { type: Boolean, default: true },
   isActive: { type: Boolean, default: true },
+  // ✅ Blood Bank Stock (units available)
+  bloodBank: {
+    "A+": { type: Number, default: 0 },
+    "A-": { type: Number, default: 0 },
+    "B+": { type: Number, default: 0 },
+    "B-": { type: Number, default: 0 },
+    "O+": { type: Number, default: 0 },
+    "O-": { type: Number, default: 0 },
+    "AB+": { type: Number, default: 0 },
+    "AB-": { type: Number, default: 0 }
+  },
   // ✅ NEW — Approval System
   approvalStatus: {
     type: String,
