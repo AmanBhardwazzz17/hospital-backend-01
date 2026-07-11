@@ -289,6 +289,7 @@ nav {
     <button class="nav-link active" onclick="showPage('dashboard',this)">🏠 Dashboard</button>
     <button class="nav-link" onclick="showPage('appointments',this)">📅 Appointments</button>
     <button class="nav-link" onclick="showPage('map',this)">🗺️ Nearby Hospitals</button>
+    <button class="nav-link" onclick="showPage('blood',this)">🩸 Blood Bank</button>
     <button class="nav-link" onclick="showPage('beds',this)">🛏️ Bed Availability</button>
     <button class="nav-link" onclick="showPage('emergency',this)">🚨 Emergency</button>
     <button class="nav-link" onclick="showPage('analytics',this)">📊 Analytics</button>
@@ -428,6 +429,33 @@ nav {
     </div>
     <div id="hospitalsGrid" class="hospitals-grid">
       <div style="text-align:center;padding:40px;grid-column:1/-1;color:var(--muted)"><div style="font-size:32px;margin-bottom:10px">⏳</div>Loading...</div>
+    </div>
+  </div>
+</div>
+<!-- BLOOD BANK PAGE -->
+<div id="page-blood" class="page">
+  <div class="beds-wrap">
+    <div style="margin-bottom:20px;">
+      <h1 style="font-size:24px;font-weight:800;margin-bottom:6px;">🩸 Blood Bank Availability</h1>
+      <p style="font-size:14px;color:var(--muted)">Search kis hospital mein aapke blood group ka stock available hai</p>
+    </div>
+
+    <div class="beds-filters" style="margin-bottom:20px;">
+      <button class="flt-btn active" data-group="A+" onclick="searchBlood('A+',this)">A+</button>
+      <button class="flt-btn" data-group="A-" onclick="searchBlood('A-',this)">A-</button>
+      <button class="flt-btn" data-group="B+" onclick="searchBlood('B+',this)">B+</button>
+      <button class="flt-btn" data-group="B-" onclick="searchBlood('B-',this)">B-</button>
+      <button class="flt-btn" data-group="O+" onclick="searchBlood('O+',this)">O+</button>
+      <button class="flt-btn" data-group="O-" onclick="searchBlood('O-',this)">O-</button>
+      <button class="flt-btn" data-group="AB+" onclick="searchBlood('AB+',this)">AB+</button>
+      <button class="flt-btn" data-group="AB-" onclick="searchBlood('AB-',this)">AB-</button>
+    </div>
+
+    <div id="bloodResultsGrid" class="hospitals-grid">
+      <div style="text-align:center;padding:40px;grid-column:1/-1;color:var(--muted)">
+        <div style="font-size:32px;margin-bottom:10px">🩸</div>
+        Koi blood group select karo upar se
+      </div>
     </div>
   </div>
 </div>
@@ -885,7 +913,46 @@ function loadDemoHospitals() {
 function filterBeds(type,btn){bedFilter=type;document.querySelectorAll('.flt-btn').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');applyBedFilter(type);}
 function applyBedFilter(type){let f=[...allHospitals];if(type==='available')f=f.filter(h=>h.availableBeds>0);if(type==='icu')f=f.filter(h=>h.icuAvailable>0);if(type==='emergency')f=f.filter(h=>h.emergencyAvailable);renderBeds(f);}
 function searchBeds(){const q=document.getElementById('bedSearch').value.toLowerCase();renderBeds(allHospitals.filter(h=>h.name.toLowerCase().includes(q)||h.city.toLowerCase().includes(q)));}
+// ✅ Blood Bank Search
+async function searchBlood(group, btn) {
+  document.querySelectorAll('#page-blood .flt-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
 
+  const grid = document.getElementById('bloodResultsGrid');
+  grid.innerHTML = '<div style="text-align:center;padding:40px;grid-column:1/-1;color:var(--muted)"><div style="font-size:32px;margin-bottom:10px">⏳</div>Searching...</div>';
+
+  try {
+    const res = await fetch(`${API_URL}/api/blood/search?group=${encodeURIComponent(group)}`);
+    const data = await res.json();
+
+    if (!data.success || !data.hospitals.length) {
+      grid.innerHTML = `<div style="text-align:center;padding:40px;grid-column:1/-1;color:var(--muted)"><div style="font-size:32px;margin-bottom:10px">🩸</div>Koi hospital mein ${group} blood available nahi hai abhi</div>`;
+      return;
+    }
+
+    grid.innerHTML = data.hospitals.map(h => `
+      <div class="hosp-card">
+        <div class="hc-top">
+          <div>
+            <div class="hc-name">🏥 ${h.name}</div>
+            <div class="hc-city">📍 ${h.city}${h.address ? ' • ' + h.address : ''}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
+            <span class="avail-badge ab-high">🩸 ${h.bloodBank[group]} Units Available</span>
+          </div>
+        </div>
+        <div class="hc-footer">
+          <span class="hc-time">Blood Group: ${group}</span>
+          <div class="hc-btns">
+            ${h.phone ? `<button class="hc-btn" onclick="window.location.href='tel:${h.phone}'">📞 Call</button>` : ''}
+          </div>
+        </div>
+      </div>
+    `).join('');
+  } catch (err) {
+    grid.innerHTML = '<div style="text-align:center;padding:40px;grid-column:1/-1;color:var(--muted)">❌ Search failed, try again</div>';
+  }
+}
 function quickCall(num){if(confirm(`Call ${num}?`))window.location.href=`tel:${num}`;}
 function sendAlert(){if(!document.getElementById('emgLocation').value||!document.getElementById('emgType').value||!document.getElementById('emgSeverity').value){showToast('⚠️ Please fill all fields!','error');return;}document.getElementById('alertModal').classList.add('show');}
 function confirmAlert(){closeModal();showToast('🚨 Emergency alert sent! 3 hospitals notified!','success');document.getElementById('emgLocation').value='';document.getElementById('emgType').value='';document.getElementById('emgSeverity').value='';}
