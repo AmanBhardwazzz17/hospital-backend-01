@@ -7,6 +7,10 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
+  .hamburger-btn{
+  display:none; width:40px; height:40px; align-items:center; justify-content:center;
+  background:none; border:none; font-size:24px; cursor:pointer; color:var(--primary);
+}
 :root {
   --primary: #1A5276;
   --primary-dark: #154360;
@@ -260,6 +264,15 @@ input:checked + .toggle-slider:before { transform: translateX(24px); }
   .bed-update-grid { grid-template-columns: 1fr; }
   .wb-stats { display: none; }
   .top-bar { display: none; }
+  .hamburger-btn{display:flex;}
+  .nav-links{
+    display:none; position:fixed; top:56px; left:0; right:0;
+    background:white; flex-direction:column; padding:16px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.15); z-index:998; gap:6px;
+    max-height:70vh; overflow-y:auto;
+  }
+  .nav-links.mobile-open{display:flex;}
+  .nav-links .nav-link{width:100%; text-align:left; padding:12px 16px;}
 }
 </style>
 </head>
@@ -280,6 +293,7 @@ input:checked + .toggle-slider:before { transform: translateX(24px); }
 <!-- NAV -->
 <nav>
   <div class="logo">Hosp<span class="blue">Track</span><span class="badge">HOSPITAL</span></div>
+  <button class="hamburger-btn" onclick="document.querySelector('.nav-links').classList.toggle('mobile-open')">☰</button>
   <div class="nav-links">
     <button class="nav-link active" onclick="showPage('dashboard',this)">🏠 Dashboard</button>
     <button class="nav-link" onclick="showPage('beds',this)">🛏️ Update Beds</button>
