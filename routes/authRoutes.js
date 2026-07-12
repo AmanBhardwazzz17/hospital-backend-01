@@ -5,7 +5,7 @@ const axios = require("axios");
 const crypto = require("crypto");
 const User = require("../models/User");
 const sendVerificationEmail = require("../utils/sendEmail");
-const { verifyToken } = require("../middleware/authMiddleware");
+const { verifyToken, adminOnly } = require("../middleware/authMiddleware");
 const router = express.Router();
 
 
@@ -406,5 +406,13 @@ router.put("/change-password", verifyToken, async (req, res) => {
     return res.status(500).json({ message: "Server error", error: err.message });
   }
 });
-
+// ✅ GET — Admin: Saare users dekho
+router.get("/users", verifyToken, adminOnly, async (req, res) => {
+  try {
+    const users = await User.find().select("-password").sort({ createdAt: -1 });
+    return res.json({ success: true, total: users.length, users });
+  } catch (err) {
+    return res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
 module.exports = router;
