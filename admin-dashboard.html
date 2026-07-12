@@ -429,7 +429,7 @@ tr:hover td { background: #fafbfc; }
       <div class="panel">
         <div class="panel-head">
           <span class="panel-title">👥 All Users</span>
-          <span style="font-size:12px;color:var(--muted)">Fetching from database...</span>
+          <span style="font-size:12px;color:var(--muted)" id="usersCountText">Fetching from database...</span>
         </div>
         <table>
           <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Verified</th><th>Status</th></tr></thead>
@@ -786,8 +786,6 @@ async function loadUsers() {
 }
 
 function renderUsers(users) {
-  const tbody = document.getElementById('usersTableBody');
-  if (!users.length) {
     tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">Koi user nahi mila</td></tr>`;
     return;
   }
