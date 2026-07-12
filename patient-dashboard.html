@@ -6,6 +6,10 @@
 <title>Patient Dashboard – HospTrack</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
 <style>
+.hamburger-btn{
+  display:none; width:40px; height:40px; align-items:center; justify-content:center;
+  background:none; border:none; font-size:24px; cursor:pointer; color:var(--primary);
+}
 :root {
   --primary: #C0392B; --primary-dark: #922B21; --primary-light: #FADBD8;
   --accent: #1A252F; --white: #FFFFFF; --off-white: #F8F9FA;
@@ -262,7 +266,16 @@ nav {
   .stats-row,.summary-grid{grid-template-columns:repeat(2,1fr);}
   .hospitals-grid{grid-template-columns:1fr;} .form-grid{grid-template-columns:1fr;}
   .quick-emg{grid-template-columns:1fr 1fr;} .bottom-grid{grid-template-columns:1fr;}
-  .welcome-stats{display:none;} .top-bar,.nav-links{display:none;}
+  .welcome-stats{display:none;} .top-bar{display:none;}
+.hamburger-btn{display:flex;}
+.nav-links{
+  display:none; position:fixed; top:56px; left:0; right:0;
+  background:white; flex-direction:column; padding:16px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.15); z-index:998; gap:6px;
+  max-height:70vh; overflow-y:auto;
+}
+.nav-links.mobile-open{display:flex;}
+.nav-links .nav-link{width:100%; text-align:left; padding:12px 16px;}
 }
 </style>
 </head>
@@ -285,6 +298,7 @@ nav {
 
 <nav>
   <div class="logo">Hosp<span class="red">Track</span></div>
+  <button class="hamburger-btn" onclick="document.querySelector('.nav-links').classList.toggle('mobile-open')">☰</button>
   <div class="nav-links">
     <button class="nav-link active" onclick="showPage('dashboard',this)">🏠 Dashboard</button>
     <button class="nav-link" onclick="showPage('appointments',this)">📅 Appointments</button>
