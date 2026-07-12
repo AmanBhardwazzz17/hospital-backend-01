@@ -795,6 +795,8 @@ async function loadUsers() {
 
 function renderUsers(users) {
   const tbody = document.getElementById('usersTableBody');
+  const countEl = document.getElementById('usersCountText');
+  if (countEl) countEl.textContent = `${users.length} total users`;
   if (!users || users.length === 0) {
     tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">Koi user nahi mila</td></tr>`;
     return;
