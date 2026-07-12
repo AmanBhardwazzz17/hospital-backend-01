@@ -311,7 +311,15 @@ tr:hover td { background: #fafbfc; }
       <input type="text" placeholder="Search hospitals, users...">
     </div>
     <div class="topbar-right">
-      <div class="icon-btn">🔔<div class="notif-dot"></div></div>
+      <div class="icon-btn" onclick="toggleNotifPanel()" style="position:relative;">
+  🔔<div class="notif-dot" id="notifDot"></div>
+  <div id="notifPanel" style="display:none; position:absolute; top:44px; right:0; width:320px; max-height:400px; overflow-y:auto; background:white; border:1px solid var(--border); border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.15); z-index:9999; text-align:left;">
+    <div style="padding:14px; border-bottom:1px solid var(--border); font-weight:700; font-size:14px;">🔔 Notifications</div>
+    <div id="notifList" style="padding:8px;">
+      <div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">Loading...</div>
+    </div>
+  </div>
+</div>
       <button class="add-btn" onclick="openAddHospital()">+ Add Hospital</button>
     </div>
   </div>
@@ -786,6 +794,8 @@ async function loadUsers() {
 }
 
 function renderUsers(users) {
+  const tbody = document.getElementById('usersTableBody');
+  if (!users || users.length === 0) {
     tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">Koi user nahi mila</td></tr>`;
     return;
   }
@@ -1006,7 +1016,89 @@ function downloadReport() {
   a.click();
   showToast('✅ Report downloaded!', 'success');
 }
+// ======================== NOTIFICATIONS ========================
+let notifOpen = false;
+function toggleNotifPanel() {
+  notifOpen = !notifOpen;
+  document.getElementById('notifPanel').style.display = notifOpen ? 'block' : 'none';
+  if (notifOpen) loadNotifications();
+}
 
+async function loadNotifications() {
+  const list = document.getElementById('notifList');
+  list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">Loading...</div>';
+
+  try {
+    const [pendingRes, emgRes] = await Promise.all([
+      fetch(`${API_URL}/api/hospitals/pending`, { headers: { Authorization: `Bearer ${token}` } }),
+      fetch(`${API_URL}/api/emergency/all`, { headers: { Authorization: `Bearer ${token}` } })
+    ]);
+    const pendingData = await pendingRes.json();
+    const emgData = await emgRes.json();
+
+    const notifs = [];
+
+    if (pendingData.success && pendingData.hospitals.length > 0) {
+      pendingData.hospitals.forEach(h => {
+        notifs.push({
+          icon: '🏥', color: '#f59e0b',
+          title: `${h.name} — approval pending`,
+          time: new Date(h.appliedAt).toLocaleDateString('en-IN'),
+          action: () => showPage('hospitals')
+        });
+      });
+    }
+
+    if (emgData.success && emgData.emergencies.length > 0) {
+      emgData.emergencies.filter(e => e.status === 'pending').forEach(e => {
+        notifs.push({
+          icon: '🚨', color: '#ef4444',
+          title: `Emergency alert — ${e.patientName || 'Patient'}`,
+          time: new Date(e.createdAt).toLocaleDateString('en-IN'),
+          action: () => showPage('emergencies')
+        });
+      });
+    }
+
+    document.getElementById('notifDot').style.display = notifs.length > 0 ? 'block' : 'none';
+
+    if (!notifs.length) {
+      list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">✅ Koi naya notification nahi</div>';
+      return;
+    }
+
+    list.innerHTML = notifs.map((n, i) => `
+      <div onclick="handleNotifClick(${i})" style="display:flex;gap:10px;padding:10px;border-radius:8px;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='var(--off-white)'" onmouseout="this.style.background='transparent'">
+        <div style="font-size:18px;">${n.icon}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;">${n.title}</div>
+          <div style="font-size:11px;color:var(--muted);">${n.time}</div>
+        </div>
+      </div>
+    `).join('');
+
+    window._notifActions = notifs.map(n => n.action);
+  } catch (err) {
+    list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">❌ Load nahi hua</div>';
+  }
+}
+
+function handleNotifClick(i) {
+  if (window._notifActions && window._notifActions[i]) {
+    window._notifActions[i]();
+    toggleNotifPanel();
+  }
+}
+
+// Bahar click karne pe panel band ho
+document.addEventListener('click', function(e) {
+  const panel = document.getElementById('notifPanel');
+  const btn = e.target.closest('.icon-btn');
+  if (notifOpen && panel && !panel.contains(e.target) && !btn) {
+    notifOpen = false;
+    panel.style.display = 'none';
+  }
+});
 // ======================== EMERGENCIES ========================
 async function loadEmergencies() {
   try {
