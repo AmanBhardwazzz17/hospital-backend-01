@@ -745,8 +745,8 @@ function showPage(page, btn) {
   if (page === 'reports') loadReports();
   if (page === 'emergencies') loadEmergencies();
   if (page === 'appointments') loadAdminAppointments();
+  if (page === 'users') loadUsers();
 }
-
 function logout() {
   if (confirm("Logout karna chahte ho?")) { localStorage.clear(); window.location.href = "index.html"; }
 }
@@ -769,7 +769,41 @@ async function loadHospitals() {
   // Load pending hospitals bhi
   loadPendingHospitals();
 }
+// ======================== LOAD USERS ========================
+async function loadUsers() {
+  const tbody = document.getElementById('usersTableBody');
+  try {
+    const res = await fetch(`${API_URL}/api/auth/users`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await res.json();
+    if (data.success) {
+      renderUsers(data.users);
+    }
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">❌ Users load nahi hue</td></tr>`;
+  }
+}
 
+function renderUsers(users) {
+  const tbody = document.getElementById('usersTableBody');
+  if (!users.length) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">Koi user nahi mila</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = users.map(u => `
+    <tr>
+      <td><div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:30px;height:30px;border-radius:8px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent)">${(u.name || 'U').charAt(0).toUpperCase()}</div>
+        <span style="font-weight:600">${u.name}</span>
+      </div></td>
+      <td style="color:var(--muted)">${u.email}</td>
+      <td><span class="badge active">${u.role}</span></td>
+      <td><span class="badge ${u.isVerified ? 'active' : ''}">${u.isVerified ? '✅ Yes' : '❌ No'}</span></td>
+      <td><span class="badge ${u.isActive ? 'active' : ''}">${u.isActive ? 'Active' : 'Inactive'}</span></td>
+    </tr>
+  `).join('');
+}
 async function loadPendingHospitals() {
   try {
     const res = await fetch(`${API_URL}/api/hospitals/pending`, {
