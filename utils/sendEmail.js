@@ -124,4 +124,19 @@ const sendAppointmentEmail = async (patientName, doctorName, date, time, hospita
   }
 };
 
-module.exports = { sendVerificationEmail, sendHospitalApprovalEmail, sendAppointmentEmail };
+const sendNewUserAlert = async (userName, userEmail, userRole) => {
+  try {
+    await resend.emails.send({
+      from: "HospTrack <onboarding@resend.dev>",
+      to: ADMIN_EMAIL,
+      subject: `New User Registered - ${userName}`,
+      html: `<div style="font-family:Arial,sans-serif;max-width:500px;margin:auto;padding:32px;border:1px solid #eee;border-radius:12px;"><div style="background:linear-gradient(135deg,#C0392B,#1A252F);padding:20px;border-radius:8px;text-align:center;margin-bottom:24px;"><h2 style="color:white;margin:0;">🏥 HospTrack</h2></div><h3 style="color:#1A252F;">👤 New User Registered!</h3><table style="width:100%;border-collapse:collapse;"><tr><td style="padding:10px;background:#f9fafb;border:1px solid #eee;font-weight:700;">Name</td><td style="padding:10px;border:1px solid #eee;">${userName}</td></tr><tr><td style="padding:10px;background:#f9fafb;border:1px solid #eee;font-weight:700;">Email</td><td style="padding:10px;border:1px solid #eee;">${userEmail}</td></tr><tr><td style="padding:10px;background:#f9fafb;border:1px solid #eee;font-weight:700;">Role</td><td style="padding:10px;border:1px solid #eee;">${userRole}</td></tr></table><p style="color:#999;font-size:12px;margin-top:20px;">HospTrack - Emergency Hospital Availability System</p></div>`,
+    });
+    console.log("✅ New user alert sent for:", userName);
+    return true;
+  } catch (err) {
+    console.error("❌ New user alert error:", err.message);
+    return false;
+  }
+};
+module.exports = { sendVerificationEmail, sendHospitalApprovalEmail, sendAppointmentEmail, sendNewUserAlert };

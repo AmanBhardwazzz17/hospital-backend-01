@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const axios = require("axios");
 const crypto = require("crypto");
 const User = require("../models/User");
+const Settings = require("../models/Settings");
 const sendVerificationEmail = require("../utils/sendEmail");
 const { verifyToken, adminOnly } = require("../middleware/authMiddleware");
 const router = express.Router();
@@ -116,8 +117,16 @@ router.post("/register", async (req, res) => {
       // verifyToken,
       // verifyTokenExpiry,
     });
-
     // await sendVerificationEmail(email, verifyToken); // ⛔ disabled
+
+    // ✅ Admin ko notify karo agar setting ON hai
+    try {
+      const settings = await Settings.findOne({ key: "global" });
+      if (settings?.emailNotifications) {
+        const { sendNewUserAlert } = require("../utils/sendEmail");
+        await sendNewUserAlert(name, email, "patient");
+      }
+    } catch (e) { /* silent fail, registration should not break */ }
 
     return res.status(201).json({
       success: true,
@@ -411,6 +420,33 @@ router.get("/users", verifyToken, adminOnly, async (req, res) => {
   try {
     const users = await User.find().select("-password").sort({ createdAt: -1 });
     return res.json({ success: true, total: users.length, users });
+  } catch (err) {
+    return res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+// ✅ GET — Settings dekho (admin only)
+router.get("/settings", verifyToken, adminOnly, async (req, res) => {
+  try {
+    let settings = await Settings.findOne({ key: "global" });
+    if (!settings) {
+      settings = await Settings.create({ key: "global", emailNotifications: false });
+    }
+    return res.json({ success: true, settings });
+  } catch (err) {
+    return res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+// ✅ PUT — Settings update karo (admin only)
+router.put("/settings", verifyToken, adminOnly, async (req, res) => {
+  try {
+    const { emailNotifications } = req.body;
+    const settings = await Settings.findOneAndUpdate(
+      { key: "global" },
+      { emailNotifications },
+      { new: true, upsert: true }
+    );
+    return res.json({ success: true, message: "Settings updated!", settings });
   } catch (err) {
     return res.status(500).json({ message: "Server error", error: err.message });
   }
