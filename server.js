@@ -86,7 +86,19 @@ app.get("/", (req, res) => {
     <p>Backend: hospital-backend-01.onrender.com</p>
   `);
 });
+// ✅ Health check — real system status
+app.get("/api/health", (req, res) => {
+  const dbState = mongoose.connection.readyState;
+  const dbStatus = dbState === 1 ? "Connected" : dbState === 2 ? "Connecting" : "Disconnected";
 
+  res.json({
+    success: true,
+    backend: "Live",
+    database: dbStatus,
+    socketio: io ? "Active" : "Inactive",
+    timestamp: new Date().toISOString()
+  });
+});
 // ✅ Use routes
 app.use("/api/auth", authRoutes);
 app.use('/api/appointments', appointmentRoutes);
