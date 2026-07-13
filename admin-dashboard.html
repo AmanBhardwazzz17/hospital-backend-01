@@ -609,9 +609,9 @@ tr:hover td { background: #fafbfc; }
         </div>
         <div class="settings-card">
           <div class="settings-title">ℹ️ System Info</div>
-          <div class="setting-item"><div><div class="setting-label">Backend</div><div class="setting-desc">Node.js + Express</div></div><span class="badge active">Live</span></div>
-          <div class="setting-item"><div><div class="setting-label">Database</div><div class="setting-desc">MongoDB Atlas</div></div><span class="badge active">Connected</span></div>
-          <div class="setting-item"><div><div class="setting-label">Socket.IO</div><div class="setting-desc">Real-time updates</div></div><span class="badge active">Active</span></div>
+          <div class="setting-item"><div><div class="setting-label">Backend</div><div class="setting-desc">Node.js + Express</div></div><span class="badge active" id="statusBackend">Checking...</span></div>
+          <div class="setting-item"><div><div class="setting-label">Database</div><div class="setting-desc">MongoDB Atlas</div></div><span class="badge active" id="statusDatabase">Checking...</span></div>
+          <div class="setting-item"><div><div class="setting-label">Socket.IO</div><div class="setting-desc">Real-time updates</div></div><span class="badge active" id="statusSocket">Checking...</span></div>
           <div class="setting-item"><div><div class="setting-label">Swagger Docs</div><div class="setting-desc">API Documentation</div></div><span class="badge blue">Live</span></div>
           <div style="margin-top:12px">
             <a href="https://hospital-backend-01.onrender.com/api-docs" target="_blank" style="display:inline-block;padding:8px 16px;background:var(--accent-light);color:var(--accent);border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;">📖 View API Docs →</a>
@@ -754,6 +754,7 @@ function showPage(page, btn) {
   if (page === 'emergencies') loadEmergencies();
   if (page === 'appointments') loadAdminAppointments();
   if (page === 'users') loadUsers();
+  if (page === 'settings') loadSystemHealth();
 }
 function logout() {
   if (confirm("Logout karna chahte ho?")) { localStorage.clear(); window.location.href = "index.html"; }
@@ -791,6 +792,33 @@ async function loadUsers() {
   } catch (err) {
     tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">❌ Users load nahi hue</td></tr>`;
   }
+  // ======================== SYSTEM HEALTH ========================
+async function loadSystemHealth() {
+  const backendEl = document.getElementById('statusBackend');
+  const dbEl = document.getElementById('statusDatabase');
+  const socketEl = document.getElementById('statusSocket');
+
+  try {
+    const res = await fetch(`${API_URL}/api/health`);
+    const data = await res.json();
+
+    if (data.success) {
+      backendEl.textContent = data.backend;
+      backendEl.className = 'badge active';
+
+      dbEl.textContent = data.database;
+      dbEl.className = data.database === 'Connected' ? 'badge active' : 'badge red';
+
+      socketEl.textContent = data.socketio;
+      socketEl.className = data.socketio === 'Active' ? 'badge active' : 'badge red';
+    }
+  } catch (err) {
+    backendEl.textContent = 'Down';
+    backendEl.className = 'badge red';
+    dbEl.textContent = 'Unknown';
+    socketEl.textContent = 'Unknown';
+  }
+}
 }
 
 function renderUsers(users) {
