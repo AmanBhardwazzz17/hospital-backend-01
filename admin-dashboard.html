@@ -816,7 +816,9 @@ async function loadSystemHealth() {
     dbEl.textContent = 'Unknown';
     socketEl.textContent = 'Unknown';
   }
-  // ======================== EMAIL NOTIFICATIONS SETTING ========================
+}
+
+// ======================== EMAIL NOTIFICATIONS SETTING ========================
 async function loadEmailNotifSetting() {
   try {
     const res = await fetch(`${API_URL}/api/auth/settings`, {
@@ -852,7 +854,7 @@ async function toggleEmailNotifications(el) {
     el.classList.toggle('off'); // revert on failure
   }
 }
-}
+
 
 function renderUsers(users) {
   const tbody = document.getElementById('usersTableBody');
