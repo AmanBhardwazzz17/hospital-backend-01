@@ -792,23 +792,21 @@ async function loadUsers() {
   } catch (err) {
     tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">❌ Users load nahi hue</td></tr>`;
   }
-  // ======================== SYSTEM HEALTH ========================
+}
+
+// ======================== SYSTEM HEALTH ========================
 async function loadSystemHealth() {
   const backendEl = document.getElementById('statusBackend');
   const dbEl = document.getElementById('statusDatabase');
   const socketEl = document.getElementById('statusSocket');
-
   try {
     const res = await fetch(`${API_URL}/api/health`);
     const data = await res.json();
-
     if (data.success) {
       backendEl.textContent = data.backend;
       backendEl.className = 'badge active';
-
       dbEl.textContent = data.database;
       dbEl.className = data.database === 'Connected' ? 'badge active' : 'badge red';
-
       socketEl.textContent = data.socketio;
       socketEl.className = data.socketio === 'Active' ? 'badge active' : 'badge red';
     }
@@ -818,7 +816,6 @@ async function loadSystemHealth() {
     dbEl.textContent = 'Unknown';
     socketEl.textContent = 'Unknown';
   }
-}
 }
 
 function renderUsers(users) {
