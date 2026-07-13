@@ -565,9 +565,9 @@ tr:hover td { background: #fafbfc; }
             <div class="toggle" onclick="this.classList.toggle('off')"></div>
           </div>
           <div class="setting-item">
-            <div><div class="setting-label">Email Notifications</div><div class="setting-desc">Naye users ko email bhejo</div></div>
-            <div class="toggle off" onclick="this.classList.toggle('off')"></div>
-          </div>
+   <div><div class="setting-label">Email Notifications</div><div class="setting-desc">Naye users ko email bhejo</div></div>
+  <div class="toggle off" id="emailNotifToggle" onclick="toggleEmailNotifications(this)"></div>
+</div>
           <div class="setting-item">
             <div><div class="setting-label">Real-time Updates</div><div class="setting-desc">Socket.IO live updates</div></div>
             <div class="toggle" onclick="this.classList.toggle('off')"></div>
@@ -754,7 +754,7 @@ function showPage(page, btn) {
   if (page === 'emergencies') loadEmergencies();
   if (page === 'appointments') loadAdminAppointments();
   if (page === 'users') loadUsers();
-  if (page === 'settings') loadSystemHealth();
+  if (page === 'settings') { loadSystemHealth(); loadEmailNotifSetting(); }
 }
 function logout() {
   if (confirm("Logout karna chahte ho?")) { localStorage.clear(); window.location.href = "index.html"; }
@@ -816,6 +816,42 @@ async function loadSystemHealth() {
     dbEl.textContent = 'Unknown';
     socketEl.textContent = 'Unknown';
   }
+  // ======================== EMAIL NOTIFICATIONS SETTING ========================
+async function loadEmailNotifSetting() {
+  try {
+    const res = await fetch(`${API_URL}/api/auth/settings`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await res.json();
+    const toggle = document.getElementById('emailNotifToggle');
+    if (data.success && toggle) {
+      if (data.settings.emailNotifications) {
+        toggle.classList.remove('off');
+      } else {
+        toggle.classList.add('off');
+      }
+    }
+  } catch (err) { console.error(err); }
+}
+
+async function toggleEmailNotifications(el) {
+  el.classList.toggle('off');
+  const isOn = !el.classList.contains('off');
+  try {
+    const res = await fetch(`${API_URL}/api/auth/settings`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ emailNotifications: isOn })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast(isOn ? '✅ Email notifications ON' : '🔕 Email notifications OFF', 'success');
+    }
+  } catch (err) {
+    showToast('❌ Setting update nahi hui', 'error');
+    el.classList.toggle('off'); // revert on failure
+  }
+}
 }
 
 function renderUsers(users) {
