@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/project-overview.png" alt="Emergency Hospital Availability Monitoring System - Project Overview" width="100%">
+![Project Overview](https://raw.githubusercontent.com/AmanBhardwazzz17/hospital-backend-01/main/assets/project-overview.png)
 
 </div>
 
