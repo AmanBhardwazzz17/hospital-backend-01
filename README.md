@@ -1,5 +1,13 @@
 <div align="center">
 
+<img src="assets/project-overview.png" alt="Emergency Hospital Availability Monitoring System - Project Overview" width="100%">
+
+</div>
+
+---
+
+<div align="center">
+
 # 🏥 Emergency Hospital Availability Monitoring System
 
 **A real-time web application that helps patients find available hospital beds during emergencies.**
